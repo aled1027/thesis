@@ -37,6 +37,11 @@
 \usepackage[hyphens]{url}
 \usepackage{rotating}
 \usepackage{natbib}
+\usepackage{hhline}
+\usepackage{multirow}
+\usepackage{adjustbox}
+
+
 % Comment out the natbib line above and uncomment the following two lines to use the new 
 % biblatex-chicago style, for Chicago A. Also make some changes at the end where the 
 % bibliography is included. 
@@ -133,26 +138,127 @@
 % \onehalfspacing
 % \doublespacing
 
-    Multiparty computation (MPC) is the study and creation of methods for computing a function between multiple parties which keeps the input of each party secret. 
-    The idea is best communicated through an example: let's say Alice has $\$x$, Bob has $\$y$, and they want to determine who has the most money.
-    But importantly, they don't want the other person to know how much money they have.
+    Multiparty computation (MPC) is the study and creation of protocols for computing a function between multiple parties, where the protocol keeps the input of each party secret. 
+    
+    The idea is best communicated through an example: let's say Alice has $x$ dollars, Bob has $y$ dollars, and they want to determine who has the most money, but they don't want the other person to know how much money they have.
     The goal of MPC is to design a protocol where Alice and Bob, by exchanging messages amongst themselves, can determine who has the most money without revealing how much money they have.
     Alice and Bob should learn no more about how much money the other has than they would by bringing in trusted third party to do the computation for them.
 
     The desired properties of a secure MPC scheme can be informally described as follows:
     \begin{itemize}
-        \item \textbf{Privacy:} 
-        \item \textbf{Correctness:}
+        \item \textbf{Privacy:} Each party's input is kept secret.
+        \item \textbf{Correctness:} The correct answer to the computation is computed.
     \end{itemize}
 
-    Why is this important? What are applications?
+    Researchers of MPC have aimed to create a generic protocol whereby an arbitrary function can be computed between multiple parties.
+    If a universal MPC protocol can be created, that is any function can be secretly computed, then there are many current, expensive practices that can be replaced.
+    For example, two companies who operate in a similar industry want to work together, but they don't want to disclose any company research which the other doesn't know.
+    These companies could a run set intersection function (a function that given two inputs finds their intersection, or overlap), to determine what information they can disclose without giving away important information.
+    
+    Another interesting example is outsourcing computation.
+    As it is right now, cloud computing companies, such as Amazon and Google, have really nice computers which they will rent out to you. 
+    But let's say that you don't trust the cloud computing company for some reason; you want some guarantee they aren't going to see your input to the computation. 
+    You could run an instance of an MPC protocol on a cloud computer, and the cloud computing company would only be able to see the output of the computation, not your input.
+    Which might be fine if the function is setup such that the output is encrypted - more on this later. 
+    
+    \section{Getting to it}
+    The basic idea of an MPC protocol is the following:
+    \begin{enumerate}
+    	\item Pick an arbitrary function.
+	\item Send messages between parties 
+	\item Each party gets the output of the function
+    \end{enumerate}
+    
+    The first problem that is run into is how do represent a function. 
+    The function can be anything that maps from an $n$-bit string to an $m$-bit string with no exceptions. 
+    It turns out what we are looking for a Turing Machine, in colloquial terms a computer. 
+    A computer scientist thinks of a computer as a machine that takes as input a sequence of $0$s and $1$s and outputs a sequence of $0$ and $1$s. 
+    So one idea for an MPC protocol might be to have one party write a program on a computer, plug their inputs into the program, and send the computer to all of the participants who would also plug their inputs into the program. 
+    After the final party has inputted their inputs, they run the program, get the output and send the output to all of the participants. 
+    
+    Passing around a computer is basically what an MPC protocol does, except that instead of using a program on a computer, MPC protocols use a boolean circuit.
+    
+    \subsection{Boolean Circuit} 
+    A boolean circuit is a mathematical model for logic circuits. 
+    A circuit takes as input a sequence of true and false values, feeds the inputs through a series of logic gates (e.g. OR and AND gates), which transform the values, and outputs a sequence of true and false values.
+    Each individual component in a circuit is called a gate, and a gate performs a single, small computation.
+    For our purposes, a gate takes as input example two values and outputs exactly one value. 
+    For example, an exclusive-or gate, otherwise known as XOR, has the following mapping:
+      
+     \begin{table}[h]
+     \centering
+     \begin{tabular}{ | l | c || r |}
+     \hline
+     x & y & xor(x,y) \\ \hline
+     true & true & false \\ \hline
+     true & false & true \\ \hline
+     false & true & true \\ \hline
+     false & false & false \\ \hline
+     \end{tabular}
+     \caption{The mapping of an XOR gate.}
+     \end{table}
+    XOR returns true if the inputs are different and false if the inputs are the same. 
+    
+    Instead of thinking of a value as true or false, it's more useful to think of false as being $0$ and true as being $1$. 
+    Then we can think of the input $($true, true$)$, as $11$, which is the binary representation of the number $3$. 
+    Here is an example of a circuit that on input of two two-bit numbers, outputs the maximum of the two numbers. 
+     \textbf{Add picture of max circuit}
+     
+     By combining ANDs and XOR gates into a circuit, \textbf{Somone} showed in \textbf{year} that circuits are capable of performing any computation that a computer can.
+     In other words, if there's some algorithm that can do it, then there is some circuit that can do it as well.
+     MPC takes advantage of this equivalence and uses circuits of its computational model.
+     The parties involved in the MPC circuit can pass around a circuit, which is equivalent to passing around a program on a computer, in order to compute their function.
+     
+     \section{Not done yet}
+     Imagine again that Alice and Bob from the beginning of the introduction are trying to compute the max amount of money between them.
+     If Alice makes a circuit that computes the max, plugs her input encoded as a binary number into the circuit and gives the circuit to Bob, then Bob can see Alice inputs - they are sitting right there hardcoded in the circuit!
+     But Alice doesn't want Bob to know how much money she has.
+     So simply passing around a circuit and plugging inputs in doesn't work, because the inputs of each party are sitting in plain sight of the subsequent parties who need to plug in their inputs. 
+     
+     And hence we need some method for disgusting inputs. 
+     Slipping them into the circuit, so that nobody sees them.
+     
+     In some year Yao did something that was cool for some reason.
+     
+     Around the same time, a group, whose names are ..., going by GMW did a similar thing like this. 
+     
+     Next, we will walk through Yao and GMW's techniques for garbling circuits (or garbled gates?). 
+    
+    
+    
+    
+    
+  
+    
+    
+    
+\section{Overview of what's going to be covered}
 
-    Instead of using a third party, we can use a series of cryptographic tools, relying on number theory, to compute a function between multiple parties without the aid of outside help.
-
-    MPC was first proposed by
-
-    \section{Section 1}
-    hey
+\begin{table}[h]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+\begin{adjustbox}{width=1\textwidth}
+  \begin{tabular}{|p{5cm}||c|c||c|c||c|c||c|}
+    \hline
+    \multirow{2}{5cm}{\centering \textbf{Mode Transition Times Duration (Typical)}} & 
+    \multicolumn{2}{c|}{\textbf{Size (x$\lambda$)}} & 
+    \multicolumn{2}{c|}{\textbf{Eval Cost}} & 
+    \multicolumn{2}{c|}{\textbf{Garble Cost}} &
+    \multirow{2}{3cm}{\centering \textbf{Assumption}} \\
+    \cline{2-7}
+    & \textbf{XOR} & \textbf{AND} & \textbf{XOR} & \textbf{AND}  & \textbf{XOR} & \textbf{AND} & \\
+    \hline
+    Classical & 1365 & 1260 & 1024 & $\mu$ s & a & b & a\\ \hline
+    Point and Permute & TBD & TBD & TBD & $\mu$ s & a & b & a\\ \hline
+    GRR3 & TBD & TBD & TBD & $\mu$ s  & a & b& a\\ \hline
+    Free XOR & TBD & TBD & TBD & $\mu$ & a & bs& a  \\ \hline
+    GRR2 XOR & TBD & TBD & TBD & $\mu$ & a & bs  & a\\ \hline
+    FleXOR& TBD & TBD & TBD & $\mu$ & a & bs & a \\ \hline
+    Half Gates & TBD & TBD & TBD & $\mu$ & a & bs & a \\ \hline
+  \end{tabular}
+  \end{adjustbox}
+  \caption{Summary of Garbled Circuit Improvements. GRR3 stands for garbled row reduction 3 and GRR2 stands for garbled row reduction 2}
+\end{table}
 
 
     \chapter{The First}
@@ -200,61 +306,61 @@ If you'd like to see examples of other things in this template, please contact C
 	\TeX\ is the best way to typeset mathematics. Donald Knuth designed \TeX\ when he got frustrated at how long it was taking the typesetters to finish his book, which contained a lot of mathematics. 
 	
 	If you are doing a thesis that will involve lots of math, you will want to read the following section which has been commented out. If you're not going to use math, skip over this next big red section. (It's red in the .tex file but does not show up in the .pdf.)
-%	
-%% MATH and PHYSICS majors: Uncomment the following section	
-%	$$\sum_{j=1}^n (\delta\theta_j)^2 \leq {{\beta_i^2}\over{\delta_i^2 + \rho_i^2}}
-%\left[ 2\rho_i^2 + {\delta_i^2\beta_i^2\over{\delta_i^2 + \rho_i^2}} \right] \equiv \omega_i^2
-%$$
+	
+% MATH and PHYSICS majors: Uncomment the following section	
+	$$\sum_{j=1}^n (\delta\theta_j)^2 \leq {{\beta_i^2}\over{\delta_i^2 + \rho_i^2}}
+\left[ 2\rho_i^2 + {\delta_i^2\beta_i^2\over{\delta_i^2 + \rho_i^2}} \right] \equiv \omega_i^2
+$$
 
-%From Informational Dynamics, we have the following (Dave Braden):
+From Informational Dynamics, we have the following (Dave Braden):
 
-%After {\it n} such encounters the posterior density for $\theta$ is
+After {\it n} such encounters the posterior density for $\theta$ is
 
-%$$
-%\pi(\theta|X_1< y_1,\dots,X_n<y_n) \varpropto \pi(\theta) \prod_{i=1}^n\int_{-\infty}^{y_i}
-%   \exp\left(-{(x-\theta)^2\over{2\sigma^2}}\right)\ dx
-%$$
+$$
+\pi(\theta|X_1< y_1,\dots,X_n<y_n) \varpropto \pi(\theta) \prod_{i=1}^n\int_{-\infty}^{y_i}
+   \exp\left(-{(x-\theta)^2\over{2\sigma^2}}\right)\ dx
+$$
 
-%
 
-%Another equation:
 
-%$$\det\left|\,\begin{matrix}%
-%c_0&c_1\hfill&c_2\hfill&\ldots&c_n\hfill\cr
-%c_1&c_2\hfill&c_3\hfill&\ldots&c_{n+1}\hfill\cr
-%c_2&c_3\hfill&c_4\hfill&\ldots&c_{n+2}\hfill\cr
-%\,\vdots\hfill&\,\vdots\hfill&
-%  \,\vdots\hfill&&\,\vdots\hfill\cr
-%c_n&c_{n+1}\hfill&c_{n+2}\hfill&\ldots&c_{2n}\hfill\cr
-%\end{matrix}\right|>0$$
+Another equation:
 
-%
-%Lapidus and Pindar, Numerical Solution of Partial Differential Equations in Science and
-%Engineering.  Page 54
+$$\det\left|\,\begin{matrix}%
+c_0&c_1\hfill&c_2\hfill&\ldots&c_n\hfill\cr
+c_1&c_2\hfill&c_3\hfill&\ldots&c_{n+1}\hfill\cr
+c_2&c_3\hfill&c_4\hfill&\ldots&c_{n+2}\hfill\cr
+\,\vdots\hfill&\,\vdots\hfill&
+  \,\vdots\hfill&&\,\vdots\hfill\cr
+c_n&c_{n+1}\hfill&c_{n+2}\hfill&\ldots&c_{2n}\hfill\cr
+\end{matrix}\right|>0$$
 
-%$$
-%\int_t\left\{\sum_{j=1}^3 T_j \left({d\phi_j\over dt}+k\phi_j\right)-kT_e\right\}w_i(t)\ dt=0,
-%   \qquad\quad i=1,2,3. 
-%$$
 
-%L\&P  Galerkin method weighting functions.  Page 55
+Lapidus and Pindar, Numerical Solution of Partial Differential Equations in Science and
+Engineering.  Page 54
 
-%$$
-%\sum_{j=1}^3 T_j\int_0^1\left\{{d\phi_j\over dt} + k\phi_j\right\} \phi_i\ dt 
-%   = \int_{0}^1k\,T_e\phi_idt, \qquad i=1,2,3 $$
-%   
-%Another L\&P (p145)
+$$
+\int_t\left\{\sum_{j=1}^3 T_j \left({d\phi_j\over dt}+k\phi_j\right)-kT_e\right\}w_i(t)\ dt=0,
+   \qquad\quad i=1,2,3. 
+$$
 
-%$$
-%\int_{-1}^1\!\int_{-1}^1\!\int_{-1}^1 f\big(\xi,\eta,\zeta\big) 
-%   = \sum_{k=1}^n\sum_{j=1}^n\sum_{i=1}^n w_i w_j w_k f\big( \xi,\eta,\zeta\big).
-%$$
+L\&P  Galerkin method weighting functions.  Page 55
 
-%Another L\&P (p126)
+$$
+\sum_{j=1}^3 T_j\int_0^1\left\{{d\phi_j\over dt} + k\phi_j\right\} \phi_i\ dt 
+   = \int_{0}^1k\,T_e\phi_idt, \qquad i=1,2,3 $$
+   
+Another L\&P (p145)
 
-%$$
-%\int_{A_e} (\,\cdot\,) dx dy = \int_{-1}^1\!\int_{-1}^1 (\,\cdot\,) \det[J] d\xi d\eta.
-%$$
+$$
+\int_{-1}^1\!\int_{-1}^1\!\int_{-1}^1 f\big(\xi,\eta,\zeta\big) 
+   = \sum_{k=1}^n\sum_{j=1}^n\sum_{i=1}^n w_i w_j w_k f\big( \xi,\eta,\zeta\big).
+$$
+
+Another L\&P (p126)
+
+$$
+\int_{A_e} (\,\cdot\,) dx dy = \int_{-1}^1\!\int_{-1}^1 (\,\cdot\,) \det[J] d\xi d\eta.
+$$
 
 \section{Chemistry 101: Symbols}
 Chemical formulas will look best if they are not italicized. Get around math mode's automatic italicizing by using the argument \verb=$\mathrm{formula here}$=, with your formula inside the curly brackets.
