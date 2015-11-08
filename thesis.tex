@@ -41,6 +41,14 @@
 \usepackage{multirow}
 \usepackage{adjustbox}
 
+\newcommand{\Gates}{\text{Gates}}
+\newcommand{\InputWires}{\text{InputWires}}
+\newcommand{\OutputWires}{\text{OutputWires}}
+\newcommand{\Wires}{\text{Wires}}
+\newcommand{\Enc}{\operatorname{Enc}}
+\newcommand{\Dec}{\operatorname{Dec}}
+
+
 
 % Comment out the natbib line above and uncomment the following two lines to use the new 
 % biblatex-chicago style, for Chicago A. Also make some changes at the end where the 
@@ -86,27 +94,27 @@
 
 % The preface is optional
 % To remove it, comment it out or delete it.
-    \chapter*{Preface}
-	This is an example of a thesis setup to use the reed thesis document class.
-	
-	
+\chapter*{Preface}
+This is an example of a thesis setup to use the reed thesis document class.
 
-    \chapter*{List of Abbreviations}
-		You can always change the way your abbreviations are formatted. Play around with it yourself, use tables, or come to CUS if you'd like to change the way it looks. You can also completely remove this chapter if you have no need for a list of abbreviations. Here is an example of what this could look like:
 
-	\begin{table}[h]
-	\centering % You could remove this to move table to the left
-	\begin{tabular}{ll}
-		\textbf{ABC}  	&  American Broadcasting Company \\
-		\textbf{CBS}  	&  Columbia Broadcasting System\\
-		\textbf{CDC}  	&  Center for Disease Control \\
-		\textbf{CIA}  	&  Central Intelligence Agency\\
-		\textbf{CLBR} 	&  Center for Life Beyond Reed\\
-		\textbf{CUS}  	&  Computer User Services\\
-		\textbf{FBI}  	&  Federal Bureau of Investigation\\
-		\textbf{NBC}  	&  National Broadcasting Corporation\\
-	\end{tabular}
-	\end{table}
+
+\chapter*{List of Abbreviations}
+	You can always change the way your abbreviations are formatted. Play around with it yourself, use tables, or come to CUS if you'd like to change the way it looks. You can also completely remove this chapter if you have no need for a list of abbreviations. Here is an example of what this could look like:
+
+\begin{table}[h]
+\centering % You could remove this to move table to the left
+\begin{tabular}{ll}
+	\textbf{ABC}  	&  American Broadcasting Company \\
+	\textbf{CBS}  	&  Columbia Broadcasting System\\
+	\textbf{CDC}  	&  Center for Disease Control \\
+	\textbf{CIA}  	&  Central Intelligence Agency\\
+	\textbf{CLBR} 	&  Center for Life Beyond Reed\\
+	\textbf{CUS}  	&  Computer User Services\\
+	\textbf{FBI}  	&  Federal Bureau of Investigation\\
+	\textbf{NBC}  	&  National Broadcasting Corporation\\
+\end{tabular}
+\end{table}
 	
 
     \tableofcontents
@@ -129,108 +137,237 @@
 %The \introduction command is provided as a convenience.
 %if you want special chapter formatting, you'll probably want to avoid using it altogether
 
-    \chapter*{Introduction}
-         \addcontentsline{toc}{chapter}{Introduction}
-	\chaptermark{Introduction}
-	\markboth{Introduction}{Introduction}
-	% The three lines above are to make sure that the headers are right, that the intro gets included in the table of contents, and that it doesn't get numbered 1 so that chapter one is 1.
+\chapter*{Introduction}
+     \addcontentsline{toc}{chapter}{Introduction}
+\chaptermark{Introduction}
+\markboth{Introduction}{Introduction}
+% The three lines above are to make sure that the headers are right, that the intro gets included in the table of contents, and that it doesn't get numbered 1 so that chapter one is 1.
 
 % \onehalfspacing
 % \doublespacing
 
-    Multiparty computation (MPC) is the study and creation of protocols for computing a function between multiple parties, where the protocol keeps the input of each party secret. 
-    
-    The idea is best communicated through an example: let's say Alice has $x$ dollars, Bob has $y$ dollars, and they want to determine who has the most money, but they don't want the other person to know how much money they have.
-    The goal of MPC is to design a protocol where Alice and Bob, by exchanging messages amongst themselves, can determine who has the most money without revealing how much money they have.
-    Alice and Bob should learn no more about how much money the other has than they would by bringing in trusted third party to do the computation for them.
+Multiparty computation (MPC) is the study and creation of protocols for computing a function between multiple parties, such that no party learns the input of any other party.
 
-    The desired properties of a secure MPC scheme can be informally described as follows:
-    \begin{itemize}
-        \item \textbf{Privacy:} Each party's input is kept secret.
-        \item \textbf{Correctness:} The correct answer to the computation is computed.
-    \end{itemize}
+The idea is best communicated through an example: suppose Alice and Bob are millionaires and wish to determine who is wealthier, but Alice and Bob are also secretive, and do not want to disclose their exact amount of wealth. 
+Is there some method by which they can determine who has more money?
 
-    Researchers of MPC have aimed to create a generic protocol whereby an arbitrary function can be computed between multiple parties.
-    If a universal MPC protocol can be created, that is any function can be secretly computed, then there are many current, expensive practices that can be replaced.
-    For example, two companies who operate in a similar industry want to work together, but they don't want to disclose any company research which the other doesn't know.
-    These companies could a run set intersection function (a function that given two inputs finds their intersection, or overlap), to determine what information they can disclose without giving away important information.
-    
-    Another interesting example is outsourcing computation.
-    As it is right now, cloud computing companies, such as Amazon and Google, have really nice computers which they will rent out to you. 
-    But let's say that you don't trust the cloud computing company for some reason; you want some guarantee they aren't going to see your input to the computation. 
-    You could run an instance of an MPC protocol on a cloud computer, and the cloud computing company would only be able to see the output of the computation, not your input.
-    Which might be fine if the function is setup such that the output is encrypted - more on this later. 
-    
-    \section{Getting to it}
-    The basic idea of an MPC protocol is the following:
-    \begin{enumerate}
-    	\item Pick an arbitrary function.
-	\item Send messages between parties 
-	\item Each party gets the output of the function
-    \end{enumerate}
-    
-    The first problem that is run into is how do represent a function. 
-    The function can be anything that maps from an $n$-bit string to an $m$-bit string with no exceptions. 
-    It turns out what we are looking for a Turing Machine, in colloquial terms a computer. 
-    A computer scientist thinks of a computer as a machine that takes as input a sequence of $0$s and $1$s and outputs a sequence of $0$ and $1$s. 
-    So one idea for an MPC protocol might be to have one party write a program on a computer, plug their inputs into the program, and send the computer to all of the participants who would also plug their inputs into the program. 
-    After the final party has inputted their inputs, they run the program, get the output and send the output to all of the participants. 
-    
-    Passing around a computer is basically what an MPC protocol does, except that instead of using a program on a computer, MPC protocols use a boolean circuit.
-    
-    \subsection{Boolean Circuit} 
-    A boolean circuit is a mathematical model for logic circuits. 
-    A circuit takes as input a sequence of true and false values, feeds the inputs through a series of logic gates (e.g. OR and AND gates), which transform the values, and outputs a sequence of true and false values.
-    Each individual component in a circuit is called a gate, and a gate performs a single, small computation.
-    For our purposes, a gate takes as input example two values and outputs exactly one value. 
-    For example, an exclusive-or gate, otherwise known as XOR, has the following mapping:
-      
-     \begin{table}[h]
-     \centering
-     \begin{tabular}{ | l | c || r |}
-     \hline
-     x & y & xor(x,y) \\ \hline
-     true & true & false \\ \hline
-     true & false & true \\ \hline
-     false & true & true \\ \hline
-     false & false & false \\ \hline
-     \end{tabular}
-     \caption{The mapping of an XOR gate.}
-     \end{table}
-    XOR returns true if the inputs are different and false if the inputs are the same. 
-    
-    Instead of thinking of a value as true or false, it's more useful to think of false as being $0$ and true as being $1$. 
-    Then we can think of the input $($true, true$)$, as $11$, which is the binary representation of the number $3$. 
-    Here is an example of a circuit that on input of two two-bit numbers, outputs the maximum of the two numbers. 
-     \textbf{Add picture of max circuit}
-     
-     By combining ANDs and XOR gates into a circuit, \textbf{Somone} showed in \textbf{year} that circuits are capable of performing any computation that a computer can.
-     In other words, if there's some algorithm that can do it, then there is some circuit that can do it as well.
-     MPC takes advantage of this equivalence and uses circuits of its computational model.
-     The parties involved in the MPC circuit can pass around a circuit, which is equivalent to passing around a program on a computer, in order to compute their function.
-     
-     \section{Not done yet}
-     Imagine again that Alice and Bob from the beginning of the introduction are trying to compute the max amount of money between them.
-     If Alice makes a circuit that computes the max, plugs her input encoded as a binary number into the circuit and gives the circuit to Bob, then Bob can see Alice inputs - they are sitting right there hardcoded in the circuit!
-     But Alice doesn't want Bob to know how much money she has.
-     So simply passing around a circuit and plugging inputs in doesn't work, because the inputs of each party are sitting in plain sight of the subsequent parties who need to plug in their inputs. 
-     
-     And hence we need some method for disgusting inputs. 
-     Slipping them into the circuit, so that nobody sees them.
-     
-     In some year Yao did something that was cool for some reason.
-     
-     Around the same time, a group, whose names are ..., going by GMW did a similar thing like this. 
-     
-     Next, we will walk through Yao and GMW's techniques for garbling circuits (or garbled gates?). 
-    
-    
-    
-    
-    
-  
-    
-    
+The goal of MPC is to design a protocol which will help Alice and Bob solve their problem.
+The desired properties of a secure MPC scheme can be informally described as follows:
+\begin{itemize}
+    \item \textbf{Privacy:} Each party's input is kept secret.
+    \item \textbf{Correctness:} The correct answer to the computation is computed.
+\end{itemize}
+
+Originally, the goal was to come up with a protocol that was secure and prove that the protocol was secure. 
+In more recent times, the focus has shifted to making the MPC faster, fast enough that it can be used regularly in the real world.
+
+If MPC can be made fast enough, it could serve a wide range of applications.
+For example, imagine that two companies who operate in a similar industry want to work together, but they don't want to disclose any company research which the other doesn't know.
+These companies could a run set intersection function (a function that given two inputs finds their intersection, or overlap), to determine what information they can disclose without giving away important information.
+
+Another interesting example of MPC is to improve the outsourcing of computation.
+As it is right now, cloud computing companies, such as Amazon and Google, have really nice computers which they will rent out to you. 
+You can pay them someone money, write a program, and run it on their computers. 
+The problem is that you may not trust the cloud computing company, and you want some guarantees that they are going to respect the privacy of your computation.
+An MPC protocol, in this setting, would allow you to run computation in the cloud, with the guarantee that the inputs to your computation are disguised.
+
+Since the research into MPC has focused on creating a method by which an arbitrary function can be computed securely, the application of MPC beyond what we can presently conceive of. 
+It's not unlikely that MPC protocols will become a standard in the internet, where when you access the internet, behind the scenes your access is being is plugged into an MPC protocol, sent off to another computer to do some processing. 
+As cryptography improves, research in MPC and other areas of cryptography, the hope is that the security of our computer systems will improve as well.
+However, there is no guarantee. 
+The modern cryptography needs to implemented and used, perhaps in some cases built into low-level standards, and used correctly.
+At this point, the outlook of cryptography is bright, but the future will only be realized positvely if it is actively worked towards.
+
+\section{Tools for MPC}
+Imagine again that millionaires Alice and Bob wish to determine who has more wealth.
+Suppose that Alice has $x$ dollars and Bob has $y$ dollars.
+Then the function that they wish to compute is $f: \{0,1\}^n \to \{0,1\}$ as defined by:
+\begin{equation}
+    \label{eqn:less_than}
+    f(x,y) = 
+    \begin{cases}
+    0, & x \leq y; \\
+    1, & \text{otherwise}.
+    \end{cases}
+\end{equation}
+
+\textbf{Why is this here?}
+If Alice and Bob successfully compute $f(x,y)$ and each gets the output, then each party has gained some knowledge about the nature of the other's input.
+For example, if $f(x,y)$ outputs $0$, then Alice and Bob know that Alice has more money.
+Alice has learned that Bob has less than $x$ dollars, and Bob has learned that Alice has more $y$ dollars.
+Therefore it's not possible for MPC to guarantee that \textit{no} information about the other parties' inputs is learned, only that nothing more is learned than what can be inferred from a single party's input and the output of $f$. 
+
+MPC requires a combination of several cryptographic tools.
+The next few sections will describe these basic tools, and then MPC will described in section $x$. 
+tools discussed are 
+\begin{enumerate}
+    \item Boolean Circuit
+    \item Encryption
+    \item Oblivious Transfer (need to explain semihonest and honest)
+\end{enumerate}
+
+
+\subsection{Boolean Circuit} 
+A function for an MPC protocol is represented by a boolean circuit.
+A boolean circuit takes as input a sequence of $n$ $0$s and $1$s, (i.e. a value in $\{0,1\}^n$), performs a series of small opreations on the inputs, and outputs a sequence of m $0$s and $1$s (i.e. a value in $\{0,1,\}$).
+You may have encountered circuits and logical operators in another context, where the inputs and outputs were True and False.
+For our usage, True will correspond to the value $1$, and False will corresond to the value $0$. 
+
+The small operations performed inside of a circuit are performem by an object called a \emph{gate}.
+A gate is composed of three wires: two input wires and one output wire, where a \emph{wire} can have a value either $0$ or $1$.
+A gate performs a simpler operation on the two inputs, resulting in a single output bit.
+Table \ref{tab:xor} gives the mapping of an XOR gate.
+
+\begin{table}[h]
+\label{tab:xor}
+\centering
+\begin{tabular}{ | l | c || r |}
+\hline
+x & y & xor(x,y) \\ \hline
+1 & 1 & 0 \\ \hline
+1 & 0 & 1 \\ \hline
+0 & 1 & 1 \\ \hline
+0 & 0 & 0 \\ \hline
+\end{tabular}
+\caption{The mapping of an XOR gate.}
+\end{table}
+
+A circuit is a combination of gates. 
+In fact, a circuit built out of only AND gates and XOR gates can compute any function.
+\textbf{Find details and citation} In other words, if there's some algorithm that do it, then there is some circuit that can do it as well.
+Hence, a circuit is a sufficient representation of the function $f$.
+Figure \ref{fig:less_than_circuit} shows the circuit representation of a circuit that computes the less than function, the function $f$, specified in equation \ref{eqn:less_than} that millionaires Alice and Bob wanted to compute.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.75]{images/drawing.png}
+    \label{fig:less_than_circuit}
+    \caption{A circuit that computes the less or equal to function, equivalent to $f$ for input of two one-bit values. \textbf{TODO, add truth table?}}
+\end{figure}
+
+A circuit \textbf{with what constraints???} can compute any function.
+
+\subsection{Technical Definition of a Circuit}
+A circuit, which I will refer to as $g$, is formalized by a 6-tuple $g = (n,m,a,A,B,G)$, where $n$ is the number of inputs, $m$ is the number of outputs and $q$ is the number of gates.
+We define $r = n + q$ to the number of wires inside of the circuit.
+We let $\Wires = \{1,\ldots, n+q\}, \InputWires = \{1,\ldots, n\}, \OutputWires = \{n+1-m+1, \ldots,n+q\}$, and $\Gates = \{n+1, \ldots, n+q\}$.
+Then $A : \Gates \to \Wires \setminus \OutputWires$ identifies each gate's first incoming wire.
+And $B : \Gates \to \Wires \setminus \OutputWires$ identifies each gate's second incoming wire.
+Finally, $G: \Gates \times \{0,1\}^2 \to \{0,1\}$ identifies the functionality of each gate.
+
+For example, the less than circuit shown in figure \ref{fig:less_than_circuit} has values:
+
+\subsection{Encryption}
+Encyprtion is the process of encoding a message such that only parties with the key can read the message.
+An encryption protocol is composed of two parts.
+The first part is the encryption function which disguises the message, and the second part is the decryption function which unobfuscates the disguised message.
+We notate encryption and decryption with
+\begin{equation}
+    \label{eqn:encryption}
+    \begin{split}
+        \Enc_k (pt) & = ct  \\
+        \Dec_k(ct) & = pt
+    \end{split}
+\end{equation}
+where $pt$ stands for plaintext and is the original message, $ct$ stands for ciphertext and is the encrypted message, $k$ is the secret key, that only authorized readers of the message hold, and is a random sequence of $\lambda$ $0$s and $1$s, and $\lambda$ is a security parameter of our protocol (As $\lambda$ increases, the size of the key increases, and so the encryption becomes harder to break.)
+
+The encryption decribed above is more precisely called symmetric-key encryption, as opposed to public-key encryption.
+The difference between the two is that for symmetric-key encryption, there is a single key and all communicating must have the same key in order to acheive secure communication, whereas in public-key encryption, the encryption key is published publicly, and anyone can send a message using the public key, and the message can only be decrypted by those with the secret key.
+For more information on encryption, we encourage the reader to peruse the many great online resources.
+
+The MPC protocols that will be examined here exclusively use symmetric-key encryption.
+
+\subsection{Digital Signatures/MACS}
+kA
+Do we need this?
+
+\subsection{The DDH Assumption} \label{sctn:DDH}
+When a cryptographic scehem is said to be \textit{secure}, cryptographers actually mean something much more precise. 
+When a cryptographic scheme is considered secure, it actually means that an adversary can beat the scheme only if the adversary can tackle the hardness assumptions on which the scheme is based.
+A common hardness assumption in crytoraphy is the Decisional Diffie-Helman Assumption (DDH Assumption), an assumption about solving a problem concerning discrete logs.
+Formally, the DDH assumption is:
+%\begin{definition}
+    %hi
+%\end{definition}
+
+
+
+The \emph{Decisional Diffie-Hellman Assumption} (DDH assumption) is hardness assumption about solving a problem about discrete logs.
+Many cryptographic protocols can be reduced down the DDH problem, meaning that if the DDH problem can be solved, then the cryptographic schemes are insecure. 
+But as long as DDH remains hard, the cryptographic protocols remain hard. 
+When we say that cryptograph
+
+\subsection{Oblivious Transfer}
+Oblivious Transfer is a special method of communicating a message between two parties where a sender sends one of two messages the receive, and the sender remains oblivious as which message was sent.
+The setup is the following:
+Alice has two messages, $m_1$ and $m_2$, and he wants to send a message to Bob under the following conditions: First, Alice sends either $m_1$ or $m_2$ but not both. Second, Alice does not know which message he sent to Bob. Third, Bob selects which message he wants to receive.
+
+Here we give the Naor-Pinkas protocol of $1-2$ oblivious transfer.
+The protocol relies on the DDH assumption (see section \ref{sctn:DDH}) and is secure in the semi-honest setting (see section \ref{sctn:semihonest}).
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.3]{images/ot_wiki}
+    \caption{Semi-honest Naor-Pinkas oblivious transfer.}
+\end{figure}
+
+Researchers have also developed methods for performing k-out-of-n oblivious transfer, where the sender sends exactly $k$ messages out of a possible $n$.
+The method described above is called $1-2$ oblivious transfer, and is the OT used in MPC protocols.
+
+Since the first proposal of OT in \textbf{year}, several improvements have been developed.
+Preprocessing.
+OT extension.
+Semi-honest/Malicious.
+
+\section{Other}
+\textbf{TODO}
+Paper has topological circuit next to real circuit
+change arbitrary functoin to arbitrary boolean function.
+
+\section{Classic MPC}
+MPC was first proposed by Andrew Yao in an oral presentation about secure function evaluation.
+Resulting from Yao's presentation, two methods for performing MPC were produced. 
+One method was contributed by Yao himself, and the other was contributed by a group of researchers, Beaver, Micali and Widgerson, (GMW).
+The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, with has since been termed garbled circuit.
+At this point, it is unclear which method is better, both in terms of security of speed, and research is still being done on both protocols.
+We will present an overview of both protocols, going more in depth into Yao's garbled circuit as it is used for the research in the remainder of the thesis.
+
+\subsection{Yao's Garbled Circuit}
+
+\subsection{GMW}
+
+\section{Improving MPC}
+\subsection{Overview of history}
+working on specific function verse general functions
+working on number of parties
+making it work for sugarbeet auction
+election potential?
+auctions
+
+
+\subsection{Point and Permute}
+\subsection{Garbled Row Reduction 3}
+\subsection{Free XOR}
+\subsection{Garbled Row Reduction 2}
+\subsection{FlexXOR}
+\subsection{Half Gates}
+
+\section{Not done yet}
+Imagine again that Alice and Bob from the beginning of the introduction are trying to compute the maximum amount of money between them.
+If Alice makes a circuit that computes the max, plugs her input encoded as a binary number into the circuit and gives the circuit to Bob, then Bob can see Alice inputs - they are sitting right there hardcoded in the circuit!
+But Alice doesn't want Bob to know how much money she has.
+So simply passing around a circuit and plugging in inputs is insecure, because the inputs of each party are sitting in plain sight of the subsequent parties who need to plug in their inputs. 
+ 
+And hence a method is needed for disguising Alice and Bob's input. 
+Two methods for disguising inputs have been developed. 
+The first method was developed by Goldreich, Micali and Widgerson, 
+Slipping them into the circuit, so that nobody sees them.
+
+In some year Yao did something that was cool for some reason.
+
+Around the same time, a group, whose names are ..., going by GMW did a similar thing like this. 
+
+Next, we will walk through Yao and GMW's techniques for garbling circuits (or garbled gates?). 
     
 \section{Overview of what's going to be covered}
 
