@@ -47,6 +47,7 @@
 \newcommand{\Wires}{\text{Wires}}
 \newcommand{\Enc}{\operatorname{Enc}}
 \newcommand{\Dec}{\operatorname{Dec}}
+\newcommand{\compIndist}{\approx_D}
 
 
 
@@ -248,7 +249,7 @@ Figure \ref{fig:less_than_circuit} shows the circuit representation of a circuit
 A circuit \textbf{with what constraints???} can compute any function.
 
 \subsection{Technical Definition of a Circuit}
-A circuit, which I will refer to as $g$, is formalized by a 6-tuple $g = (n,m,a,A,B,G)$, where $n$ is the number of inputs, $m$ is the number of outputs and $q$ is the number of gates.
+A circuit, which I will refer to as $g$, is formalized by a 6-tuple $g = (n,m,q,A,B,G)$, where $n$ is the number of inputs, $m$ is the number of outputs and $q$ is the number of gates.
 We define $r = n + q$ to the number of wires inside of the circuit.
 We let $\Wires = \{1,\ldots, n+q\}, \InputWires = \{1,\ldots, n\}, \OutputWires = \{n+1-m+1, \ldots,n+q\}$, and $\Gates = \{n+1, \ldots, n+q\}$.
 Then $A : \Gates \to \Wires \setminus \OutputWires$ identifies each gate's first incoming wire.
@@ -258,7 +259,7 @@ Finally, $G: \Gates \times \{0,1\}^2 \to \{0,1\}$ identifies the functionality o
 For example, the less than circuit shown in figure \ref{fig:less_than_circuit} has values:
 
 \subsection{Encryption}
-Encyprtion is the process of encoding a message such that only parties with the key can read the message.
+Encryption is a method of encoding a message such that only parties with the key can read the message.
 An encryption protocol is composed of two parts.
 The first part is the encryption function which disguises the message, and the second part is the decryption function which unobfuscates the disguised message.
 We notate encryption and decryption with
@@ -278,24 +279,23 @@ For more information on encryption, we encourage the reader to peruse the many g
 The MPC protocols that will be examined here exclusively use symmetric-key encryption.
 
 \subsection{Digital Signatures/MACS}
-kA
 Do we need this?
 
 \subsection{The DDH Assumption} \label{sctn:DDH}
-When a cryptographic scehem is said to be \textit{secure}, cryptographers actually mean something much more precise. 
+When a cryptographic scehe is said to be \textit{secure}, cryptographers actually mean something much more precise. 
 When a cryptographic scheme is considered secure, it actually means that an adversary can beat the scheme only if the adversary can tackle the hardness assumptions on which the scheme is based.
 A common hardness assumption in crytoraphy is the Decisional Diffie-Helman Assumption (DDH Assumption), an assumption about solving a problem concerning discrete logs.
-Formally, the DDH assumption is:
-%\begin{definition}
-    %hi
-%\end{definition}
+Informally, the DDH assumption is:
+\begin{equation}
+	\label{eqn:DDH}
+	\begin{split}
+	& \qquad \text{Let $G$ be a group of order $q$ with generator $g$.} \\
+	& \qquad \text{Let $a, b$ and $c$ be random elements from $\mathbb{Z}_q$.} \\
+	& \qquad \text{Then, $(g^a, g^b, g^{ab}) \compIndist (g^a, g^b, b^c)$}. 
+	\end{split}
+\end{equation}
 
-
-
-The \emph{Decisional Diffie-Hellman Assumption} (DDH assumption) is hardness assumption about solving a problem about discrete logs.
-Many cryptographic protocols can be reduced down the DDH problem, meaning that if the DDH problem can be solved, then the cryptographic schemes are insecure. 
-But as long as DDH remains hard, the cryptographic protocols remain hard. 
-When we say that cryptograph
+\textbf{Define computationally indistinguishability somewhere}
 
 \subsection{Oblivious Transfer}
 Oblivious Transfer is a special method of communicating a message between two parties where a sender sends one of two messages the receive, and the sender remains oblivious as which message was sent.
@@ -322,7 +322,7 @@ Semi-honest/Malicious.
 \section{Other}
 \textbf{TODO}
 Paper has topological circuit next to real circuit
-change arbitrary functoin to arbitrary boolean function.
+change arbitrary function to arbitrary boolean function.
 
 \section{Classic MPC}
 MPC was first proposed by Andrew Yao in an oral presentation about secure function evaluation.
@@ -332,7 +332,41 @@ The two methods are premised on a similar idea: encrypt a circuit by encrypting 
 At this point, it is unclear which method is better, both in terms of security of speed, and research is still being done on both protocols.
 We will present an overview of both protocols, going more in depth into Yao's garbled circuit as it is used for the research in the remainder of the thesis.
 
+\subsection{Formal Definition of a Garbling Scheme}
+Give the definition in Foundations of Garbled Circuits
+
 \subsection{Yao's Garbled Circuit}
+% http://repository.cmu.edu/cgi/viewcontent.cgi?article=1004&context=jpc
+Yao's Garbled Circuit works by having one party, say Alice, generate an ``encrypted'' or ``garbled'' circuit, and send the circuit to Bob.
+Bob, using Oblivious Transfer, requests a series of keys from Alice, and uses the keys to compute the circuit.
+After computing the circuit, Bob will send the final output to Alice. 
+
+\textbf{Write out in algorithm form.}
+
+\subsubsection{Step 0: Setup}
+Alice and Bob want to compute the function $f(x,y)$, where $x,y \in \{0,1\}^*$.
+Alice is the garbler, and will create the circuit.
+Bob is the evaluator, and will compute the circuit.
+During the setup stage, Alice first hard-codes her inputs into a new function $\hat{f}(\cdot, y)$.
+She then creates a circuit based on $\hat{f}$, such that her inputs are already hard-coded in.
+
+\subsubsection{Step 1: Garbling the Circuit}
+For each wire $w_i$ in the circuit, Alice creates two random keys $K^0_i$ and $K^1_i$.
+The idea is that $K^0_i$ will correspond to $w_i$ being assigned a value of $0$, and $K^1_i$ will correspond to $w_i$ being assigned a value of $1$.
+
+For every gate $g$ in the circuit, say that $g$ has input wire $w_i$ and $w_j$ and output wire $w_k$, Alice creates a table $T_g$.
+$T_g$ encrypts the output wire using the input wires as keys.
+The table enables the computation of the gate $g$ given either $K^0_i$ or $K^1_i$ and either $K^0_j$ or $K^1_j$.
+
+Figure \ref{asdf} gives an example of garbled AND gate.
+
+Explain that shit.
+
+\subsubsection{Step 2: Bob's Input}
+asdf
+
+\subsubsection{Step3: Computing the Circuit}
+asdf
 
 \subsection{GMW}
 
