@@ -40,13 +40,21 @@
 \usepackage{hhline}
 \usepackage{multirow}
 \usepackage{adjustbox}
+\usepackage{algorithm,algpseudocode}
 
+%%% begin alex commands %%%
 \newcommand{\Gates}{\text{Gates}}
 \newcommand{\InputWires}{\text{InputWires}}
 \newcommand{\OutputWires}{\text{OutputWires}}
 \newcommand{\Wires}{\text{Wires}}
 \newcommand{\Enc}{\operatorname{Enc}}
 \newcommand{\Dec}{\operatorname{Dec}}
+
+\newcounter{defcounter}
+\setcounter{defcounter}{0}
+\newenvironment{definition}{\medskip\noindent\refstepcounter{defcounter}{\bf Definition \thedefcounter}\hspace*{2pt}}{\hspace*{\fill}\nopagebreak[4]$\diamondsuit$\medskip}  
+
+%%% end alex commands %%%
 
 
 
@@ -141,10 +149,12 @@ This is an example of a thesis setup to use the reed thesis document class.
      \addcontentsline{toc}{chapter}{Introduction}
 \chaptermark{Introduction}
 \markboth{Introduction}{Introduction}
-% The three lines above are to make sure that the headers are right, that the intro gets included in the table of contents, and that it doesn't get numbered 1 so that chapter one is 1.
-
 % \onehalfspacing
 % \doublespacing
+
+ Introduction goes here
+
+\chapter{Background}
 
 Multiparty computation (MPC) is the study and creation of protocols for computing a function between multiple parties, such that no party learns the input of any other party.
 
@@ -180,21 +190,21 @@ At this point, the outlook of cryptography is bright, but the future will only b
 
 \section{Tools for MPC}
 Imagine again that millionaires Alice and Bob wish to determine who has more wealth.
-Suppose that Alice has $x$ dollars and Bob has $y$ dollars.
+Suppose that Alice has $x_a$ dollars and Bob has $y_b$ dollars.
 Then the function that they wish to compute is $f: \{0,1\}^n \to \{0,1\}$ as defined by:
 \begin{equation}
     \label{eqn:less_than}
-    f(x,y) = 
+    f(x_a,x_b) = 
     \begin{cases}
-    0, & x \leq y; \\
+    0, & x_a \leq x_b; \\
     1, & \text{otherwise}.
     \end{cases}
 \end{equation}
 
 \textbf{Why is this here?}
 If Alice and Bob successfully compute $f(x,y)$ and each gets the output, then each party has gained some knowledge about the nature of the other's input.
-For example, if $f(x,y)$ outputs $0$, then Alice and Bob know that Alice has more money.
-Alice has learned that Bob has less than $x$ dollars, and Bob has learned that Alice has more $y$ dollars.
+For example, if $f(x_a,x_b)$ outputs $0$, then Alice and Bob know that Alice has more money.
+Alice has learned that Bob has less than $x$ dollars, and Bob has learned that Alice has more $x_b$ dollars.
 Therefore it's not possible for MPC to guarantee that \textit{no} information about the other parties' inputs is learned, only that nothing more is learned than what can be inferred from a single party's input and the output of $f$. 
 
 MPC requires a combination of several cryptographic tools.
@@ -206,6 +216,29 @@ tools discussed are
     \item Oblivious Transfer (need to explain semihonest and honest)
 \end{enumerate}
 
+\subsection{Encryption}
+Encyprtion is the process of encoding a message such that only parties with the key can read the message.
+An encryption protocol is composed of two parts.
+The first part is the encryption function which disguises the message, and the second part is the decryption function which unobfuscates the disguised message.
+We notate encryption and decryption with
+\begin{equation}
+    \label{eqn:encryption}
+    \begin{split}
+        \Enc_k (pt) & = ct  \\
+        \Dec_k(ct) & = pt
+    \end{split}
+\end{equation}
+where $pt$ stands for plaintext and is the original message, $ct$ stands for ciphertext and is the encrypted message, $k$ is the secret key, that only authorized readers of the message hold, and is a random sequence of $\lambda$ $0$s and $1$s, and $\lambda$ is a security parameter of our protocol (As $\lambda$ increases, the size of the key increases, and so the encryption becomes harder to break.)
+
+The encryption decribed above is more precisely called symmetric-key encryption, as opposed to public-key encryption.
+The difference between the two is that for symmetric-key encryption, there is a single key and all communicating must have the same key in order to acheive secure communication, whereas in public-key encryption, the encryption key is published publicly, and anyone can send a message using the public key, and the message can only be decrypted by those with the secret key.
+For more information on encryption, we encourage the reader to peruse the many great online resources.
+
+The MPC protocols that will be examined here exclusively use symmetric-key encryption.
+
+\subsection{Digital Signatures/MACS}
+kA
+Do we need this?
 
 \subsection{Boolean Circuit} 
 A function for an MPC protocol is represented by a boolean circuit.
@@ -257,29 +290,47 @@ Finally, $G: \Gates \times \{0,1\}^2 \to \{0,1\}$ identifies the functionality o
 
 For example, the less than circuit shown in figure \ref{fig:less_than_circuit} has values:
 
-\subsection{Encryption}
-Encyprtion is the process of encoding a message such that only parties with the key can read the message.
-An encryption protocol is composed of two parts.
-The first part is the encryption function which disguises the message, and the second part is the decryption function which unobfuscates the disguised message.
-We notate encryption and decryption with
-\begin{equation}
-    \label{eqn:encryption}
-    \begin{split}
-        \Enc_k (pt) & = ct  \\
-        \Dec_k(ct) & = pt
-    \end{split}
-\end{equation}
-where $pt$ stands for plaintext and is the original message, $ct$ stands for ciphertext and is the encrypted message, $k$ is the secret key, that only authorized readers of the message hold, and is a random sequence of $\lambda$ $0$s and $1$s, and $\lambda$ is a security parameter of our protocol (As $\lambda$ increases, the size of the key increases, and so the encryption becomes harder to break.)
+\newcommand{\Gb}{\operatorname{Gb}}
+\newcommand{\En}{\operatorname{En}}
+\newcommand{\De}{\operatorname{De}}
+\newcommand{\Ev}{\operatorname{Ev}}
+\newcommand{\ev}{\operatorname{ev}}
+\newcommand{\evcirc}{\ev_{circ}}
 
-The encryption decribed above is more precisely called symmetric-key encryption, as opposed to public-key encryption.
-The difference between the two is that for symmetric-key encryption, there is a single key and all communicating must have the same key in order to acheive secure communication, whereas in public-key encryption, the encryption key is published publicly, and anyone can send a message using the public key, and the message can only be decrypted by those with the secret key.
-For more information on encryption, we encourage the reader to peruse the many great online resources.
+\newcommand{\fbar}{f^-}
+\newcommand{\Topo}{\operatorname{Topo}}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
 
-The MPC protocols that will be examined here exclusively use symmetric-key encryption.
+To evaluate a circuit, we use a canonical algorithm $\evcirc$.
+$\evcirc$ takes as input a string $f$ and a string $x = x_1 x_2 \ldots x_n$ and does the following:
 
-\subsection{Digital Signatures/MACS}
-kA
-Do we need this?
+\begin{algorithm}
+\caption{$\evcirc$}
+\label{alg:evcirc}
+\begin{algorithmic}
+\Require Function $f$ and String $x = x_1, \ldots x_n$.
+\Ensure Output of function $f$ on input $x$.
+\State $(n,m,a,A,B,G) \gets f$
+\Comment parse $f$ as a circuit
+\For{$g = n+1$ to $n+q$} 
+\Comment loop over all gates.
+\State $a \gets A(g)$
+\Comment compute each gate
+\State $b \gets B(g)$
+\State $x_g \gets G_g(x_a, x_b)$
+\EndFor \\
+\Return $x_{n+q-m+1} \ldots x_{n+q}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{definition}{Topological Circuit}
+    A topological circuit, denoted $\fbar$, is the $5$-tuple $(n,m,q,A,B)$ for some circuit $f = (n,m,q,A,B,G)$.
+    Furthermore, define $\Topo(f)$ such that $\fbar = \Topo(f)$.
+\end{definition}
+
+A topological circuit is the same as its conventional circuit $f$, except that the functionality of the gates is not specified.
+If one holds a topological circuit, then they know the structure of the function, but not what is being computed.
 
 \subsection{The DDH Assumption} \label{sctn:DDH}
 When a cryptographic scehem is said to be \textit{secure}, cryptographers actually mean something much more precise. 
@@ -289,8 +340,6 @@ Formally, the DDH assumption is:
 %\begin{definition}
     %hi
 %\end{definition}
-
-
 
 The \emph{Decisional Diffie-Hellman Assumption} (DDH assumption) is hardness assumption about solving a problem about discrete logs.
 Many cryptographic protocols can be reduced down the DDH problem, meaning that if the DDH problem can be solved, then the cryptographic schemes are insecure. 
@@ -319,18 +368,110 @@ Preprocessing.
 OT extension.
 Semi-honest/Malicious.
 
-\section{Other}
+\subsection{Other}
 \textbf{TODO}
 Paper has topological circuit next to real circuit
 change arbitrary functoin to arbitrary boolean function.
 
 \section{Classic MPC}
-MPC was first proposed by Andrew Yao in an oral presentation about secure function evaluation.
-Resulting from Yao's presentation, two methods for performing MPC were produced. 
+MPC was first proposed by Andrew Yao in an oral presentation on secure function evaluation.
+After Yao's presentation, two methods for performing MPC were developed.
 One method was contributed by Yao himself, and the other was contributed by a group of researchers, Beaver, Micali and Widgerson, (GMW).
 The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, with has since been termed garbled circuit.
-At this point, it is unclear which method is better, both in terms of security of speed, and research is still being done on both protocols.
-We will present an overview of both protocols, going more in depth into Yao's garbled circuit as it is used for the research in the remainder of the thesis.
+At this point, it is unclear which method is better, both in terms of security and in terms of speed speed. 
+As a result, research is still being done on both protocols.
+
+This section will first give a new definition of a garbling scheme, first presented by BHR in 2012, and then give Yao's garbled circuit protocol, and finally GMW's garbled circuit protocol.
+
+\subsection{Garbling Schemes}
+Recall millionaires Alice and Bob who want to determine who has more wealth.
+Alice and Bob start with a function $f$ (defined in \ref{function}) and their inputs, $x_a$ and $x_b$, which corresond to their amount of wealth.
+In order to compute who has more money, the function $f$ needs to be transformed such that they can compute the function by sending messages between each other.eir inputs, $x_a$ and $x_b$, which corresond to their amount of wealth.
+Informally, a garbling scheme transforms a specification of a function into a collection of algorithms which can in combination can compute the function.
+
+\begin{definition}{Garbling Scheme}
+    A garblering scheme is a $5$ tuple of algorithms $G = (\Gb, \En, \De, \Ev, \ev)$ where the algorithms are
+    \begin{itemize}
+        \item $\Gb(f, k) \rightarrow (F,e,d)$. 
+        \item $\En(e,x) \rightarrow X$.
+        \item $\Ev(F,X) \rightarrow Y$.
+        \item $\De(d,Y) \rightarrow y$.
+        \item $\ev(f, x) \rightarrow y$.
+        where 
+        \begin{itemize}
+            \item $f$ is a function.
+            \item $k \in \mathbb{N}$ is the security parameter.
+            \item $x \in \{0,1\}^n$ is the initial input.
+            \item $X$ is the garbled input
+            \item $Y$ is the garbled output
+            \item $y$ is the final output
+            \item $F$ is a string that describes the operation of the $\Ev$ algorithm. 
+            \item $e$ is a string describing the operation of the $\En$ algorithm. In particular, $e$ describes how to obscure the input $x$.
+            \item $d$ is a string describing the operation of the $\De$ algorithm. In particular, $d$ describes how to unobscure the output $Y$.
+
+        \end{itemize}
+        \item A garbling scheme guarantees correctness if $\De(d, \Ev(F, \En(e,x))) = \ev(f,x)$.
+    \end{itemize}
+    A garbling schemes map the information:
+\begin{equation}
+    (f,k,x) \rightarrow^{\Gb} (F,e,d,x) \rightarrow^{\En} (F,d,X) \rightarrow^{\Ev} (d,Y) \rightarrow^{\De} y
+\end{equation}
+\end{definition}
+
+To make the idea a garbling scheme more concrete, below is an example of how Alice and Bob would compute who is wealthier. 
+The inputs to their computation are $f$, the function to be computed which is defined in equation \ref{eqn:less_than}, and their inputs $x_a$ and $x_b$.
+\begin{enumerate}
+    \item Alice has the function $f$ to be computed, her input $x_a$, and Bob has his input $x_b$.
+    \item Alice hard-codes her inputs into the function, resulting in $\hat{f}$.
+    \item Alice runs the probabilistic algorithm $\Gb(\hat{f}, k)$. She now has $(F,e,d)$.
+    \item Alice encodes all possible inputs that Bob could, all possible sequences of $0$s and $1$s, into $X$ using $\En$.
+    \item Alice sends $(F,X,d)$ to Bob.
+    \item Bob runs $\Ev(F,X)$ to get $Y$. This computes the function, but the output, $Y$, is obscured.
+    \item Bob runs $\De(d,Y)$ to get $y$. This unobscure the output $Y$. Bob now has $y \in \{0,1\}$.
+        If $y = 0$, then Bob knows that Alice is wealthier. 
+        If $y = 1$, then Bob knows that he is wealthier.
+    \item Bob sends $y$ to Alice.
+\end{enumerate}
+
+The definition of a garbling scheme is a recently created definition, proposed for the first time ****, *** years after Yao's garbled circuit was propsed.
+The benefits of thinking of a garbled scheme in terms of this defintion are signficant.
+For one, it easier to map a theoretically garbling protocol into practice, i.e program it. 
+The methods are already separated, whereas before the algorithm was generally one giant idea.
+When the methods are separated, the programmer does not need to intimately understand the security guarantees and pitfalls of the method, as the sequence of events that need to happen is explicit in the construction.
+A second reason that this definition of a garbling scheme is good is that it presents garbling as a larger cryographic abstraction. 
+Garbling schemes are simply methods for garbling a function and input, and this definition matches the intuition. 
+
+\subsection{Projective Garbling Schemes}
+Perhaps a helpful abstraction to have later.
+
+\subsection{Security of Garbling Schemes}
+This section will give the definition of security of a garbling scheme.
+
+\subsection{Goldreich's Security Definition}
+This is from page 620, definition 7.2.1.
+
+This is the definition for two party MPC in the presence of static semi-honest adversaries.
+
+Let $f: \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^* \times \{0,1\}^*$ be a functionality, where $f_1(x,y)$ denotes the first element of $f(x,y)$, and likewise $f_2(x,y)$ represents the second element.
+Let $\Pi$ be a two party protocol for computing $f$.
+Denote the view of the $i$th party (where $i \in \{1,2\}$ for 2-party computation) during an execution of $\Pi$ on inputs $(x,y)$ as $$view^{\Pi}_i(x,y) = (x,r,m_1, \ldots m_t)$$ where $r$ represents the outcome of the $i$th party's internal coin tosses, and $m_j$ represents the $j$th message it has received.
+Define the output of the first party after an execution of $\Pi$ on inputs $(x,y)$ as $OUTPUT^{\Pi}_1(x,y)$. 
+The output is implicit to the party's view of the execution, and define 
+$$Output^{\Pi}(x,y) = (output^{\Pi}_1(x,y), OUTPUT^{\Pi}_2(x,y))$$.
+
+We say that $\Pi$ privately computes $f$ if there exist probabilistic polynomial-time algorithms, denoted $S_1$ and $S_2$, such that
+\begin{equation} 
+    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_1(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
+\end{equation}
+\begin{equation} 
+    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_2(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
+\end{equation}
+
+
+That is, for all pairs of inputs, $x,y \in \{0,1\}^n$, the output-pair is a random variable $(f_1(x,y), f_2(x,y)$.
+The first party, who has input $x$, obtains $f_1(x,y)$, and the second party, who has input $y$, obtains $f_2(x,y)$.
+Denote the functionality $f \mapsto (f_1(x,y), f_2(x,y))$.
+
 
 \subsection{Yao's Garbled Circuit}
 
@@ -352,23 +493,6 @@ auctions
 \subsection{FlexXOR}
 \subsection{Half Gates}
 
-\section{Not done yet}
-Imagine again that Alice and Bob from the beginning of the introduction are trying to compute the maximum amount of money between them.
-If Alice makes a circuit that computes the max, plugs her input encoded as a binary number into the circuit and gives the circuit to Bob, then Bob can see Alice inputs - they are sitting right there hardcoded in the circuit!
-But Alice doesn't want Bob to know how much money she has.
-So simply passing around a circuit and plugging in inputs is insecure, because the inputs of each party are sitting in plain sight of the subsequent parties who need to plug in their inputs. 
- 
-And hence a method is needed for disguising Alice and Bob's input. 
-Two methods for disguising inputs have been developed. 
-The first method was developed by Goldreich, Micali and Widgerson, 
-Slipping them into the circuit, so that nobody sees them.
-
-In some year Yao did something that was cool for some reason.
-
-Around the same time, a group, whose names are ..., going by GMW did a similar thing like this. 
-
-Next, we will walk through Yao and GMW's techniques for garbling circuits (or garbled gates?). 
-    
 \section{Overview of what's going to be covered}
 
 \begin{table}[h]
