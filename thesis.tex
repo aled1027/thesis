@@ -41,6 +41,7 @@
 \usepackage{multirow}
 \usepackage{adjustbox}
 \usepackage{algorithm,algpseudocode}
+\usepackage{changepage}
 
 %%% begin alex commands %%%
 \newcommand{\Gates}{\text{Gates}}
@@ -54,6 +55,13 @@
 \newcounter{defcounter}
 \setcounter{defcounter}{0}
 \newenvironment{definition}{\medskip\noindent\refstepcounter{defcounter}{\bf Definition \thedefcounter}\hspace*{2pt}}{\hspace*{\fill}\nopagebreak[4]$\diamondsuit$\medskip}  
+
+\newenvironment{blockquote}{%
+  \par%
+  \medskip
+  \leftskip=4em\rightskip=2em%
+  \noindent\ignorespaces}{%
+  \par\medskip}
 
 %%% end alex commands %%%
 
@@ -475,18 +483,89 @@ Perhaps a helpful abstraction to have later.
 \subsection{Security of Garbling Schemes}
 This section will give the definition of security of a garbling scheme.
 
-\subsection{Goldreich's Security Definition}
-This is from page 620, definition 7.2.1.
+\subsection{MPC Security Definitions}
+A number of definitions which formalize what it means for a mulitparty computation have been formalized. 
+Yao, in his 1982 paper on secure function evaluation, says a protocol is secure if it has the property:
 
-This is the definition for two party MPC in the presence of static semi-honest adversaries.
+\begin{blockquote}
+If one participant behaves according the the protocol, the probability that the other participant successfully cheats is at most $\gamma$ for $\gamma \in \{0,1\}$.
+\end{blockquote}
+As more complex protocols were developed, both for MPC, and in other areas of cryptography, property based definitions became difficult to work with.
+The main problem that it was unclear precisely what assumptions were being made about what each party could and couldn't do. 
+For example, in Yao's definition above, it's not clear that the parties' inputs are kept secret if both parties behave according to the protocol.
+At the least, the definition doesn't give any guarantee.
+For a while, cryptographers added in additional properties to definitions, but eventually it became clear that there was always the possibility that a certain property was being missed.
 
-Let $f: \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^* \times \{0,1\}^*$ be a functionality, where $f_1(x,y)$ denotes the first element of $f(x,y)$, and likewise $f_2(x,y)$ represents the second element.
+This led to the creation to indistinguishability and simulation based definitions of security.
+The idea is that the adversary cannot tell what is going on, based on the information that they receive, so the best that the adversary can possible do is guess what is happening.
+For example, a definition of a secure encryption scheme could be:
+\textbf{Might give the definition of encryption in the section above. If we do, just reference that section. That might be preferable}
+\begin{blockquote}
+\begin{itemize}
+	\item Adversary picks two messages, $m_0$ and $m_1$. 
+	\item We pick a random bit $b \in \{0,1\}$. Encrypt $m_b$, and send the encrypted version to the adversary (i.e. send $c = \Enc(m_b)$).
+	\item Adversary outputs a bit $b'$ where $b' = 0$ if they believe the encrypted messages was $m_0$, and $b' = 1$ if they think the encrypted message was $m_1$. 
+	\item Finally, we consider the encryption scheme secure if
+	$$Pr[\text{Adversary outputs $b' = b$}] \approx_C \frac{1}{2}.$$
+\end{itemize}
+\end{blockquote}
+
+The cryptography research community now tends to prefer simulation based definitions. 
+The idea behind simulation based definitions is that we have ideal world, in which the protocol is run perfectly and securely, and then we have the real world protocol, the one that Alice and Bob run. 
+Then, for some adversary, we randomly choose either the real ideal or real world and run the MPC computation with the adversary in that world.
+The adversaries attempts to determine which world the protocol is being run in.
+Finally, the protocol is secure if the adversary can't do any better than guessing which world they are in.
+As a consequence, the real world is indistinguishable from the ideal world, hence cryptographers feel confident that the protocol is secure. 
+The idea being that if the adversary could learn more information in the real world, say information about other parties' inputs, then they would know that they are in the real world, hence the protocol is insecure. 
+
+The biggest problem with simulation based definitions is that it is difficult and labor intensive to prove with the definition.
+The property based definitions are the most straightforward to prove, and the most familiar to proofs used in mathematics.
+
+
+\subsection{Goodrich's Definition of Security for 2PC}
+Here we give Goldreich's definition of MPC security, which is presented in his textbook, \textit{Foundations of Cryptography Volume II} \cite{goldreich_vol2}. 
+The definition is designed for static, semi-honest adversaries. 
+
+\textbf{Setup} 
+\begin{blockquote}
+Let $f: \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^* \times \{0,1\}^*$ be a functionality.
+Let $f_1(x,y)$ denotes the first component of $f(x,y)$, and likewise $f_2(x,y)$ represents the second component.
+The first party, with input $x$, wishes to determine $f_1(x,y)$, and the second party, with input $y$, wishes to determine $f_2(x,y)$.
+
 Let $\Pi$ be a two party protocol for computing $f$.
-Denote the view of the $i$th party (where $i \in \{1,2\}$ for 2-party computation) during an execution of $\Pi$ on inputs $(x,y)$ as $$view^{\Pi}_i(x,y) = (x,r,m_1, \ldots m_t)$$ where $r$ represents the outcome of the $i$th party's internal coin tosses, and $m_j$ represents the $j$th message it has received.
-Define the output of the first party after an execution of $\Pi$ on inputs $(x,y)$ as $OUTPUT^{\Pi}_1(x,y)$. 
-The output is implicit to the party's view of the execution, and define 
-$$Output^{\Pi}(x,y) = (output^{\Pi}_1(x,y), OUTPUT^{\Pi}_2(x,y))$$.
 
+Denote the view of the $i$th party (where $i \in \{1,2\}$ for 2-party computation) during an execution of $\Pi$ on inputs $(x,y)$ as $$view^{\Pi}_i(x,y) = (x,r,m_1, \ldots m_t)$$ where $r$ represents the outcome of the $i$th party's internal coin tosses, and $m_j$ represents the $j$th message it has received.
+Define the output of the $i$th party after an execution of $\Pi$ on inputs $(x,y)$ as $OUTPUT^{\Pi}_i(x,y)$. 
+The output is implicit to the party's view of the execution, and define 
+$$Output^{\Pi}(x,y) = (output^{\Pi}_1(x,y), OUTPUT^{\Pi}_2(x,y)).$$
+\end{blockquote}
+
+---
+\begin{blockquote}
+MOST RECENTLY WRITTEN DEFINITION \\\\
+\textbf{setup}
+Let $f = (f_1, f_2)$ be a probability, polynomial time functionality. 
+Let $\Pi$ be a two party protocol for computing $f$. 
+Define $view_i^{\Pi}(n,x,y)$.
+Define $output^{\Pi}_i(n,x,y)$.
+The output of the $i$th party can be computed from the view of the $i$th party.
+
+view and output are random variables, with the probability taken over the random tapes of the two parties.
+
+\textbf{definition}
+We say that $\Pi$ securely computes $f$ in the presence of static semi-honest adversaries if there exists probabiliistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following are true:
+\begin{equation} 
+    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_1(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
+\end{equation}
+\begin{equation} 
+    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_2(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
+\end{equation}
+
+make a note about $|x| = |y|$. 
+\end{blockquote}
+---
+
+\begin{blockquote}
 We say that $\Pi$ privately computes $f$ if there exist probabilistic polynomial-time algorithms, denoted $S_1$ and $S_2$, such that
 \begin{equation} 
     \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_1(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
@@ -499,6 +578,8 @@ We say that $\Pi$ privately computes $f$ if there exist probabilistic polynomial
 That is, for all pairs of inputs, $x,y \in \{0,1\}^n$, the output-pair is a random variable $(f_1(x,y), f_2(x,y)$.
 The first party, who has input $x$, obtains $f_1(x,y)$, and the second party, who has input $y$, obtains $f_2(x,y)$.
 Denote the functionality $f \mapsto (f_1(x,y), f_2(x,y))$.
+
+\end{blockquote}
 
 
 \subsection{Formal Definition of a Garbling Scheme}
