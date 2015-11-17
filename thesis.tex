@@ -277,7 +277,7 @@ x & y & xor(x,y) \\ \hline
 \end{table}
 
 A circuit is a combination of gates. 
-In fact, a circuit built out of only AND gates and XOR gates can compute any function.
+In fact, a circuit built out of only AND gates, XOR gates and NOT gates can compute any function.
 \textbf{Find details and citation} In other words, if there's some algorithm that do it, then there is some circuit that can do it as well.
 Hence, a circuit is a sufficient representation of the function $f$.
 Figure \ref{fig:less_than_circuit} shows the circuit representation of a circuit that computes the less than function, the function $f$, specified in equation \ref{eqn:less_than} that millionaires Alice and Bob wanted to compute.
@@ -414,7 +414,7 @@ change arbitrary function to arbitrary boolean function.
 \section{Classic MPC}
 MPC was first proposed by Andrew Yao in an oral presentation on secure function evaluation.
 After Yao's presentation, two methods for performing MPC were developed.
-One method was contributed by Yao himself, and the other was contributed by a group of researchers, Beaver, Micali and Widgerson, (GMW).
+One method was contributed by Yao himself, and the other was contributed by a group of researchers, Beaver, Micali and Widgerson.
 The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, with has since been termed garbled circuit.
 At this point, it is unclear which method is better, both in terms of security and in terms of speed speed. 
 As a result, research is still being done on both protocols.
@@ -423,8 +423,8 @@ This section will first give a new definition of a garbling scheme, first presen
 
 \subsection{Garbling Schemes}
 Recall millionaires Alice and Bob who want to determine who has more wealth.
-Alice and Bob start with a function $f$ (defined in \ref{function}) and their inputs, $x_a$ and $x_b$, which corresond to their amount of wealth.
-In order to compute who has more money, the function $f$ needs to be transformed such that they can compute the function by sending messages between each other.eir inputs, $x_a$ and $x_b$, which corresond to their amount of wealth.
+Alice and Bob start with a function $f$ (defined in \ref{function}) and their inputs, $x_a$ and $x_b$, which correspond to their amount of wealth.
+In order to compute who has more money, the function $f$ needs to be transformed such that they can compute the function by sending messages between each other their inputs, $x_a$ and $x_b$, which correspond to their amount of wealth.
 Informally, a garbling scheme transforms a specification of a function into a collection of algorithms which can in combination can compute the function.
 
 \begin{definition}{Garbling Scheme}
@@ -465,18 +465,18 @@ The inputs to their computation are $f$, the function to be computed which is de
     \item Alice encodes all possible inputs that Bob could, all possible sequences of $0$s and $1$s, into $X$ using $\En$.
     \item Alice sends $(F,X,d)$ to Bob.
     \item Bob runs $\Ev(F,X)$ to get $Y$. This computes the function, but the output, $Y$, is obscured.
-    \item Bob runs $\De(d,Y)$ to get $y$. This unobscure the output $Y$. Bob now has $y \in \{0,1\}$.
+    \item Bob runs $\De(d,Y)$ to get $y$. This unobscures the output $Y$. Bob now has $y \in \{0,1\}$.
         If $y = 0$, then Bob knows that Alice is wealthier. 
         If $y = 1$, then Bob knows that he is wealthier.
     \item Bob sends $y$ to Alice.
 \end{enumerate}
 
-The definition of a garbling scheme is a recently created definition, proposed for the first time ****, *** years after Yao's garbled circuit was propsed.
-The benefits of thinking of a garbled scheme in terms of this defintion are signficant.
+The definition of a garbling scheme is a recently created definition, proposed for the first time ****, *** years after Yao's garbled circuit was proposed.
+The benefits of thinking of a garbled scheme in terms of this definition are significant.
 For one, it easier to map a theoretically garbling protocol into practice, i.e program it. 
 The methods are already separated, whereas before the algorithm was generally one giant idea.
 When the methods are separated, the programmer does not need to intimately understand the security guarantees and pitfalls of the method, as the sequence of events that need to happen is explicit in the construction.
-A second reason that this definition of a garbling scheme is good is that it presents garbling as a larger cryographic abstraction. 
+A second reason that this definition of a garbling scheme is good is that it presents garbling as a larger cryptographic abstraction. 
 Garbling schemes are simply methods for garbling a function and input, and this definition matches the intuition. 
 
 \subsection{Projective Garbling Schemes}
@@ -486,7 +486,7 @@ Perhaps a helpful abstraction to have later.
 This section will give the definition of security of a garbling scheme.
 
 \subsection{MPC Security Definitions}
-A number of definitions which formalize what it means for a mulitparty computation have been formalized. 
+A number of definitions which formalize what it means for a multiparty computation have been formalized. 
 Yao, in his 1982 paper on secure function evaluation, says a protocol is secure if it has the property:
 
 \begin{blockquote}
@@ -524,7 +524,7 @@ The biggest problem with simulation based definitions is that it is difficult an
 The property based definitions are the most straightforward to prove, and the most familiar to proofs used in mathematics.
 
 
-\subsection{Goldreich's Definition of Security for 2PC}
+\subsection{Goldreich and Lindell's Definition of Security for 2PC}
 Here we give Goldreich's definition of MPC security, which is presented in his textbook, \textit{Foundations of Cryptography Volume II} \cite{goldreich_vol2}. 
 The definition is designed for static, semi-honest adversaries. 
 
@@ -561,14 +561,15 @@ We say that $\Pi$ securely computes $f$ in the presence of static semi-honest ad
     The value of $\outputrv^{\Pi}_i$ is computable from the tuple $\viewrv^{\Pi}_i$.
 
     Let's dig a little deeper into the meanings of equation \ref{eqn:secdef1} and \ref{eqn:secdef2}.
-    They state that a proabilistic, polynomial time algorithm, denoted $S_1$ and $S_2$, which is given access \textit{only} to the party's input and output can compute the view of a party.
-    For example, the defintion requires that $S_1$ on input $(x, f(x,y))$ must be able to compute $\viewrv^{\Pi}_i(x,y)$, in particular the messages received by party 1, such that the generated view is indistinguishable from the actual view.
+    They state that a probabilistic, polynomial time algorithm, denoted $S_1$ and $S_2$, which is given access \textit{only} to the party's input and output can compute the view of a party.
+    For example, the definition requires that $S_1$ on input $(x, f(x,y))$ must be able to compute $\viewrv^{\Pi}_i(x,y)$, in particular the messages received by party 1, such that the generated view is indistinguishable from the actual view.
 If there exists an algorithm that can perform the aforementioned task, then $\Pi$ does not adequately conceal information, so we should not consider $\Pi$ to be secure.
 
     Finally, the definition requires that $|x| = |y|$; however, this constraint can be overcome in practice by making the shorter input longer by adding padding.
 \end{description}
 
-The definition provided here is only secure when adveraries are semi-honest (see \ref{semihonest section}).DDefinitions of security in settings with malicious adversaries require substantially more complexity.
+The definition of security provided here is only applies when adversaries are semi-honest (see \ref{semihonest section}).
+Definitions of security in settings with malicious adversaries require substantially more complexity.
 As a result, these definitions are often simulation based definitions.
 They imagine an ideal world, where the function $f$ must be computed securely, and by a series of comparisons, show that the real world where $\Pi$ computes $f$ is essentially the same as the ideal world.
 For an easy to understand security definition of 2PC with malicious adversaries, we refer to reader to \cite{lindell2009}.
@@ -599,9 +600,39 @@ Yao's protocol depends on first encoding the function $f$ as a circuit, as discu
     \State Let $w_j$ be $g$'s second input wire.
     \State Let $w_k$ be $g$'s output wire.
     \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
-    \State $T_g(u,v) = \Enc_{W_i^u}( \Enc_{W_j^v} ( W_k^{g(u,v)}))$
+    \State $T_g[u,v] = \Enc_{W_i^u}( \Enc_{W_j^v} ( W_k^{g(u,v)}))$
     \EndFor
     \State $f(x,\cdot).tables[g] = T_g$.
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Evaluate Circuit}
+\label{alg:evaluate}
+\begin{algorithmic}
+
+\Require $(input\_wires, tables, gates)$
+\For{Input wire $w_i$ in $input\_wires$}
+	\Comment retrieve garbled values of input wires
+	\State Perform OT$(w_i, x_i)$ 
+	\Comment retrieve $W^{x_i}_i$ from Alice
+	\State Save the value to $w_i$.
+\EndFor
+
+\For{Gate $g$ in $gates$}
+	\Comment compute the output of each gate.
+	\State Let $w_i$ be $g$'s first input wire.
+	\State Let $w_j$ be $g$'s second input wire.
+	\State Let $w_k$ be $g$'s output wire.
+	\State \textbf{Require} $w_i$ and $w_j$ have been assigned garbled values.
+	\State \textbf{Require} $w_k$ has not been assigned a garbled value.
+    	\For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
+		\State $temp = \Dec_{w_j}(\Dec_{w_i}(tables[g][u,v]))$
+		\If{$temp$ decrypted correctly}
+			\State $w_k = temp$
+		\EndIf
+	\EndFor
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -613,26 +644,18 @@ Bob is the evaluator, and will compute the circuit.
 Alice first hardwires her inputs into the circuit, yielding a circuit that computes $f(x,\cdot)$.
 
 \subsubsection{Step 1: Garbling the Circuit}
-For each wire $w_i$ in the circuit, 
-
-For every gate $g$ in the circuit, say that $g$ has input wire $w_i$ and $w_j$ and output wire $w_k$, Alice creates a table $T_g$.
-$T_g$ encrypts the output wire using the input wires as keys.
-The table enables the computation of the gate $g$ given either $K^0_i$ or $K^1_i$ and either $K^0_j$ or $K^1_j$.
-Algorithm \ref{alg:garble} gives the pseudocode for Alice's garbling.
-The algorithm essentially produces keys, and encrypts keys using other keys.
+Alice garbles each gate, according to the algorithm outlined in Algorithm \ref{lag:garble}, which produces a table $T_g$ for each gate $g$.
+The table enables the computation of $g$, if one is given either $W^0_i$ or $W^1_i$ and either $W^0_j$ or $W^1_j$ where wire $i$ and $j$ are the input wires to $g$.
 Figure \ref{example} gives an example of a table for an AND gate. \textbf{TODO}
 
-\subsubsection{Step 2: Bob's Input}
+\subsubsection{Step 2: Bob's Input and Computing the Circuit}
 Alice sends the garbled circuit to bob, which consists of the garbled tables, $f(x,\cdot).tables$, and the rules for connecting the gates together.
-In order for Bob to compute the circuit, he needs garbled values of all input wires.
-Once he has the garbled values of the input wires, he can decrypt the first few gates, and acquire the decryption keys of the other gates, until he has the keys to decrypt all of the gates in the circuit, yieliding the outp.
-Bob can acquire the garble values of the input wires from Alice using 1-out-of-2 oblivious transfer on each input wire.
-Section \ref{sect:oblivious_transfer} explains oblivious transfer.
-
-\subsubsection{Step 3: Computing the Circuit}
-After receiving the garbled values of the input wires, Bob decrypts the input gates, works through the rest of the circuit, decrypting gates as he goes, until he finally receives the output. 
-At this point, Bob has learned $f(x,y)$, but Alice has learned nothing. 
-To complete the protocol, Bob sends Alice $f(x,y)$, the functionality requires it (i.e. if $f_1(x,y) = f_2(x,y)$).
+In order for Bob to compute the circuit, he needs the garbled values of all input wires.
+Once he has the garbled values of the input wires, he can decrypt the first few gates, and acquire the decryption keys of the other gates until he has the keys to decrypt all of the gates in the circuit, yielding the output.
+Bob can acquire the garbled values of the input wires from Alice using 1-out-of-2 oblivious transfer on each input wire (see section \ref{sctn:oblivious_transfer}).
+If necessary, Bob sends the final output of the circuit to Alice. 
+This is necessary only if $f_1(x,y) = f_2(x,y)$. 
+Bob's protocol is outlined in more detail in Algorithm \ref{alg:evaluate}.
 
 \subsubsection{Explanation of the security of Yao's protocol}
 To do.
@@ -640,23 +663,44 @@ To do.
 \subsubsection{Notes about complexity}
 1 OT per (input?) wire.
 How much encryption?
-Not good enoug hfor practice.
+Not good enough for practice.
 
 \subsection{GMW}
+GMW starts by obscuring the inputs by xoring the input bits with random values, and splitting the obfuscated inputs among Alice and Bob.
 
 \begin{algorithm}
 \caption{Garble Circuit}
 \label{alg:gmw}
 \begin{algorithmic}
     \Require Circuit $f(x,\cdot)$ 
-
-
     \State For Person 1:
     \For{wire $w_i$ in $f(x, \cdot).wires$}
         \State Assign $a^1_{w_i} \leftarrow \{0,1\}$
         \Comment a uniform random selection of $0$ or $1$.
-        \State Assign $b^1_{w_i} = x_i xor a_{w_i}^1$
+        \State Assign $b^1_{w_i} = x_i \oplus a_{w_i}^1$
     \EndFor \\
+    
+    \State \textbf{XOR Gate}
+    \Comment $x_i \oplus y_i = (a_{w_i}^1 \oplus b_{w_i}^1) \oplus (a_{w_i}^2 \oplus a_{w_i}^2)$
+    \State Alice evaluates $a_{w_i}^1 \oplus a_{w_i}^2$
+    \State Bob evaluates $b_{w_i}^1 \oplus b_{w_i}^2$
+    \State now what?
+    \\
+    
+    \State \textbf{AND Gate}
+    \Comment $x_i \wedge y_i = (a_{w_i}^1 \oplus b_{w_i}^1) \wedge (a_{w_i}^2 \oplus a_{w_i}^2)$
+    \State Use 1-4 OT
+    \State Let $\tau = x_i \wedge y_i$
+    \State Alice $\sigma \leftarrow \{0,1\}$
+    \Comment a uniform random selection of $0$ or $1$
+    \State Alice constructs table $T$:
+     \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
+     	\State do it
+     \EndFor
+
+    
+    \\
+    \State \textbf{NOT Gate}
 
 \end{algorithmic}
 \end{algorithm}
