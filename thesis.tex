@@ -487,46 +487,50 @@ This section will give the definition of security of a garbling scheme.
 
 \subsection{MPC Security Definitions}
 A number of definitions which formalize what it means for a multiparty computation have been formalized. 
-Yao, in his 1982 paper on secure function evaluation, says a protocol is secure if it has the property:
+Yao, in his 1982 paper on secure function evaluation, says a 2PC protocol is secure if it has the property:
 
 \begin{blockquote}
 If one participant behaves according the the protocol, the probability that the other participant successfully cheats is at most $\gamma$ for $\gamma \in \{0,1\}$.
 \end{blockquote}
-As more complex protocols were developed, both for MPC, and in other areas of cryptography, property based definitions became difficult to work with.
-The main problem that it was unclear precisely what assumptions were being made about what each party could and couldn't do. 
-For example, in Yao's definition above, it's not clear that the parties' inputs are kept secret if both parties behave according to the protocol.
-At the least, the definition doesn't give any guarantee.
-For a while, cryptographers added in additional properties to definitions, but eventually it became clear that there was always the possibility that a certain property was being missed.
 
-This led to the creation to indistinguishability and simulation based definitions of security.
-The idea is that the adversary cannot tell what is going on, based on the information that they receive, so the best that the adversary can possible do is guess what is happening.
-For example, a definition of a secure encryption scheme could be:
-\textbf{Might give the definition of encryption in the section above. If we do, just reference that section. That might be preferable}
-\begin{blockquote}
-\begin{itemize}
-	\item Adversary picks two messages, $m_0$ and $m_1$. 
-	\item We pick a random bit $b \in \{0,1\}$. Encrypt $m_b$, and send the encrypted version to the adversary (i.e. send $c = \Enc(m_b)$).
-	\item Adversary outputs a bit $b'$ where $b' = 0$ if they believe the encrypted messages was $m_0$, and $b' = 1$ if they think the encrypted message was $m_1$. 
-	\item Finally, we consider the encryption scheme secure if
-	$$Pr[\text{Adversary outputs $b' = b$}] \approx_C \frac{1}{2}.$$
-\end{itemize}
-\end{blockquote}
+Since Yao's original definition, many other definitions for the security of 2PC protocols have been proposed.
+Here we give Goldreich's definition of 2PC, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on multiparty computation \cite{goldreich2, lindell2009}.
 
-The cryptography research community now tends to prefer simulation based definitions. 
-The idea behind simulation based definitions is that we have ideal world, in which the protocol is run perfectly and securely, and then we have the real world protocol, the one that Alice and Bob run. 
-Then, for some adversary, we randomly choose either the real ideal or real world and run the MPC computation with the adversary in that world.
-The adversaries attempts to determine which world the protocol is being run in.
-Finally, the protocol is secure if the adversary can't do any better than guessing which world they are in.
-As a consequence, the real world is indistinguishable from the ideal world, hence cryptographers feel confident that the protocol is secure. 
-The idea being that if the adversary could learn more information in the real world, say information about other parties' inputs, then they would know that they are in the real world, hence the protocol is insecure. 
+%As more complex protocols were developed, both for MPC, and in other areas of cryptography, property based definitions became difficult to work with.
+%The main problem that it was unclear precisely what assumptions were being made about what each party could and couldn't do. 
+%For example, in Yao's definition above, it's not clear that the parties' inputs are kept secret if both parties behave according to the protocol.
+%At the least, the definition doesn't give any guarantee.
+%For a while, cryptographers added in additional properties to definitions, but eventually it became clear that there was always the possibility that a certain property was being missed.
 
-The biggest problem with simulation based definitions is that it is difficult and labor intensive to prove with the definition.
-The property based definitions are the most straightforward to prove, and the most familiar to proofs used in mathematics.
+%This led to the creation to indistinguishability and simulation based definitions of security.
+%The idea is that the adversary cannot tell what is going on, based on the information that they receive, so the best that the adversary can possible do is guess what is happening.
+%For example, a definition of a secure encryption scheme could be:
+%\textbf{Might give the definition of encryption in the section above. If we do, just reference that section. That might be preferable}
 
+%\begin{blockquote}
+%\begin{itemize}
+%	\item Adversary picks two messages, $m_0$ and $m_1$. 
+%	\item We pick a random bit $b \in \{0,1\}$. Encrypt $m_b$, and send the encrypted version to the adversary (i.e. send $c = \Enc(m_b)$).
+%	\item Adversary outputs a bit $b'$ where $b' = 0$ if they believe the encrypted messages was $m_0$, and $b' = 1$ if they think the encrypted message was $m_1$. 
+%	\item Finally, we consider the encryption scheme secure if
+%	$$Pr[\text{Adversary outputs $b' = b$}] \approx_C \frac{1}{2}.$$
+%\end{itemize}
+%\end{blockquote}
+%
+%The cryptography research community now tends to prefer simulation based definitions. 
+%The idea behind simulation based definitions is that we have ideal world, in which the protocol is run perfectly and securely, and then we have the real world protocol, the one that Alice and Bob run. 
+%Then, for some adversary, we randomly choose either the real ideal or real world and run the MPC computation with the adversary in that world.
+%The adversaries attempts to determine which world the protocol is being run in.
+%Finally, the protocol is secure if the adversary can't do any better than guessing which world they are in.
+%As a consequence, the real world is indistinguishable from the ideal world, hence cryptographers feel confident that the protocol is secure. 
+%The idea being that if the adversary could learn more information in the real world, say information about other parties' inputs, then they would know that they are in the real world, hence the protocol is insecure. 
+%
+%The biggest problem with simulation based definitions is that it is difficult and labor intensive to prove with the definition.
+%The property based definitions are the most straightforward to prove, and the most familiar to proofs used in mathematics.
+%
 
 \subsection{Goldreich and Lindell's Definition of Security for 2PC}
-Here we give Goldreich's definition of MPC security, which is presented in his textbook, \textit{Foundations of Cryptography Volume II} \cite{goldreich_vol2}. 
-The definition is designed for static, semi-honest adversaries. 
+%The definition is designed for static, semi-honest adversaries. 
 
 \begin{description}
 \item [Setup:] \hfill
@@ -538,14 +542,14 @@ The definition is designed for static, semi-honest adversaries.
         \item Define $\viewrv_i^{\Pi}(n,x,y)$ (for $i \in \{1,2\}$) as the view of the $i$th party on input $(x,y)$ and security parameter $n$.
         $\viewrv_i^{\Pi}(n,x,y)$ equals the tuple $(1^n, x, r^i, m_1^i, \ldots, m_t^i)$, where $r^i$ is the contents of the $i$th party's internal random tape, and $m_j^i$ is the $j$th message that the $i$th party received.
     
-        \item Define $output^{\Pi}_i(n,x,y)$ as the output of the $i$th party on input $(x,y)$ and security parameters $n$.
+        \item Define $output^{\Pi}_i(n,x,y)$ as the output of the $i$th party on input $(x,y)$ and security parameter $n$.
         Also denote
         $$ \outputrv^{\Pi}(n,x,y) = (\outputrv^{\Pi}_1(n,x,y), \outputrv^{\Pi}_2(n,x,y)).$$
 
     \item Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. Also note that for two party computation.
 \end{itemize}
 \item [Definition:]
-We say that $\Pi$ securely computes $f$ in the presence of static semi-honest adversaries if there exists probabiliistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following are true:
+We say that $\Pi$ securely computes $f$ in the presence of static semi-honest adversaries if there exists probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following are true:
 \begin{equation} 
     \label{eqn:secdef1}
     \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
@@ -565,10 +569,10 @@ We say that $\Pi$ securely computes $f$ in the presence of static semi-honest ad
     For example, the definition requires that $S_1$ on input $(x, f(x,y))$ must be able to compute $\viewrv^{\Pi}_i(x,y)$, in particular the messages received by party 1, such that the generated view is indistinguishable from the actual view.
 If there exists an algorithm that can perform the aforementioned task, then $\Pi$ does not adequately conceal information, so we should not consider $\Pi$ to be secure.
 
-    Finally, the definition requires that $|x| = |y|$; however, this constraint can be overcome in practice by making the shorter input longer by adding padding.
+    Finally, the definition requires that $|x| = |y|$; however, this constraint can be overcome in practice by padding the shorter input.
 \end{description}
 
-The definition of security provided here is only applies when adversaries are semi-honest (see \ref{semihonest section}).
+The definition of security provided here only applies when adversaries are semi-honest (see \ref{semihonest section}).
 Definitions of security in settings with malicious adversaries require substantially more complexity.
 As a result, these definitions are often simulation based definitions.
 They imagine an ideal world, where the function $f$ must be computed securely, and by a series of comparisons, show that the real world where $\Pi$ computes $f$ is essentially the same as the ideal world.
@@ -666,42 +670,69 @@ How much encryption?
 Not good enough for practice.
 
 \subsection{GMW}
-GMW starts by obscuring the inputs by xoring the input bits with random values, and splitting the obfuscated inputs among Alice and Bob.
+Where Yao's protocol is premised on encrypting gates individually, GMW's protocol for garbling circuits is premised on secret sharing, and performing operations on the shared secrets. 
+Secret sharing, in its general idea, is class of methods for distributing a secret to a group of participants, where each participants is allocated a \textit{share} of the secret. 
+The secret can only be reconstructed when a sufficient number of the participants combine their shares, but any pool of insufficient shares yields no information about the secret.
 
-\begin{algorithm}
-\caption{Garble Circuit}
-\label{alg:gmw}
+GMW begins by having Alice and Bob secret share their inputs, so each party now has a collection of \textit{shares}. 
+Algorithm \ref{alg:gmw_setup} describes this process in more detail.
+Then Alice and Bob perform a series of operations on their shares, which are dictated by the gates in the function they wish to compute.
+As with Yao's protocol, a gate may either compute XOR, AND or NOT.
+Each operation requires a different series of operations, which are described in Algorithm \ref{alg:gmw_gates}.
+Finally, Alice and Bob publicize their shares to each other, at which point each party will have sufficient shares to compute the output of the function.
+
+\begin{algorithm}[h!]
+\caption{GMW Setup}
+\label{alg:gmw_setup}
 \begin{algorithmic}
-    \Require Circuit $f(x,\cdot)$ 
-    \State For Person 1:
+% http://crypto.biu.ac.il/gmw-multi-party-protocol-and-oblivious-transfer-extension
+    \State Alice does the following on input Circuit $f(x,\cdot)$ and $x = x_0x_1\ldots x_n$
     \For{wire $w_i$ in $f(x, \cdot).wires$}
         \State Assign $a^1_{w_i} \leftarrow \{0,1\}$
         \Comment a uniform random selection of $0$ or $1$.
         \State Assign $b^1_{w_i} = x_i \oplus a_{w_i}^1$
-    \EndFor \\
-    
+    \EndFor
+    \State Bob does likewise on input Circuit $f(x,\cdot)$ and $y = y_0y_1\ldots y_n$
+    \State Hence Alice has generated shares $\{a^1_w, b^1_w\}_w$ 
+    \State and Bob has generated shares $\{a^2_w, b^2_w\}_w$
+    \State Alice and Bob divide the shares such that Alice has all $a_w$ and Bob has all $b_w$.
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{GMW Gate Evaluation}
+\label{alg:gmw_gates}
+\begin{algorithmic}
     \State \textbf{XOR Gate}
     \Comment $x_i \oplus y_i = (a_{w_i}^1 \oplus b_{w_i}^1) \oplus (a_{w_i}^2 \oplus a_{w_i}^2)$
     \State Alice evaluates $a_{w_i}^1 \oplus a_{w_i}^2$
     \State Bob evaluates $b_{w_i}^1 \oplus b_{w_i}^2$
-    \State now what?
     \\
     
     \State \textbf{AND Gate}
     \Comment $x_i \wedge y_i = (a_{w_i}^1 \oplus b_{w_i}^1) \wedge (a_{w_i}^2 \oplus a_{w_i}^2)$
-    \State Use 1-4 OT
-    \State Let $\tau = x_i \wedge y_i$
-    \State Alice $\sigma \leftarrow \{0,1\}$
+    \State Alice samples $\sigma \leftarrow \{0,1\}$
     \Comment a uniform random selection of $0$ or $1$
     \State Alice constructs table $T$:
      \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
-     	\State do it
-     \EndFor
-
-    
+     	\State $T[u,v] = (a^1_{w_i} \oplus u) \wedge (a^2_{w_i} \oplus v)$
+	\State $s[u,v] = \sigma \oplus T[u,v]$.
+     \EndFor    
+     \State Do 1-4OT. Alice sends $(s[0,0], s[0,1], s[1,0], s[1,1])$ 
+     \State Bob selects result based on $(u,v) = (b^1_{w_i}, b^2_{w_i})$.
     \\
+    
     \State \textbf{NOT Gate}
-
+    \Comment $w_i = (\neg a_{w_i}) \oplus (\neg b_{w_i})$
+    \State $\triangleright$ Evaluate the negative of a particular wire $w_i$. 
+    \State $w_i = a_{w_i} \oplus b_{w_i}$
+    \State Let $a'_{w_i} = 1 \oplus a_{w_i}$
+    \Comment i.e. $a'_{w_i} = \neg a_{w_i}$
+    \State Let $b'_{w_i} = 1 \oplus b_{w_i}$
+    \Comment i.e. $b'_{w_i} = \neg b_{w_i}$
+    
+    
+    
 \end{algorithmic}
 \end{algorithm}
 
