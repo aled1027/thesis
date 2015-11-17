@@ -51,6 +51,8 @@
 \newcommand{\Enc}{\operatorname{Enc}}
 \newcommand{\Dec}{\operatorname{Dec}}
 \newcommand{\compIndist}{\approx_D}
+\newcommand{\outputrv}{{\sf output}}
+\newcommand{\viewrv}{{\sf view}}
 
 \newcounter{defcounter}
 \setcounter{defcounter}{0}
@@ -522,103 +524,143 @@ The biggest problem with simulation based definitions is that it is difficult an
 The property based definitions are the most straightforward to prove, and the most familiar to proofs used in mathematics.
 
 
-\subsection{Goodrich's Definition of Security for 2PC}
+\subsection{Goldreich's Definition of Security for 2PC}
 Here we give Goldreich's definition of MPC security, which is presented in his textbook, \textit{Foundations of Cryptography Volume II} \cite{goldreich_vol2}. 
 The definition is designed for static, semi-honest adversaries. 
 
-\textbf{Setup} 
-\begin{blockquote}
-Let $f: \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^* \times \{0,1\}^*$ be a functionality.
-Let $f_1(x,y)$ denotes the first component of $f(x,y)$, and likewise $f_2(x,y)$ represents the second component.
-The first party, with input $x$, wishes to determine $f_1(x,y)$, and the second party, with input $y$, wishes to determine $f_2(x,y)$.
+\begin{description}
+\item [Setup:] \hfill
+    \begin{itemize}
+        \item Let $f = (f_1, f_2)$ be a probabilistic, polynomial time functionality. 
 
-Let $\Pi$ be a two party protocol for computing $f$.
+        \item Let $\Pi$ be a two party protocol for computing $f$. 
 
-Denote the view of the $i$th party (where $i \in \{1,2\}$ for 2-party computation) during an execution of $\Pi$ on inputs $(x,y)$ as $$view^{\Pi}_i(x,y) = (x,r,m_1, \ldots m_t)$$ where $r$ represents the outcome of the $i$th party's internal coin tosses, and $m_j$ represents the $j$th message it has received.
-Define the output of the $i$th party after an execution of $\Pi$ on inputs $(x,y)$ as $OUTPUT^{\Pi}_i(x,y)$. 
-The output is implicit to the party's view of the execution, and define 
-$$Output^{\Pi}(x,y) = (output^{\Pi}_1(x,y), OUTPUT^{\Pi}_2(x,y)).$$
-\end{blockquote}
+        \item Define $\viewrv_i^{\Pi}(n,x,y)$ (for $i \in \{1,2\}$) as the view of the $i$th party on input $(x,y)$ and security parameter $n$.
+        $\viewrv_i^{\Pi}(n,x,y)$ equals the tuple $(1^n, x, r^i, m_1^i, \ldots, m_t^i)$, where $r^i$ is the contents of the $i$th party's internal random tape, and $m_j^i$ is the $j$th message that the $i$th party received.
+    
+        \item Define $output^{\Pi}_i(n,x,y)$ as the output of the $i$th party on input $(x,y)$ and security parameters $n$.
+        Also denote
+        $$ \outputrv^{\Pi}(n,x,y) = (\outputrv^{\Pi}_1(n,x,y), \outputrv^{\Pi}_2(n,x,y)).$$
 
----
-\begin{blockquote}
-MOST RECENTLY WRITTEN DEFINITION \\\\
-\textbf{setup}
-Let $f = (f_1, f_2)$ be a probability, polynomial time functionality. 
-Let $\Pi$ be a two party protocol for computing $f$. 
-Define $view_i^{\Pi}(n,x,y)$.
-Define $output^{\Pi}_i(n,x,y)$.
-The output of the $i$th party can be computed from the view of the $i$th party.
-
-view and output are random variables, with the probability taken over the random tapes of the two parties.
-
-\textbf{definition}
+    \item Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. Also note that for two party computation.
+\end{itemize}
+\item [Definition:]
 We say that $\Pi$ securely computes $f$ in the presence of static semi-honest adversaries if there exists probabiliistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following are true:
 \begin{equation} 
-    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_1(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
+    \label{eqn:secdef1}
+    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
 \end{equation}
 \begin{equation} 
-    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_2(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
+    \label{eqn:secdef2}
+    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_2(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
 \end{equation}
 
-make a note about $|x| = |y|$. 
-\end{blockquote}
----
+\item[Intuition:]
+    We think of $\viewrv^{\Pi}_i$ as all of the information that the $i$th has to operate with, such that any conclusion that the $i$th party can come to could be determined from $view^{\Pi}_i$.
+    Moreover, $\outputrv^{\Pi}_i$ is simply a complicated way of writing the output of the $i$th party. 
+    The value of $\outputrv^{\Pi}_i$ is computable from the tuple $\viewrv^{\Pi}_i$.
 
-\begin{blockquote}
-We say that $\Pi$ privately computes $f$ if there exist probabilistic polynomial-time algorithms, denoted $S_1$ and $S_2$, such that
-\begin{equation} 
-    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_1(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
-\end{equation}
-\begin{equation} 
-    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \equiv^C \{(view^{\Pi}_2(x,y), OUTPUT^{\Pi}(x,y)) \}_{x,y} 
-\end{equation}
+    Let's dig a little deeper into the meanings of equation \ref{eqn:secdef1} and \ref{eqn:secdef2}.
+    They state that a proabilistic, polynomial time algorithm, denoted $S_1$ and $S_2$, which is given access \textit{only} to the party's input and output can compute the view of a party.
+    For example, the defintion requires that $S_1$ on input $(x, f(x,y))$ must be able to compute $\viewrv^{\Pi}_i(x,y)$, in particular the messages received by party 1, such that the generated view is indistinguishable from the actual view.
+If there exists an algorithm that can perform the aforementioned task, then $\Pi$ does not adequately conceal information, so we should not consider $\Pi$ to be secure.
 
+    Finally, the definition requires that $|x| = |y|$; however, this constraint can be overcome in practice by making the shorter input longer by adding padding.
+\end{description}
 
-That is, for all pairs of inputs, $x,y \in \{0,1\}^n$, the output-pair is a random variable $(f_1(x,y), f_2(x,y)$.
-The first party, who has input $x$, obtains $f_1(x,y)$, and the second party, who has input $y$, obtains $f_2(x,y)$.
-Denote the functionality $f \mapsto (f_1(x,y), f_2(x,y))$.
-
-\end{blockquote}
-
-
-\subsection{Formal Definition of a Garbling Scheme}
-Give the definition in Foundations of Garbled Circuits
+The definition provided here is only secure when adveraries are semi-honest (see \ref{semihonest section}).DDefinitions of security in settings with malicious adversaries require substantially more complexity.
+As a result, these definitions are often simulation based definitions.
+They imagine an ideal world, where the function $f$ must be computed securely, and by a series of comparisons, show that the real world where $\Pi$ computes $f$ is essentially the same as the ideal world.
+For an easy to understand security definition of 2PC with malicious adversaries, we refer to reader to \cite{lindell2009}.
 
 \subsection{Yao's Garbled Circuit}
-% http://repository.cmu.edu/cgi/viewcontent.cgi?article=1004&context=jpc
-Yao's Garbled Circuit works by having one party, say Alice, generate an ``encrypted'' or ``garbled'' circuit, and send the circuit to Bob.
-Bob, using Oblivious Transfer, requests a series of keys from Alice, and uses the keys to compute the circuit.
-After computing the circuit, Bob will send the final output to Alice. 
+We now give an implementation of a generic 2PC protocol created by Yao \cite{yao}.
+The protocol works for two parties; we will call party 1 Alice, denoted $A$, and party 2 Bob, denoted $B$, who have inputs $x$ and $y$ respectively.
+Suppose $f$ is the function that Alice and Bob wish to compute.
 
-\textbf{Write out in algorithm form.}
+Yao's protocol depends on first encoding the function $f$ as a circuit, as discussed in more detail in section \ref{sctn:circuits}, and then Alice and Bob together evaluate the circuit.
+
+% (complexity - add to end) The number of round is constant.
+% 1 OT per input wire of party B + enc/dec for each gate.
+
+\begin{algorithm}
+\caption{Garble Circuit}
+\label{alg:garble}
+\begin{algorithmic}
+    \Require Circuit $f(x,\cdot)$ 
+    \Ensure Populate garbled tables $f(x,\cdot).tables$.
+\For{wire $w_i$ in $f(x,\cdot).wires$} 
+    \State Generate two encryption keys, called garbled values, $W_i^0$ and $W_i^1$.
+    \State Assign $(W_i^0, W_i^1)$ to $w_i$.
+\EndFor \\
+
+\For{gate $g$ in $f(x,\cdot).gates$}
+    \State Let $w_i$ be $g$'s first input wire.
+    \State Let $w_j$ be $g$'s second input wire.
+    \State Let $w_k$ be $g$'s output wire.
+    \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
+    \State $T_g(u,v) = \Enc_{W_i^u}( \Enc_{W_j^v} ( W_k^{g(u,v)}))$
+    \EndFor
+    \State $f(x,\cdot).tables[g] = T_g$.
+\EndFor
+\end{algorithmic}
+\end{algorithm}
 
 \subsubsection{Step 0: Setup}
 Alice and Bob want to compute the function $f(x,y)$, where $x,y \in \{0,1\}^*$.
 Alice is the garbler, and will create the circuit.
 Bob is the evaluator, and will compute the circuit.
-During the setup stage, Alice first hard-codes her inputs into a new function $\hat{f}(\cdot, y)$.
-She then creates a circuit based on $\hat{f}$, such that her inputs are already hard-coded in.
+Alice first hardwires her inputs into the circuit, yielding a circuit that computes $f(x,\cdot)$.
 
 \subsubsection{Step 1: Garbling the Circuit}
-For each wire $w_i$ in the circuit, Alice creates two random keys $K^0_i$ and $K^1_i$.
-The idea is that $K^0_i$ will correspond to $w_i$ being assigned a value of $0$, and $K^1_i$ will correspond to $w_i$ being assigned a value of $1$.
+For each wire $w_i$ in the circuit, 
 
 For every gate $g$ in the circuit, say that $g$ has input wire $w_i$ and $w_j$ and output wire $w_k$, Alice creates a table $T_g$.
 $T_g$ encrypts the output wire using the input wires as keys.
 The table enables the computation of the gate $g$ given either $K^0_i$ or $K^1_i$ and either $K^0_j$ or $K^1_j$.
-
-Figure \ref{asdf} gives an example of garbled AND gate.
-
-Explain that shit.
+Algorithm \ref{alg:garble} gives the pseudocode for Alice's garbling.
+The algorithm essentially produces keys, and encrypts keys using other keys.
+Figure \ref{example} gives an example of a table for an AND gate. \textbf{TODO}
 
 \subsubsection{Step 2: Bob's Input}
-asdf
+Alice sends the garbled circuit to bob, which consists of the garbled tables, $f(x,\cdot).tables$, and the rules for connecting the gates together.
+In order for Bob to compute the circuit, he needs garbled values of all input wires.
+Once he has the garbled values of the input wires, he can decrypt the first few gates, and acquire the decryption keys of the other gates, until he has the keys to decrypt all of the gates in the circuit, yieliding the outp.
+Bob can acquire the garble values of the input wires from Alice using 1-out-of-2 oblivious transfer on each input wire.
+Section \ref{sect:oblivious_transfer} explains oblivious transfer.
 
-\subsubsection{Step3: Computing the Circuit}
-asdf
+\subsubsection{Step 3: Computing the Circuit}
+After receiving the garbled values of the input wires, Bob decrypts the input gates, works through the rest of the circuit, decrypting gates as he goes, until he finally receives the output. 
+At this point, Bob has learned $f(x,y)$, but Alice has learned nothing. 
+To complete the protocol, Bob sends Alice $f(x,y)$, the functionality requires it (i.e. if $f_1(x,y) = f_2(x,y)$).
+
+\subsubsection{Explanation of the security of Yao's protocol}
+To do.
+
+\subsubsection{Notes about complexity}
+1 OT per (input?) wire.
+How much encryption?
+Not good enoug hfor practice.
 
 \subsection{GMW}
+
+\begin{algorithm}
+\caption{Garble Circuit}
+\label{alg:gmw}
+\begin{algorithmic}
+    \Require Circuit $f(x,\cdot)$ 
+
+
+    \State For Person 1:
+    \For{wire $w_i$ in $f(x, \cdot).wires$}
+        \State Assign $a^1_{w_i} \leftarrow \{0,1\}$
+        \Comment a uniform random selection of $0$ or $1$.
+        \State Assign $b^1_{w_i} = x_i xor a_{w_i}^1$
+    \EndFor \\
+
+\end{algorithmic}
+\end{algorithm}
+
 
 \section{Improving MPC}
 \subsection{Overview of history}
