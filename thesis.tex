@@ -44,6 +44,13 @@
 \usepackage{changepage}
 
 %%% begin alex commands %%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
 \newcommand{\Gates}{\text{Gates}}
 \newcommand{\InputWires}{\text{InputWires}}
 \newcommand{\OutputWires}{\text{OutputWires}}
@@ -161,7 +168,7 @@ This is an example of a thesis setup to use the reed thesis document class.
 \chaptermark{Introduction}
 \markboth{Introduction}{Introduction}
 % \onehalfspacing
-% \doublespacing
+\doublespacing
 
  Introduction goes here
 
@@ -736,24 +743,148 @@ Finally, Alice and Bob publicize their shares to each other, at which point each
 \end{algorithmic}
 \end{algorithm}
 
+see mike rosulek first few slides for good images. 
+illustrative about translating bits over to wire labels
 
-\section{Improving MPC}
-\subsection{Overview of history}
-working on specific function verse general functions
-working on number of parties
-making it work for sugarbeet auction
-election potential?
-auctions
+\chapter{Improving MPC}
+A number of improvements have been made to garbled circuits since their inception in 1986.
+The first scheme for a garbled circuit, the one described in section \ref{garbled_circuit_scheme} has the following requirements: \textbf{include chart here}.
+Let's look into how much work is required in classical garbled circuits.
+\textbf{mention that we look gate-wise}
+The first metric that we look at is the size of the garbled table.
+\textbf{check this definition}:The garbled table, if you call recall from earlier, is the set of ciphertexts that is sent from the garbler to the evaluator, like in figure \ref{the fig thats a garbled table}.
+Hence the size refers to the number of ciphertexts that an evaulator needs to compute a single gate.
+The XOR column gives the size of the garbled table for an xor gate, and naturaly the AND columns gives the of the garbled table for an AND gate.
+The cost associated with the size of a garbled table manifests in effecting the amount of bandwidth that needs to be transmitted between the garbler and evaluator.
+In order to evaluate the gate, the evaluator needs the entire garbled table (\textbf{research idea: what if they don't? what if they can know when to request more information, to reduce the average amount of bandwidth? maybe this could be used to reduce calls to OT?)}, so reducing the size of the garbled table reduces bandwidth.
+It turns out that bandwidth contributes a large hit to the total time required to perform mpc with garlbed circuits, and as a result, many of the improvements to garbled circuits have specifically targted reducing the size of the garbled table down from 4 ciphertexts.
+\textbf{maybe mention lower bound?}
+
+The second metric we use to analyze garbled circuits is eval cost.
+Eval cost is the amount of computation that the evaluator must perform in order to process a single gate.
+In the classical setting, the evaluator goes down the garbled table decrypting each ciphertext until one of the decrypts correctly. 
+In the worst case, this requires 8 decryptions, because each wire is encrypted twice, once with the key from the first input wire and then again with the key from second input wire.
+If a dual-key cipher (an encryption scheme that takes two keys, see section \ref{dkc section}), then the evaluator only needs to perform four decryptions in the worst case.
+The metric that we consider is the garble cost of a gate. 
+The garble cost of a gate is amount of computation that the garbler needs to perform.
+The improvements to MPC have generally increased the garble cost; having the garbler do more work, can reduce the size of the garble table which reduces bandwidth, and can reduce the amount of computation the evaluator needs to perform \textbf{fact check this}.
+Before the research of \cite{our_paper} and the research presented in this thesis, there were not substantial benefits to garbler preprocessing, that is having the garbler do work \textit{before} the actual computation time. 
+We call this having the garbler do offline work, because they can do the work at their leisure, like at night when computers are less used.
+Then the online work, when the actual comptuation is performed, is reduced.
+
+As we walk through the improvements to Yao's garbled circuit, we are going to think about the improvements affect the three metrics described above.
+It should also be noted before we begin that these are improvements to the the computation of a single gate.
+Speedups on the gate level propagately widely through the computation of the entire garbled circuit.
+For example, the computation of AES now requires approximatley $40,000$ gates, so reducing the number of ciphertexts being transmitted per gate by $1$, reduces the total amount of ciphertexts that need to be sent by $10,000$ - a substantial speedup indeed.
+
+\section{Overview of history}
+\begin{itemize}
+    \item working on specific function verse general functions
+    \item working on number of parties
+    \item making it work for sugarbeet auction
+    \item election potential?
+    \item auctions
+    \item ----- Mike talk -----
+    \item Things to think about:
+    \item hardness assumption (Mike does not focus on)
+    \item size: CTs/ per gate
+    \item computation required
+    \item Mike at 9:00 has cites to papers of big improvements
+    \item Focus is on improving each individual gate
+\end{itemize}
+
+\section{Point and Permute}
+Beaver, Micali and Rogaway contributed the first major improvement to Yao's garbled circuit in 1990.
+A detail that I may or may not (\textbf{check this}) have left out in the description of Yao's garbled circuit is that the order of the garbled table needs to be permuted.
+The order 
 
 
-\subsection{Point and Permute}
-\subsection{Garbled Row Reduction 3}
-\subsection{Free XOR}
-\subsection{Garbled Row Reduction 2}
-\subsection{FlexXOR}
-\subsection{Half Gates}
+\begin{itemize}
+    \item relative position of ciphertexts in table leaks information
+    \item so we have to permute the ciphertexts
+    \item when evaluating, trial decrypt all 4 until 1 works
+    \item beaver micali rogaway 90
+    \item randomly assign color (r,b) to each pair of wire label
+    \item Order the 4 cts canonically, by \emph{color} of keys: ((r,r),(r,b),(b,r),(b,b))
+    \item evaluate by decrypting ciphertexts indexed by your colors
+    \item Can use one-time-security encyption (e.g. OTP)
+    \item color independent of semantic value
+    \item show chart
+\end{itemize}
 
-\section{Overview of what's going to be covered}
+\section{Garbled Row Reduction 3}
+\begin{itemize}
+    \item asdf
+    \item Based on point and permute, what is first ciphertext?
+    \item Assume it's $C_1$, with input keys $A_0$, $B_1$.
+    \item Then set $C_1 \leftarrow \Enc_{A_0, B_1}^{-1}(0^n)$
+    \item So now we don't have to send the first CT: if evaluator sees a red-red, then assume $0^n$.
+\end{itemize}
+
+\section{Free XOR}
+\begin{itemize}
+    \item post Fairplay
+    \item KolesnikovSchneider
+    \item $A,A \oplus \Delta$.
+    \item Note same delta every gate
+    \item Choose $C = A \oplus B$
+    \item XOR is then free: walk through that computatoin
+    \item Still works with GRR3
+    \item Because $\Delta$ is in the key and in the payload, requires circularity assumption
+    \item Incentivizes gates with as many xors as possible (has been done with AES -- why it's so fast)
+    \item Evaluator must konw what type of gate is being exectued: we have been assuming all along that the evaluator and garbler know the function.
+\end{itemize}
+
+\section{Garbled Row Reduction 2}
+\begin{itemize}
+    \item use unique deg-2 polynomial
+    \item use 2 second degree polynomials
+    \item then interpolate
+    \item can't do free xor.
+    \item because we have lost control of $C_0$ and $C_1$ (they are dependent on the polynomial)
+\end{itemize}
+
+\section{FlexXOR}
+\begin{itemize}
+    \item switch delta value: $A,A \oplus \Delta_1 \to A', A' \oplus \Delta_2$
+    \item cost a single ciphertext (after using GRR3 trick)
+    \item total cost 0,1,2 dependent on how many distinct deltas
+    \item make wire label outputs of AND gates based on polynomial interpolation (GRR2)
+    \item So we can do both free xor (which cost 0 CTs) and GRR2 (which cost 2 CTs per And gate + delta correction)
+    \item turns into combinatorial optimization problem: determine offset for each wire to minimize total cost of each xor gate + subject to compatibility of 2-CT row-reduction of AND gates.
+    \item in practice, seemed to usually require 0 or 1
+    \item still has circularity problem because based on free zor
+\end{itemize}
+
+\section{Half Gates}
+\begin{itemize}
+    \item Goal: make AND gates cost 2 and have free xor.
+    \item a high level way to think about it: make AND gates rely on free xor in some way
+    \item ``philosophical question'': What is the garbler knows in advance the truth value of one input wire?
+    \item e.g. AND gate and their input value is a false
+    \item turn into unary gate (either note gate or identity gate)
+    \item Use GRR3 trick to get one to disappear (GRR3 relies on point and permute, so that is happening too)
+    \item So use only 1 ciphertext.
+    \item What if evaluator knows the truth value on input wire?
+    \item someohow learn that have the false wire label
+    \item if AND gate, then know that will learn false
+    \item similar thing with above with not and identity gate
+    \item cost 1 CT.
+    \item No need for point and permute here: because evaluator does different things based on having true or false wire label (and the assumption is that they know)
+    \item Real thing:
+    \item two halves make a whole!
+    \item compatible with free xor
+    \item AND gate requires two CTs
+    \item don't need to make $r$, we have a convenient $r$ floating around
+    \item r = color bit of FALSE wire label A
+    \item $a \oplus r$ = color bit of wire label evaluator gets ($A$ or $A \oplus \Delta)$
+    \item no polynomial interpolation at all -- i.e. not based on GRR2
+    \item every garbling scheme is a combo of
+    \item 1. symmetric primitive (PRF/hash function) (can be modeled as random oracle
+    \item 2. $GF((2^{\lambda}$-linear operators (XOR, polynomial interpolation)
+    \item Garbling a single AND gate requires 2 CTS ($2 \lambda$ bits) if garbling scheme is ``linear'' in this sense.
+    \item hence half-gates is size optimal: use ``known techniques'' and work gate-by-gate basis 
+\end{itemize}
 
 \begin{table}[h]
   \centering
@@ -782,8 +913,8 @@ auctions
 \end{table}
 
 
-    \chapter{The First}
-    	This is the first page of the first chapter. You may delete the contents of this chapter so you can add your own text; it's just here to show you some examples. 
+\chapter{The First}
+This is the first page of the first chapter. You may delete the contents of this chapter so you can add your own text; it's just here to show you some examples. 
 	
 \section{References, Labels, Custom Commands and Footnotes}
 It is easy to refer to anything within your document using the \texttt{label} and \texttt{ref} tags.  Labels must be unique and shouldn't use any odd characters; generally sticking to letters and numbers (no spaces) should be fine. Put the label on whatever you want to refer to, and put the reference where you want the reference. \LaTeX\ will keep track of the chapter, section, and figure or table numbers for you. 
