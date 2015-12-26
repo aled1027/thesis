@@ -57,6 +57,10 @@
 \newcommand{\Wires}{\text{Wires}}
 \newcommand{\Enc}{\operatorname{Enc}}
 \newcommand{\Dec}{\operatorname{Dec}}
+\newcommand{\EncInv}{\Enc^{-1}}
+\newcommand{\EncDKC}{\operatorname{EncDKC}}
+\newcommand{\DecDKC}{\operatorname{DecDKC}}
+\newcommand{\EncDKCInv}{\EncDKC^{-1}}
 \newcommand{\compIndist}{\approx_D}
 \newcommand{\outputrv}{{\sf output}}
 \newcommand{\viewrv}{{\sf view}}
@@ -207,54 +211,53 @@ The modern cryptography needs to implemented and used, perhaps in some cases bui
 At this point, the outlook of cryptography is bright, but the future will only be realized positvely if it is actively worked towards.
 
 \section{Tools for MPC}
-Imagine again that millionaires Alice and Bob wish to determine who has more wealth.
-Suppose that Alice has $x_a$ dollars and Bob has $y_b$ dollars.
-Then the function that they wish to compute is $f: \{0,1\}^n \to \{0,1\}$ as defined by:
-\begin{equation}
-    \label{eqn:less_than}
-    f(x_a,x_b) = 
-    \begin{cases}
-    0, & x_a \leq x_b; \\
-    1, & \text{otherwise}.
-    \end{cases}
-\end{equation}
-
-\textbf{Why is this here?}
-If Alice and Bob successfully compute $f(x,y)$ and each gets the output, then each party has gained some knowledge about the nature of the other's input.
-For example, if $f(x_a,x_b)$ outputs $0$, then Alice and Bob know that Alice has more money.
-Alice has learned that Bob has less than $x$ dollars, and Bob has learned that Alice has more $x_b$ dollars.
-Therefore it's not possible for MPC to guarantee that \textit{no} information about the other parties' inputs is learned, only that nothing more is learned than what can be inferred from a single party's input and the output of $f$. 
-
-MPC requires a combination of several cryptographic tools.
-The next few sections will describe these basic tools, and then MPC will described in section $x$. 
+MPC is a complex construction with many moving parts. 
+Each moving part is itself a unique cryptographic primitive, which when combined give rise to MPC.
+The following sections give a summary of the crytographic tools required for MPC.
 
 \subsection{Encryption}
-Encyprtion is the process of encoding a message such that only parties with the key can read the message.
-An encryption protocol is composed of two parts.
-The first part is the encryption function which disguises the message, and the second part is the decryption function which unobfuscates the disguised message.
+Encryption is the process of encoding a message such that only parties with the key can read the message.
+As we discuss MPC, we will be using symmetric-key encryption, the case of encryption where encryption and decryption use the same key.
+Public key encryption, in constrast, uses two different keys: one key for encryption and a different key for decryption.
+While early MPC schemes used public key encryption, modern methods do not require public key encryption, and symmetric-key encryption algorithms are faster, making them preferable.
+
+A symmetric-key encryption protocol is composed of two parts.
+The first part is the encryption algorithm which disguises the message, and the second part is the decryption algorithm which unobfuscates the disguised message.
+We notate the decryption algorithm, $\Dec$ as $\EncInv$.
 We notate encryption and decryption with
-%\begin{equation}
-%    \label{eqn:encryption}
-%    \begin{split}
-%        \Enc_k (pt) & = ct  \\
-%        \Dec_k(ct) & = pt
-%    \end{split}
-%\end{equation}
-where $pt$ stands for plaintext and is the original message, $ct$ stands for ciphertext and is the encrypted message, $k$ is the secret key, that only authorized readers of the message hold, and is a random sequence of $\lambda$ $0$s and $1$s, and $\lambda$ is a security parameter of our protocol (As $\lambda$ increases, the size of the key increases, and so the encryption becomes harder to break.)
+\begin{equation}
+    \label{eqn:encryption}
+    \begin{split}
+        \Enc_k (pt) & = ct  \\
+        \EncInv_k(ct) & = pt
+    \end{split}
+\end{equation}
+where $pt$ stands for plaintext and is the original message, $ct$ stands for ciphertext and is the encrypted message, and $k$ is the secret key, that only authorized readers of the message hold.
+For the algorithm to be effective, the secret key $k$ must be a randomstring of $0$s and $1$s of length $\lambda$.
+\footnote{The notion of randomness in cyptoraphy has a precise definition, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseuodorandom. Pseudorandom also has precise cryptographyic definition.}
 
-The encryption decribed above is more precisely called symmetric-key encryption, as opposed to public-key encryption.
-The difference between the two is that for symmetric-key encryption, there is a single key and all communicating must have the same key in order to acheive secure communication, whereas in public-key encryption, the encryption key is published publicly, and anyone can send a message using the public key, and the message can only be decrypted by those with the secret key.
-For more information on encryption, we encourage the reader to peruse the many great online resources.
+$\lambda$ is the security parameter of our protocol.
+If we increase $\lambda$, thereby increasing the size of the key, then the encyrption algorithm becomes harder for an adversary to break.
 
-The MPC protocols that will be examined here exclusively use symmetric-key encryption.
+It is useful for MPC to define a specific type of symmetric-key encryption algorithm called a Dual-Key Cipher (DKC) \cite{bellare2012foundations}.
+A DKC requires two secret keys to encrypt and decrypt the message, in constrast to classic encryption which only requires one.
+It is easy to instantiate a DKC if one has a secure encryption scheme: let $k_0$ and $k_1$ be the two secret keys, and instantiate the DKC as follows:
+\begin{equation}
+    \begin{split}
+        \EncDKC_{k_0, k_1}(pt) = \Enc_{k_1} ( \Enc_{k_0} ( pt )) \\
+        \EncDKCInv_{k_0, k_1}(ct) = \EncInv_{k_0} ( \EncInv_{k_1} ( ct )) 
+    \end{split}
+\end{equation}
+This construction of a DKC is slow, and there are many faster methods for instantiating DKCS.
+For more information, see \cite{bellare2012foundations}.
 
 \subsection{Boolean Circuit} 
 A function for an MPC protocol is represented by a boolean circuit.
-A boolean circuit takes as input a sequence of $n$ $0$s and $1$s, (i.e. a value in $\{0,1\}^n$), performs a series of small opreations on the inputs, and outputs a sequence of m $0$s and $1$s (i.e. a value in $\{0,1,\}$).
+A boolean circuit takes as input a sequence of $n$ $0$s and $1$s, (i.e. a value in $\{0,1\}^n$), performs a series of small opreations on the inputs, and outputs a sequence of m $0$s and $1$s (i.e. a value in $\{0,1\}$).
 You may have encountered circuits and logical operators in another context, where the inputs and outputs were True and False.
 For our usage, True will correspond to the value $1$, and False will corresond to the value $0$. 
 
-The small operations performed inside of a circuit are performem by an object called a \emph{gate}.
+The small operations done inside of a circuit are performed by an object called a \emph{gate}.
 A gate is composed of three wires: two input wires and one output wire, where a \emph{wire} can have a value either $0$ or $1$.
 A gate performs a simpler operation on the two inputs, resulting in a single output bit.
 Table \ref{tab:xor} gives the mapping of an XOR gate.
@@ -274,10 +277,9 @@ x & y & xor(x,y) \\ \hline
 \end{table}
 
 A circuit is a combination of gates. 
-In fact, a circuit built out of only AND gates, XOR gates and NOT gates can compute any function.
+In fact, a circuit built out of only AND gates, XOR gates and NOT gates can compute any function or algorithm.
 \textbf{Find details and citation} In other words, if there's some algorithm that do it, then there is some circuit that can do it as well.
-Hence, a circuit is a sufficient representation of the function $f$.
-Figure \ref{fig:less_than_circuit} shows the circuit representation of a circuit that computes the less than function, the function $f$, specified in equation \ref{eqn:less_than} that millionaires Alice and Bob wanted to compute.
+Figure \ref{fig:less_than_circuit} shows the circuit representation of the less than function, $f$ as specified in equation \ref{eqn:less_than}.
 
 \begin{figure}[h]
     \centering
@@ -286,10 +288,10 @@ Figure \ref{fig:less_than_circuit} shows the circuit representation of a circuit
     \caption{A circuit that computes the less or equal to function, equivalent to $f$ for input of two one-bit values. \textbf{TODO, add truth table?}}
 \end{figure}
 
-A circuit \textbf{with what constraints???} can compute any function.
-
 \subsection{Technical Definition of a Circuit}
-\textbf{Use / begin definition}
+It is useful at times to have a formal definition of a circuit.
+Here we give a formal definition of a circuit proposed by BHR in \cite{bellare2012foundations}.
+
 A circuit is formalized by a 6-tuple $g = (n,m,q,A,B,G)$, where $n$ is the number of inputs, $m$ is the number of outputs and $q$ is the number of gates.
 We define $r = n + q$ to the number of wires inside of the circuit.
 We let $\Wires = \{1,\ldots, n+q\}, \InputWires = \{1,\ldots, n\}, \OutputWires = \{n+1-m+1, \ldots,n+q\}$, and $\Gates = \{n+1, \ldots, n+q\}$.
@@ -297,9 +299,9 @@ Then $A : \Gates \to \Wires \setminus \OutputWires$ identifies each gate's first
 And $B : \Gates \to \Wires \setminus \OutputWires$ identifies each gate's second incoming wire.
 Finally, $G: \Gates \times \{0,1\}^2 \to \{0,1\}$ identifies the functionality of each gate.
 
-For example, the less than circuit shown in figure \ref{fig:less_than_circuit} has values:
+% TODO - if we want - 
+% For example, the less than circuit shown in figure \ref{fig:less_than_circuit} has values:
 
-<<<<<<< HEAD
 \newcommand{\Gb}{\operatorname{Gb}}
 \newcommand{\En}{\operatorname{En}}
 \newcommand{\De}{\operatorname{De}}
@@ -312,8 +314,7 @@ For example, the less than circuit shown in figure \ref{fig:less_than_circuit} h
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
-To evaluate a circuit, we use a canonical algorithm $\evcirc$.
-$\evcirc$ takes as input a string $f$ and a string $x = x_1 x_2 \ldots x_n$ and does the following:
+To evaluate a circuit, we use a canonical algorithm $\evcirc$, which takes as input a function $f$ (encoded as a string) and a string $x = x_1 x_2 \ldots x_n$ and does the following:
 
 \begin{algorithm}
 \caption{$\evcirc$}
@@ -334,41 +335,29 @@ $\evcirc$ takes as input a string $f$ and a string $x = x_1 x_2 \ldots x_n$ and 
 \end{algorithmic}
 \end{algorithm}
 
-\begin{definition}{Topological Circuit}
-    A topological circuit, denoted $\fbar$, is the $5$-tuple $(n,m,q,A,B)$ for some circuit $f = (n,m,q,A,B,G)$.
-    Furthermore, define $\Topo(f)$ such that $\fbar = \Topo(f)$.
-\end{definition}
+\subsection{Computational Indistinguishability and the DDH Assumption} 
+\label{sctn:DDH}
+\textbf{Add in computational indist defn here. use lindellpinkas paper}
+\textbf{Check if this is ever used - it is used. see eqn 1.6, ensebles}
+\textbf{Give encryptiong example?}
 
-A topological circuit is the same as its conventional circuit $f$, except that the functionality of the gates is not specified.
-If one holds a topological circuit, then they know the structure of the function, but not what is being computed.
-=======
-\subsection{Encryption}
-Encryption is a method of encoding a message such that only parties with the key can read the message.
-An encryption protocol is composed of two parts.
-The first part is the encryption function which disguises the message, and the second part is the decryption function which unobfuscates the disguised message.
-We notate encryption and decryption with
-\begin{equation}
-    \label{eqn:encryption}
-    \begin{split}
-        \Enc_k (pt) & = ct  \\
-        \Dec_k(ct) & = pt
-    \end{split}
-\end{equation}
-where $pt$ stands for plaintext and is the original message, $ct$ stands for ciphertext and is the encrypted message, $k$ is the secret key, that only authorized readers of the message hold, and is a random sequence of $\lambda$ $0$s and $1$s, and $\lambda$ is a security parameter of our protocol (As $\lambda$ increases, the size of the key increases, and so the encryption becomes harder to break.)
+When a cryptographic scheme is said to be \textit{secure}, cryptographers actually mean something much more precise. 
+It means that an adversary can beat the scheme only if the adversary can tackle the hardness assumptions on which the scheme is based.
+Hardness assumption, in the way I'm using it, means a problem, like factoring a number or finding the greatest common divisor of two numbers.
+At a high level then a cryptographic scheme is secure so long as there is no efficient algorithm for solving the underlying problem.
 
-The encryption decribed above is more precisely called symmetric-key encryption, as opposed to public-key encryption.
-The difference between the two is that for symmetric-key encryption, there is a single key and all communicating must have the same key in order to acheive secure communication, whereas in public-key encryption, the encryption key is published publicly, and anyone can send a message using the public key, and the message can only be decrypted by those with the secret key.
-For more information on encryption, we encourage the reader to peruse the many great online resources.
+For example, say we have some encryption scheme with has algorithms $\Enc$ and $\EncInv$.
+Then in order to make the statement ``$\Enc$ is secure'' substantial and precise, we might say that ``an adversary can determine $m$ given $\Enc_k(m)$ and the $\Enc$ algorithm if and only if the same adversary can solve problem $P$''.
+The real trick for making a good encryption algorithm is threefold: (1) finding a problem $P$ which is hard to solve, (2) making $\Enc$ dependent on $P$, and (3) ensuring that $\Enc^{-1}$ is efficient to solve (because we need to be able to decrypt our messages quickly).
 
-The MPC protocols that will be examined here exclusively use symmetric-key encryption.
+This formulation of security turns out to be useful for a number of reasons. 
+One reason is that we will know when the scheme becomes insecure. 
+If the underlying problem, like factoring large numbers, becomes solvable efficiently, then we immediately know that our scheme in insecure.
+There is a major disadvantage to this formulationation.
+Once researchers found a few good hardness assumption, almost all cryptographic schemes became dependent on these problems; all of the eggs were put in a few baskets. 
+So if one big problem is found to have an efficient solution, such as factoring prime numbers, then many cryptographic schemes will break.
 
-\subsection{Digital Signatures/MACS}
-Do we need this?
-
-\subsection{The DDH Assumption} \label{sctn:DDH}
-When a cryptographic scehe is said to be \textit{secure}, cryptographers actually mean something much more precise. 
-When a cryptographic scheme is considered secure, it actually means that an adversary can beat the scheme only if the adversary can tackle the hardness assumptions on which the scheme is based.
-A common hardness assumption in crytoraphy is the Decisional Diffie-Helman Assumption (DDH Assumption), an assumption about solving a problem concerning discrete logs.
+A common hardness assumption is the Decisional Diffie-Helman Assumption (DDH Assumption), an assumption about solving a problem concerning discrete logs.
 
 Informally, the DDH assumption is:
 \begin{equation}
@@ -380,9 +369,11 @@ Informally, the DDH assumption is:
 	\end{split}
 \end{equation}
 
-\textbf{Define computationally indistinguishability somewhere}
+\textbf{Give encryptiong example?}
+
 
 \subsection{Oblivious Transfer}
+\textbf{TODO Remove gender}
 Oblivious Transfer is a special method of communicating a message between two parties where a sender sends one of two messages the receive, and the sender remains oblivious as which message was sent.
 The setup is the following:
 Alice has two messages, $m_1$ and $m_2$, and he wants to send a message to Bob under the following conditions: First, Alice sends either $m_1$ or $m_2$ but not both. Second, Alice does not know which message he sent to Bob. Third, Bob selects which message he wants to receive.
@@ -412,10 +403,9 @@ change arbitrary function to arbitrary boolean function.
 \section{Classic MPC}
 MPC was first proposed by Andrew Yao in an oral presentation on secure function evaluation.
 After Yao's presentation, two methods for performing MPC were developed.
-One method was contributed by Yao himself, and the other was contributed by a group of researchers, Beaver, Micali and Widgerson.
-The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, with has since been termed garbled circuit.
-At this point, it is unclear which method is better, both in terms of security and in terms of speed speed. 
-As a result, research is still being done on both protocols.
+One method was developed by Yao himself, and the other was developed by a group of researchers, Beaver, Micali and Widgerson.
+The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, which has since been termed garbled circuit.
+At this point, it is unclear which method is better, so researchers continue to study both methods.
 
 This section will first give a new definition of a garbling scheme, first presented by BHR in 2012, and then give Yao's garbled circuit protocol, and finally GMW's garbled circuit protocol.
 
