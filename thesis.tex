@@ -395,91 +395,70 @@ Preprocessing.
 OT extension.
 Semi-honest/Malicious.
 
-\subsection{Other}
-\textbf{TODO}
-Paper has topological circuit next to real circuit
-change arbitrary function to arbitrary boolean function.
-
-\section{Classic MPC}
+\section{Classic 2PC}
 MPC was first proposed by Andrew Yao in an oral presentation on secure function evaluation.
 After Yao's presentation, two methods for performing MPC were developed.
 One method was developed by Yao himself, and the other was developed by a group of researchers, Beaver, Micali and Widgerson.
 The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, which has since been termed garbled circuit.
 At this point, it is unclear which method is better, so researchers continue to study both methods.
 
-This section will first give a new definition of a garbling scheme, first presented by BHR in 2012, and then give Yao's garbled circuit protocol, and finally GMW's garbled circuit protocol.
+Section xxx gives the definition gives a definition of security for an MPC protocol. 
+Section yyy gives ...
 
-\subsection{Garbling Schemes}
-Recall millionaires Alice and Bob who want to determine who has more wealth.
-Alice and Bob start with a function $f$ (defined in \ref{function}) and their inputs, $x_a$ and $x_b$, which correspond to their amount of wealth.
-In order to compute who has more money, the function $f$ needs to be transformed such that they can compute the function by sending messages between each other their inputs, $x_a$ and $x_b$, which correspond to their amount of wealth.
-Informally, a garbling scheme transforms a specification of a function into a collection of algorithms which can in combination can compute the function.
-
-\begin{definition}{Garbling Scheme}
-    A garblering scheme is a $5$ tuple of algorithms $G = (\Gb, \En, \De, \Ev, \ev)$ where the algorithms are
-    \begin{itemize}
-        \item $\Gb(f, k) \rightarrow (F,e,d)$. 
-        \item $\En(e,x) \rightarrow X$.
-        \item $\Ev(F,X) \rightarrow Y$.
-        \item $\De(d,Y) \rightarrow y$.
-        \item $\ev(f, x) \rightarrow y$.
-        where 
-        \begin{itemize}
-            \item $f$ is a function.
-            \item $k \in \mathbb{N}$ is the security parameter.
-            \item $x \in \{0,1\}^n$ is the initial input.
-            \item $X$ is the garbled input
-            \item $Y$ is the garbled output
-            \item $y$ is the final output
-            \item $F$ is a string that describes the operation of the $\Ev$ algorithm. 
-            \item $e$ is a string describing the operation of the $\En$ algorithm. In particular, $e$ describes how to obscure the input $x$.
-            \item $d$ is a string describing the operation of the $\De$ algorithm. In particular, $d$ describes how to unobscure the output $Y$.
-
-        \end{itemize}
-        \item A garbling scheme guarantees correctness if $\De(d, \Ev(F, \En(e,x))) = \ev(f,x)$.
-    \end{itemize}
-    A garbling schemes map the information:
+\subsection{2PC Security Motivation}
+Think back to Alice and Bob in section xxx. 
+Alice and Bob were millionaires who wanted to determine who was wealthier without disclosing how much wealth they had.
+Formally, we say that Alice has input $x$ and Bob has input $y$ ($x$ and $y$ are the wealth of each party), and they want to compute the greater than function $f$, such that 
+\textbf{Is this equation still somewhere else}
 \begin{equation}
-    (f,k,x) \rightarrow^{\Gb} (F,e,d,x) \rightarrow^{\En} (F,d,X) \rightarrow^{\Ev} (d,Y) \rightarrow^{\De} y
+    f = .
 \end{equation}
-\end{definition}
 
-To make the idea a garbling scheme more concrete, below is an example of how Alice and Bob would compute who is wealthier. 
-The inputs to their computation are $f$, the function to be computed which is defined in equation \ref{eqn:less_than}, and their inputs $x_a$ and $x_b$.
-\begin{enumerate}
-    \item Alice has the function $f$ to be computed, her input $x_a$, and Bob has his input $x_b$.
-    \item Alice hard-codes her inputs into the function, resulting in $\hat{f}$.
-    \item Alice runs the probabilistic algorithm $\Gb(\hat{f}, k)$. She now has $(F,e,d)$.
-    \item Alice encodes all possible inputs that Bob could, all possible sequences of $0$s and $1$s, into $X$ using $\En$.
-    \item Alice sends $(F,X,d)$ to Bob.
-    \item Bob runs $\Ev(F,X)$ to get $Y$. This computes the function, but the output, $Y$, is obscured.
-    \item Bob runs $\De(d,Y)$ to get $y$. This unobscures the output $Y$. Bob now has $y \in \{0,1\}$.
-        If $y = 0$, then Bob knows that Alice is wealthier. 
-        If $y = 1$, then Bob knows that he is wealthier.
-    \item Bob sends $y$ to Alice.
-\end{enumerate}
+We call the overarching interaction between Alice and Bob the protocol $\Pi$, and it consists of all messages exchanged and computations performed.
+Based on the setup of the problem, we can list a few properties that Alice and Bob wish $\Pi$ to have.
+\begin{description}
+    \item[Privacy] 
+        Parties only learn their output. 
+        Any information learned by a single during the execution of $\Pi$ must be deduced from the output. 
+        For example, in the case of Alice and Bob, if Alice learns that they had more money, then they learn that $y < x$, which is some information about $y$, but is deduced from the output so it is reasonable. 
+        It would be unreasonable if during the execution of $\Pi$ Alice learns that $1,000,000 < y < 2,000,000$, as that information is not deducable from $f(x,y)$.
+    \item[Correctness] 
+        Each party receives the correct output.
+        In the case of Alice and Bob, this simply means that they learn correclty who has more money.
+    \item[Fairness] 
+        Each party receives their input if and only if the other party receives their input.
+        In the case of Alice and Bob, this means that Alice receives their input if and only if Bob recieves their input.
+        This property prevents the case where Alice sends her input to Bob, Bob computes $f$ with Alice's input and their own input, and then Bob refuses to send his input to Alice. 
+        Hence Bob has learned to output of $f$, but Alice hasn't. 
+        We do not want to this scenario to happen, so we require that each party receive their input if and only if the party does. 
+        We do not require that all parties always receive their inputs, because a party could abort from the execution in the middle of the protocol.
+        \footnote{Technically this is incorrect since we assume that each party is semihonest, but the property generalizes more easily when this requirement when considering aborts.}
+    \item[Semi-honesty]
+        Each party must obey the protocol.
+        We are assuming that Alice and Bob are semi-honest agents, which means that Alice and Bob are not malicious, trying to steal information from each other. 
+        They are simply trying to compute $f$, but would use the information that they receive in order to deduce information about the other party.
+        In contrast, we could imagine the scenario where Alice and Bob are untrustworthy: they would send lies, send the wrong input, or deviate in any number of ways to get the upper hand in the protocol.
+        While assuming semi-honesty is not the most realistic scenario, most cryptographic protocols secure with semi-honest agents can be transformed into stronger protocols protecting against malicious agents.
+        Morever, the semi-honest protocols are more intuitive.
+\end{description}
+These properties themselves do not constute definition, but rather any secure protocol should have these properties.
+One possible method for making a definition of security would be to list a number of properties a secure protocol must have.
+This approach is unsatisfactory for a number of reasons.
+One reason is that an important property of security may be missed.
+Many different applications of 2PC have different requirements, and which means that an important requirement may be missed in corner cases.
+Ideally, a good definition of 2PC works for all applications, henc capturing all of those requirements.
+A second reason that the property based definition is unsatisfactory is that the definition should be simple.
+If the definition is simple, then it should be clear that \textit{all} possible attacks against the protocol are prevented by the definition.
 
-The definition of a garbling scheme is a recently created definition, proposed for the first time ****, *** years after Yao's garbled circuit was proposed.
-The benefits of thinking of a garbled scheme in terms of this definition are significant.
-For one, it easier to map a theoretically garbling protocol into practice, i.e program it. 
-The methods are already separated, whereas before the algorithm was generally one giant idea.
-When the methods are separated, the programmer does not need to intimately understand the security guarantees and pitfalls of the method, as the sequence of events that need to happen is explicit in the construction.
-A second reason that this definition of a garbling scheme is good is that it presents garbling as a larger cryptographic abstraction. 
-Garbling schemes are simply methods for garbling a function and input, and this definition matches the intuition. 
-
-\subsection{Projective Garbling Schemes}
-Perhaps a helpful abstraction to have later.
-
-\subsection{Security of Garbling Schemes}
-This section will give the definition of security of a garbling scheme.
-
-\subsection{MPC Security Definitions}
-A number of definitions which formalize what it means for a multiparty computation have been formalized. 
+\subsection{2PC Security Definition}
+A number of definitions formalize what it means for a 2PC protocol to be secure.
 Yao, in his 1982 paper on secure function evaluation, says a 2PC protocol is secure if it has the property:
 
 \begin{blockquote}
 If one participant behaves according the the protocol, the probability that the other participant successfully cheats is at most $\gamma$ for $\gamma \in \{0,1\}$.
 \end{blockquote}
+
+TODO mention that this doesn't use the properties.
 
 Since Yao's original definition, many other definitions for the security of 2PC protocols have been proposed.
 Here we give Goldreich's definition of 2PC, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on multiparty computation \cite{goldreich2, lindell2009}.
@@ -517,7 +496,6 @@ Here we give Goldreich's definition of 2PC, which is given in his textbook \text
 %The property based definitions are the most straightforward to prove, and the most familiar to proofs used in mathematics.
 %
 
-\subsection{Goldreich and Lindell's Definition of Security for 2PC}
 %The definition is designed for static, semi-honest adversaries. 
 
 \begin{description}
