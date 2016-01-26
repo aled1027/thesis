@@ -972,46 +972,113 @@ Without doing too much (if any) optimization of the circuit, FleXOR usually requ
 %\end{itemize}
 
 \section{Half Gates}
-Half Gates is the most recent technique developed to improve Yao's garbled circuit.
-The goal was to make AND gates cost 2 ciphertexts, and for Free XOR to always be free.
-The methodology at high level is to make AND gates rely on Free XOR, so that AND gates result in values with the correct Free XOR delta.
+Half Gates is the most recent improvement Yao's garbled circuit.
+The goal of Half Gates is to make AND gates cost two ciphertexts, while preserving properties necessary for Free XOR. 
+I'm going to introduce Half Gates in a different way from the original paper.
 
-%\begin{itemize}
-%    \item Goal: make AND gates cost 2 and have free xor.
-%    \item a high level way to think about it: make AND gates rely on free xor in some way
-%    \item ``philosophical question'': What is the garbler knows in advance the truth value of one input wire?
-%    \item e.g. AND gate and their input value is a false
-%    \item turn into unary gate (either note gate or identity gate)
-%    \item Use GRR3 trick to get one to disappear (GRR3 relies on point and permute, so that is happening too)
-%    \item So use only 1 ciphertext.
-%    \item What if evaluator knows the truth value on input wire?
-%    \item someohow learn that have the false wire label
-%    \item if AND gate, then know that will learn false
-%    \item similar thing with above with not and identity gate
-%    \item cost 1 CT.
-%    \item No need for point and permute here: because evaluator does different things based on having true or false wire label (and the assumption is that they know)
-%    \item Real thing:
-%    \item two halves make a whole!
-%    \item compatible with free xor
-%    \item AND gate requires two CTs
-%    \item don't need to make $r$, we have a convenient $r$ floating around
-%    \item r = color bit of FALSE wire label A
-%    \item $a \oplus r$ = color bit of wire label evaluator gets ($A$ or $A \oplus \Delta)$
-%    \item no polynomial interpolation at all -- i.e. not based on GRR2
-%    \item every garbling scheme is a combo of
-%    \item 1. symmetric primitive (PRF/hash function) (can be modeled as random oracle
-%    \item 2. $GF((2^{\lambda}$-linear operators (XOR, polynomial interpolation)
-%    \item Garbling a single AND gate requires 2 CTS ($2 \lambda$ bits) if garbling scheme is ``linear'' in this sense.
-%    \item hence half-gates is size optimal: use ``known techniques'' and work gate-by-gate basis 
-%\end{itemize}
+We consider the case of an AND gate $c = a \wedge b$, where the generator knows the value of $a$. 
+If $a = 0$, then the generator will create a unary gate that always outpost false, $c$. 
+Otherwise if $a = 1$, then the generator create a unary identity gate that always outputs $b$. 
+Table \ref{tbl:halfgate-gg-garb} shows the garbled gates for different values of $a$. 
+
+%\begin{align*}
+%& \text{If $a = 0$, then } 0 \wedge b = 0 \text{, so output } H(B) \oplus C. \\
+%& \text{If $a = 1$, then } 1 \wedge b = b \text{, so output } H(B \oplus \Delta) \oplus C \oplus a\Delta .
+%\end{align*}
+\begin{table}[h]
+    \label{tbl:halfgate-gg-garb}
+    \centering
+    \begin{tabular}{|c|}
+    \hline
+    Garbled Table for $a = 0$ \\
+    \hline
+    $H(B) \oplus C$ \\
+    $H(B) \oplus C$ \\
+    \hline
+    \end{tabular}
+    \begin{tabular}{|c|}
+    \hline
+    Garbled Table for $a = 1$ \\
+    \hline
+    $H(B) \oplus C$ \\
+    $H(B) \oplus C \oplus \Delta$ \\
+    \hline
+    \end{tabular} $\;\rightarrow$
+     \begin{tabular}{|c|}
+    \hline
+    Garbled Table for any $a$ \\
+    \hline
+    $H(B) \oplus C$ \\
+    $H(B) \oplus C \oplus a\Delta$ \\
+    \hline
+    \end{tabular}
+    \caption{Generator's Garbled Half Gate for $a = 0$, $a = 1$, and written more succinctly with $a\Delta$ for $a \in \{0,1\}$. If $a = 0$, then $a\Delta = 0$.  Otherwise if $a = 1$, then $a\Delta = \Delta$.}
+\end{table}
+
+Since the evaluator has the wire label corresponding to b (either $B$ or $B \oplus \Delta$), the evaluator can compute the label of the output wire of the AND gate by xoring the rows in the garbled table by $H(B)$ or $H(B \oplus \Delta)$ to get $C$ or $C \oplus \Delta$ respectively. 
+
+A further improvement can be garnered by using the garbled row-reduction trick.
+We choose $C$ such that the first of the top row of the garbled table is the all zeros ciphertext. 
+The top row may not necessarily be $H(B) \oplus C$, since for security the rows are permuted. 
+Because the top row is all 0s, it does not need to be sent to the evaluator. 
+If the evaluator should decrypt the cipher text on the top row (as directed by point and permute), then the evaluator assumes the cipher text to be all 0s. Overall, computing $a \wedge b = c$ requires two having operations by the generator, a single hash operation by the evaluator, and the communication of one ciphertext. 
+
+We now consider computing $a \wedge b = c$, where the evaluator somehow already knows the value of $a$.
+If $a = 0$, then the evaluator should acquire $C$. 
+Otherwise if $a = 1$, then the evaluator should acquire $C \oplus b\Delta$, in which case it is sufficient for the evaluator to obtain $\Omega = C \oplus B$ (then xor $\Omega$ with the wire label corresponding to $b$).
+Table \ref{tbl:halfgate-gg-eval} shows cipher texts which the garbler gives to the evaluator.
+
+This table is different from other garbled tables. 
+First, the table does not need to be permuted. 
+Secondly, evaluation is different.
+If $a = 0$, then the evaluator uses wire label $A$ to decrypt the top row of the table and acquire $C$. 
+If $a = 1$, then the evaluator uses $A \oplus \Delta$ to decrypt the second row, yielding $C \oplus B$.
+The evaluator then xors wire label $B + b\Delta$ by $C \oplus B$ to obtain $C \oplus b\Delta$. 
+As before, the ciphertext  on the top row does not need to be communicatd by using the garbled row-reduction trick.
+The generator sets $C$ such that $H(A) \oplus C = 0$ (i.e. $C = H(A)$). 
+The total cost of this half gate is the same as before: two hashes by the generator, one hash by the evaluator, and once cipher text. 
+
+\begin{table}[h]
+    \label{tbl:halfgate-gg-eval}
+    \centering
+    \begin{tabular}{|c|}
+    \hline
+    Garbled Table for any $A$ \\
+    \hline
+    $H(A) \oplus C$ \\
+    $H(A \oplus \Delta) \oplus C \oplus B$ \\
+    \hline
+    \end{tabular}
+    \caption{Evaluator's half gate garbled table.}
+\end{table}
+
+We now put the two half gates together to form an AND gate. 
+Consider the following where $r$ is a random bit generated by the generator:
+\begin{equation}
+a \wedge b = a \wedge (r \oplus r \oplus b) = (a \wedge r) \oplus (a \wedge (r \oplus b)).
+\end{equation}
+The first AND gate, $a \wedge r$, can be computed with a generator-half-gate - the generator ``knows'' $r$. 
+Furthermore, if we can let the evaluator know the value of $r \oplus b$, then the second AND gate, $(a \wedge (r \oplus b)$, can be computed with an evaluator-half-gate - the evaluator ``knows'' $r \oplus b$. 
+And the final XOR can be computed with free xor at the cost of no ciphertexts. 
+
+It is secure for the garbler to give $r \oplus b$ to the evaluator, since $r$ is random and blinds the value of $b$. 
+The value of $r \oplus b$, while only a single bit, can be communicated to the evaluator for free: use the select bit (from the point and permute technique) of the false wire label on wire $b$ (so $r$ is the select bit on the true wire label of wire $b$).
+
+The overall cost of using Half Gates for AND gates is four calls to $H$ for the generator, two calls to $H$ for the evaluator, and the communication of $2$ ciphertexts. 
+Half Gates guarantees only two ciphertexts are needed per AND gate, but the tradeoff is the additional computation for both parties (i.e. computing $H$).
+With FleXOR, the number of ciphertexts that need to be communicated may vary, but there is less computation required.
+
+When MPC becomes used in real operations, the circuit will likely not be optimized for XOR gates (reducing the number of AND gates). 
+In this case, where an arbitrary function is being computed, it is hypothesized that Half Gates will outperform FleXOR. 
+But in many of the cases being examined now - most notably computing AES - the circuit has been optimized heavily to have very few AND gates, hence the benefits of Half Gates are less noticeable.\footnote{At present, the AES circuit is 80\% XOR gates} 
 
 \begin{table}[h]
   \centering
   \renewcommand{\arraystretch}{1.2}
 \begin{adjustbox}{width=1\textwidth}
-  \begin{tabular}{|p{5cm}||c|c||c|c||c|c||c|}
+  \begin{tabular}{|p{5cm}|c|c|c|c|c|c|c|}
     \hline
-    \multirow{2}{5cm}{\centering \textbf{Mode Transition Times Duration (Typical)}} & 
+    \multirow{2}{5cm}{\centering \textbf{Garbled Circuit Improvement}} & 
     \multicolumn{2}{c|}{\textbf{Size (x$\lambda$)}} & 
     \multicolumn{2}{c|}{\textbf{Eval Cost}} & 
     \multicolumn{2}{c|}{\textbf{Garble Cost}} &
@@ -1025,33 +1092,11 @@ The methodology at high level is to make AND gates rely on Free XOR, so that AND
     Free XOR & TBD & TBD & TBD & $\mu$ & a & bs& a  \\ \hline
     GRR2 XOR & TBD & TBD & TBD & $\mu$ & a & bs  & a\\ \hline
     FleXOR& TBD & TBD & TBD & $\mu$ & a & bs & a \\ \hline
-    Half Gates & TBD & TBD & TBD & $\mu$ & a & bs & a \\ \hline
+    Half Gates & 2 & 0 & 2 & 0 & 4 & 0 & a \\ \hline
   \end{tabular}
   \end{adjustbox}
   \caption{Summary of Garbled Circuit Improvements. GRR3 stands for garbled row reduction 3 and GRR2 stands for garbled row reduction 2}
 \end{table}
-
-
-\chapter{Template tips}
-This is the first page of the first chapter. You may delete the contents of this chapter so you can add your own text; it's just here to show you some examples. 
-	
-\subsection{Footnotes and Endnotes}
-	You might want to footnote something.\footnote{footnote text} Be sure to leave no spaces between the word immediately preceding the footnote command and the command itself. The footnote will be in a smaller font and placed appropriately. Endnotes work in much the same way. More information can be found about both on the CUS site.
-	
-\section{Bibliographies}
-	Of course you will need to cite things, and you will probably accumulate an armful of sources. This is why BibTeX was created. For more information about BibTeX and bibliographies, see our CUS site (\url{web.reed.edu/cis/help/latex/index.html})\footnote{\cite{reedweb:2007}}. There are three pages on this topic: {\it bibtex} (which talks about using BibTeX, at \url{/latex/bibtex.html}), {\it bibtexstyles} (about how to find and use the bibliography style that best suits your needs, at \url{/latex/bibtexstyles.html}) and {\it bibman} (which covers how to make and maintain a bibliography by hand, without BibTeX, at at \url{/latex/bibman.html}). The last page will not be useful unless you have only a few sources. There used to be APA stuff here, but we don't need it since I've fixed this with my apa-good natbib style file.
-	
-\subsection{Tips for Bibliographies}
-\begin{enumerate}
-\item Like with thesis formatting, the sooner you start compiling your bibliography for something as large as thesis, the better. Typing in source after source is mind-numbing enough; do you really want to do it for hours on end in late April? Think of it as procrastination.
-\item The cite key (a citation's label) needs to be unique from the other entries.
-\item When you have more than one author or editor, you need to separate each author's name by the word ``and'' e.g.\\ \verb+Author = {Noble, Sam and Youngberg, Jessica},+.
-\item Bibliographies made using BibTeX (whether manually or using a manager) accept LaTeX markup, so you can italicize and add symbols as necessary.
-\item To force capitalization in an article title or where all lowercase is generally used, bracket the capital letter in curly braces.
-\item You can add a Reed Thesis citation\footnote{\cite{noble:2002}} option. The best way to do this is to use the phdthesis type of citation, and use the optional ``type'' field to enter ``Reed thesis'' or ``Undergraduate thesis''. Here's a test of Chicago, showing the second cite in a row\footnote{\cite{noble:2002}} being different. Also the second time not in a row\footnote{\cite{reedweb:2007}} should be different. Of course in other styles they'll all look the same.
-\end{enumerate}
-\section{Anything else?}
-If you'd like to see examples of other things in this template, please contact CUS (email cus@reed.edu) with your suggestions. We love to see people using \LaTeX\ for their theses, and are happy to help.
 
 \chapter*{Conclusion}
          \addcontentsline{toc}{chapter}{Conclusion}
