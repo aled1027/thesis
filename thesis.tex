@@ -1,35 +1,7 @@
-% This is the Reed College LaTeX thesis template. Most of the work 
-% for the document class was done by Sam Noble (SN), as well as this
-% template. Later comments etc. by Ben Salzberg (BTS). Additional
-% restructuring and APA support by Jess Youngberg (JY).
-% Your comments and suggestions are more than welcome; please email
-% them to cus@reed.edu
-%
-% See http://web.reed.edu/cis/help/latex.html for help. There are a 
-% great bunch of help pages there, with notes on
-% getting started, bibtex, etc. Go there and read it if you're not
-% already familiar with LaTeX.
-%
-% Any line that starts with a percent symbol is a comment. 
-% They won't show up in the document, and are useful for notes 
-% to yourself and explaining commands. 
-% Commenting also removes a line from the document; 
-% very handy for troubleshooting problems. -BTS
 
-% As far as I know, this follows the requirements laid out in 
-% the 2002-2003 Senior Handbook. Ask a librarian to check the 
-% document before binding. -SN
+% Main tex file for Alex Ledger's thesis
 
-%%
-%% Preamble
-%%
-% \documentclass{<something>} must begin each LaTeX document
 \documentclass[12pt,twoside]{reedthesis}
-% Packages are extensions to the basic LaTeX functions. Whatever you
-% want to typeset, there is probably a package out there for it.
-% Chemistry (chemtex), screenplays, you name it.
-% Check out CTAN to see: http://www.ctan.org/
-%%
 \usepackage{graphicx,latexsym} 
 \usepackage{amssymb,amsthm,amsmath}
 \usepackage{longtable,booktabs,setspace} 
@@ -41,8 +13,8 @@
 \usepackage{adjustbox}
 \usepackage{algorithm,algpseudocode}
 \usepackage{changepage}
+\input{macros}
 
-%%% begin alex commands %%%
 \usepackage{hyperref}
 \hypersetup{
     colorlinks=true,
@@ -50,34 +22,6 @@
     filecolor=magenta,      
     urlcolor=cyan,
 }
-\newcommand{\Gates}{\text{Gates}}
-\newcommand{\InputWires}{\text{InputWires}}
-\newcommand{\OutputWires}{\text{OutputWires}}
-\newcommand{\Wires}{\text{Wires}}
-\newcommand{\Enc}{\operatorname{Enc}}
-\newcommand{\Dec}{\operatorname{Dec}}
-\newcommand{\EncInv}{\Enc^{-1}}
-\newcommand{\EncDKC}{\operatorname{EncDKC}}
-\newcommand{\DecDKC}{\operatorname{DecDKC}}
-\newcommand{\EncDKCInv}{\EncDKC^{-1}}
-\newcommand{\compIndist}{\approx_D}
-\newcommand{\outputrv}{{\sf output}}
-\newcommand{\viewrv}{{\sf view}}
-
-\newcounter{defcounter}
-\setcounter{defcounter}{0}
-\newenvironment{definition}{\medskip\noindent\refstepcounter{defcounter}{\bf Definition \thedefcounter}\hspace*{2pt}}{\hspace*{\fill}\nopagebreak[4]$\diamondsuit$\medskip}  
-
-\newenvironment{blockquote}{%
-  \par%
-  \medskip
-  \leftskip=4em\rightskip=2em%
-  \noindent\ignorespaces}{%
-  \par\medskip}
-
-%%% end alex commands %%%
-
-
 
 % Comment out the natbib line above and uncomment the following two lines to use the new 
 % biblatex-chicago style, for Chicago A. Also make some changes at the end where the 
@@ -85,54 +29,35 @@
 %\usepackage{biblatex-chicago}
 %\bibliography{thesis}
 
-% \usepackage{times} % other fonts are available like times, bookman, charter, palatino
-
 \title{Two Party Computation}
 \author{Alex Ledger}
 % The month and year that you submit your FINAL draft TO THE LIBRARY (May or December)
 \date{May 2015}
 \division{Mathematics and Natural Sciences}
 \advisor{Adam Groce}
-%If you have two advisors for some reason, you can use the following
-%\altadvisor{Your Other Advisor}
-%%% Remember to use the correct department!
 \department{Mathematics}
-% if you're writing a thesis in an interdisciplinary major,
-% uncomment the line below and change the text as appropriate.
-% check the Senior Handbook if unsure.
-%\thedivisionof{The Established Interdisciplinary Committee for}
-% if you want the approval page to say "Approved for the Committee",
-% uncomment the next line
-%\approvedforthe{Committee}
-
 \setlength{\parskip}{0pt}
-%%
-%% End Preamble
-%%
-%% The fun begins:
+
 \begin{document}
 
-  \maketitle
-  \frontmatter % this stuff will be roman-numbered
-  \pagestyle{empty} % this removes page numbers from the frontmatter
+\maketitle
+\frontmatter % this stuff will be roman-numbered
+\pagestyle{empty} % this removes page numbers from the frontmatter
 
-% Acknowledgements (Acceptable American spelling) are optional
-% So are Acknowledgments (proper English spelling)
-    \chapter*{Acknowledgements}
-	I want to thank a few people.
+\chapter*{Acknowledgements}
+I want to thank a few people.
 
 % The preface is optional
 % To remove it, comment it out or delete it.
 \chapter*{Preface}
 This is an example of a thesis setup to use the reed thesis document class.
 
-
-
 \chapter*{List of Abbreviations}
-	You can always change the way your abbreviations are formatted. Play around with it yourself, use tables, or come to CUS if you'd like to change the way it looks. You can also completely remove this chapter if you have no need for a list of abbreviations. Here is an example of what this could look like:
+You can always change the way your abbreviations are formatted. Play around with it yourself, use tables, or come to CUS if you'd like to change the way it looks. You can also completely remove this chapter if you have no need for a list of abbreviations. Here is an example of what this could look like:
 
 \begin{table}[h]
 \centering % You could remove this to move table to the left
+\al{Do I need this?}
 \begin{tabular}{ll}
 	\textbf{ABC}  	&  American Broadcasting Company \\
 	\textbf{CBS}  	&  Columbia Broadcasting System\\
@@ -145,70 +70,45 @@ This is an example of a thesis setup to use the reed thesis document class.
 \end{tabular}
 \end{table}
 	
+\tableofcontents
+\listoftables
+\listoffigures
 
-    \tableofcontents
-% if you want a list of tables, optional
-    \listoftables
-% if you want a list of figures, also optional
-    \listoffigures
-
-% The abstract is not required if you're writing a creative thesis (but aren't they all?)
-% If your abstract is longer than a page, there may be a formatting issue.
-    \chapter*{Abstract}
-	The preface pretty much says it all.
+\input{abstract}
+\input{dedication}
 	
-	\chapter*{Dedication}
-	You can have a dedication here if you wish.
+\mainmatter % here the regular arabic numbering starts
+\pagestyle{fancyplain} % turns page numbering back on
 
-  \mainmatter % here the regular arabic numbering starts
-  \pagestyle{fancyplain} % turns page numbering back on
-
-%The \introduction command is provided as a convenience.
-%if you want special chapter formatting, you'll probably want to avoid using it altogether
-
-\chapter*{Introduction}
-     \addcontentsline{toc}{chapter}{Introduction}
-\chaptermark{Introduction}
-\markboth{Introduction}{Introduction}
-% \onehalfspacing
-\doublespacing
-
- Introduction goes here
-
+\input{intro}
 \input{background}
-
 \input{improving_mpc}
-
 \input{conclusion}
 
-
-
-%If you feel it necessary to include an appendix, it goes here.
-    \appendix
-      \chapter{The First Appendix}
-      \chapter{The Second Appendix, for Fun}
+\appendix
+\chapter{The First Appendix}
+\chapter{The Second Appendix, for Fun}
 
 
 %This is where endnotes are supposed to go, if you have them.
 %I have no idea how endnotes work with LaTeX.
 
-  \backmatter % backmatter makes the index and bibliography appear properly in the t.o.c...
+\backmatter % backmatter makes the index and bibliography appear properly in the t.o.c...
 
 % if you're using bibtex, the next line forces every entry in the bibtex file to be included
 % in your bibliography, regardless of whether or not you've cited it in the thesis.
-    \nocite{*}
+\nocite{*}
 
 % Rename my bibliography to be called "Works Cited" and not "References" or ``Bibliography''
 % \renewcommand{\bibname}{Works Cited}
 
-%    \bibliographystyle{bsts/mla-good} % there are a variety of styles available; 
-%  \bibliographystyle{plainnat}
+% \bibliographystyle{bsts/mla-good} % there are a variety of styles available; 
+% \bibliographystyle{plainnat}
 % replace ``plainnat'' with the style of choice. You can refer to files in the bsts or APA 
 % subfolder, e.g. 
- \bibliographystyle{APA/apa-good}  % or
- \bibliography{thesis}
- % Comment the above two lines and uncomment the next line to use biblatex-chicago.
- %\printbibliography[heading=bibintoc]
-
+\bibliographystyle{APA/apa-good}  % or
+\bibliography{thesis}
+% Comment the above two lines and uncomment the next line to use biblatex-chicago.
+%\printbibliography[heading=bibintoc]
 % Finally, an index would go here... but it is also optional.
 \end{document}

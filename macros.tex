@@ -1,0 +1,52 @@
+% Alex L's macros 
+% taken and co-opted from a variety of sources
+
+% definition counter
+\newcounter{defcounter}
+\setcounter{defcounter}{0}
+\newenvironment{definition}{\medskip\noindent\refstepcounter{defcounter}{\bf Definition \thedefcounter}\hspace*{2pt}}{\hspace*{\fill}\nopagebreak[4]$\diamondsuit$\medskip}  
+
+% block quote
+\newenvironment{blockquote}{%
+  \par%
+  \medskip
+  \leftskip=4em\rightskip=2em%
+  \noindent\ignorespaces}{%
+  \par\medskip}
+
+% Author Macros
+% colors: red, magenta, blue, orange
+\newcounter{al}
+\newcommand{\al}[1]{\textcolor{blue}{\{AL-\arabic{al}: #1\}}\addtocounter{al}{1}}
+
+
+\newcommand{\ignore}[1]{}
+
+% From CompGC paper
+%\renewcommand{\sim}{S}
+%\newcommand{\Input}{\ensuremath{\textsf{Input}}\xspace}
+%\newcommand{\Output}{\ensuremath{\textsf{Output}}\xspace}
+%\newcommand{\Inputs}{\ensuremath{\textsf{Inputs}}\xspace}
+%\newcommand{\Outputs}{\ensuremath{\textsf{Outputs}}\xspace}
+%\newcommand{\Components}{\ensuremath{\textsf{Components}}\xspace}
+
+% my commands for JustGarble Notation
+\newcommand{\Gates}{\text{Gates}}
+\newcommand{\InputWires}{\text{InputWires}}
+\newcommand{\OutputWires}{\text{OutputWires}}
+\newcommand{\Wires}{\text{Wires}}
+\newcommand{\Enc}{\operatorname{Enc}}
+\newcommand{\Dec}{\operatorname{Dec}}
+\newcommand{\EncInv}{\Enc^{-1}}
+\newcommand{\EncDKC}{\operatorname{EncDKC}}
+\newcommand{\DecDKC}{\operatorname{DecDKC}}
+\newcommand{\EncDKCInv}{\EncDKC^{-1}}
+\newcommand{\compIndist}{\approx_D}
+\newcommand{\outputrv}{{\sf output}}
+\newcommand{\viewrv}{{\sf view}}
+
+% Garbled circuits notations
+\newcommand{\CompGC}{\textsf{CompGC}\xspace}
+\newcommand{\JustGarble}{\textsf{JustGarble}\xspace}
+\newcommand{\Naive}{\textsf{Naive}\xspace}
+\newcommand{\scmc}{SCMC\xspace} % Single Communication Multiple Connnection
