@@ -1,0 +1,397 @@
+\chapter{Improving MPC}
+A number of improvements have been made to Yao's garbled circuit since its inception in 1986.
+The first scheme for a garbled circuit, the one described in section \ref{garbled_circuit_scheme} has the following requirements: \textbf{include chart here}.
+Let's look into how much work is required in classical garbled circuits.
+\textbf{mention that we look gate-wise}
+The first metric that we look at is the size of the garbled table.
+\textbf{check this definition}:The garbled table, if you call recall from earlier, is the set of ciphertexts that is sent from the garbler to the evaluator, like in figure \ref{the fig thats a garbled table}.
+Hence the size refers to the number of ciphertexts that an evaulator needs to compute a single gate.
+The XOR column gives the size of the garbled table for an xor gate, and naturaly the AND columns gives the of the garbled table for an AND gate.
+The cost associated with the size of a garbled table manifests in effecting the amount of bandwidth that needs to be transmitted between the garbler and evaluator.
+In order to evaluate the gate, the evaluator needs the entire garbled table (\textbf{research idea: what if they don't? what if they can know when to request more information, to reduce the average amount of bandwidth? maybe this could be used to reduce calls to OT?)}, so reducing the size of the garbled table reduces bandwidth.
+It turns out that bandwidth contributes a large hit to the total time required to perform mpc with garlbed circuits, and as a result, many of the improvements to garbled circuits have specifically targted reducing the size of the garbled table down from 4 ciphertexts.
+\textbf{maybe mention lower bound?}
+
+The second metric we use to analyze garbled circuits is eval cost.
+Eval cost is the amount of computation that the evaluator must perform in order to process a single gate.
+In the classical setting, the evaluator goes down the garbled table decrypting each ciphertext until one of the decrypts correctly. 
+In the worst case, this requires 8 decryptions, because each wire is encrypted twice, once with the key from the first input wire and then again with the key from second input wire.
+If a dual-key cipher (an encryption scheme that takes two keys, see section \ref{dkc section}), then the evaluator only needs to perform four decryptions in the worst case.
+The metric that we consider is the garble cost of a gate. 
+The garble cost of a gate is amount of computation that the garbler needs to perform.
+The improvements to MPC have generally increased the garble cost; having the garbler do more work, can reduce the size of the garble table which reduces bandwidth, and can reduce the amount of computation the evaluator needs to perform \textbf{fact check this}.
+Before the research of \cite{our_paper} and the research presented in this thesis, there were not substantial benefits to garbler preprocessing, that is having the garbler do work \textit{before} the actual computation time. 
+We call this having the garbler do offline work, because they can do the work at their leisure, like at night when computers are less used.
+Then the online work, when the actual comptuation is performed, is reduced.
+
+As we walk through the improvements to Yao's garbled circuit, we are going to think about the improvements affect the three metrics described above.
+It should also be noted before we begin that these are improvements to the the computation of a single gate.
+Speedups on the gate level propagately widely through the computation of the entire garbled circuit.
+For example, the computation of AES now requires approximatley $40,000$ gates, so reducing the number of ciphertexts being transmitted per gate by $1$, reduces the total amount of ciphertexts that need to be sent by $10,000$ - a substantial speedup indeed.
+
+%\section{Overview of history}
+%\begin{itemize}
+%    \item working on specific function verse general functions
+%    \item working on number of parties
+%    \item making it work for sugarbeet auction
+%    \item election potential?
+%    \item auctions
+%    \item ----- Mike talk -----
+%    \item Things to think about:
+%    \item hardness assumption (Mike does not focus on)
+%    \item size: CTs/ per gate
+%    \item computation required
+%    \item Mike at 9:00 has cites to papers of big improvements
+%    \item Focus is on improving each individual gate
+%\end{itemize}
+
+\section{Point and Permute}
+Beaver, Micali and Rogaway contributed the first major improvement to Yao's garbled circuit in 1990.
+A detail that I may or may not (\textbf{check this}) have left out in the description of Yao's garbled circuit is that the order of the garbled table needs to be permuted.
+If the first key sent is always the key corresponding to the input wires's $0$ keys, then the evaluator can learn what the value of the input wires is - a violation of security.
+The solution to this problem is easy: permute the order of the garbled table.
+Now the evaulator trial decrypts each of the $4$ ciphertexts until there is a valid decryption .
+\footnote{There exists encryption/decryption schemes that in addition to decrypting a ciphertext will also output a bit indicating if the decryption occurred correctly. Using schemes like this, the evaluator can decrypt all $4$ ciphertexts until one of them decrypts correctly, as indicated by the extra bit output by the decryption algorithm.}
+
+The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which single ciphertext to decrypt.
+Using point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label in a wire \textbf{Is it clear what a wire label is, as opposed to a wire? Should be by now.}
+The assignment of the select bit is independent of the truth value of the wire, so two things can happen. 
+First, the garbler can permute the garbled table based on the select bits, and second, the select bits can be sent to the evaluator.
+Upon receving the garbled table, the evaluator knows exactly which ciphertext to decrypt based on the select bits of the input wires.
+
+Point and permute slightly increases the amoount of garbler-side computation to substantially decrease the amount of evaluator computation.
+The garbler needs to sample $n+q$\footnote{Recall from \textbf{todo some previous section} that $n+q$ = number of wires.} additional random bits.
+Without point and permute, the evaluator needs to decrypt $2.5$ ciphertexts on average, hence we estimate that there are roughly $1.5(n+q)$ fewer decryptions required.
+The overall bandwidth is increased by $2$ bits per wire, from $256$ bits to $258$ bits: a small constant increase. \footnote{The value is constant in the sense that it is independent of the security parameter.}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Select Bit & Wire Label \\
+    \hline
+    0 & $A_0$ \\
+    1 & $A_1$ \\
+    1 & $B_0$ \\
+    0 & $B_1$ \\
+    \hline
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|c|}
+    \hline
+    Select Bits & Encryption \\
+    \hline
+    (0,0) & $\Enc_{A_0, B_1}(C_1)$ \\
+    (0,1) & $\Enc_{A_0, B_0}(C_0)$ \\
+    (1,0) & $\Enc_{A_1, B_1}(C_0)$ \\
+    (1,1) & $\Enc_{A_1, B_0}(C_0)$ \\
+    \hline
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|}
+    \hline
+    $C_0 \gets \{0,1\}^n$ \\
+    $C_1 \gets \{0,1\}^n$ \\
+    \hline
+    \end{tabular}
+    \caption{Garbled Gate for Point and Permute}
+    \caption{Example garbled gate using point and permute. The gate being computed is given in figure \textbf{Make it 23:30 in mike's talk}}
+\end{table}
+
+\textbf{add chart if you want}
+
+%\begin{itemize}
+%    \item relative position of ciphertexts in table leaks information
+%    \item so we have to permute the ciphertexts
+%    \item when evaluating, trial decrypt all 4 until 1 works
+%    \item beaver micali rogaway 90
+%    \item randomly assign color (r,b) to each pair of wire label
+%    \item Order the 4 cts canonically, by \emph{color} of keys: ((r,r),(r,b),(b,r),(b,b))
+%    \item evaluate by decrypting ciphertexts indexed by your colors
+%    \item Can use one-time-security encyption (e.g. OTP)
+%    \item color independent of semantic value
+%    \item show chart
+%\end{itemize}
+
+\section{Garbled Row Reduction 3}
+Garbled Row Reduction 3 (GRR3) is technique proposed by \textbf{who} which decreases the number of ciphertexts that need be communicated between the garbler and evaluator.
+To use GRR3, the garbler must also use the point and permute method.
+Using Garbled Row Reduction, the garbler sets the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$.
+\footnote{In previous constructions the value for the ciphertext was chosen randomly.}
+Upon evaluating the garbled gate, if the evaluator sees that the select bits of the input wires indicate to decrypt the first row, the evaluator simply assumes the ciphertext be of value $O^n$. 
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Select Bit & Wire Label \\
+    \hline
+    0 & $A_0$ \\
+    1 & $A_1$ \\
+    1 & $B_0$ \\
+    0 & $B_1$ \\
+    \hline
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|c|}
+    \hline
+    Select Bits & Encryption \\
+    \hline
+    (0,1) & $\Enc_{A_0, B_0}(C_0)$ \\
+    (1,0) & $\Enc_{A_1, B_1}(C_0)$ \\
+    (1,1) & $\Enc_{A_1, B_0}(C_0)$ \\
+    \hline
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|}
+    \hline
+    $C_0 \gets \{0,1\}^n$ \\
+    $C_1 \gets \Enc_{A_0, B_1}^{-1}(0^n)$ \\
+    \hline
+    \end{tabular}
+    \caption{Example garbled gate using point and permute and garbled row reduction 3. The gate being computed is given in figure \textbf{Make it 23:30 in mike's talk}}
+\end{table}
+
+Discuss security.
+
+GRR3 does not have a significant effect on garbler side compuation.
+The difference being that for constructing some wire lables, the garbler may need to compute $\Enc^{-1}$ instead of generating random bits. 
+The evaluator needs to perform slightly less computation: in the event that the first row needs to be decrypted, the evaluator doesn't need to perform the decryption algorithm. 
+This events occur with probabilty $\frac{1}{4}$, so we can extrapolate that the evaluator needs to perform $\frac{1}{4}$ fewer decryptions than wwould be necessary if only PP were being used.
+GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, a $25\%$ reduction.
+
+\section{Free XOR}
+The Free XOR technique was developed by \textbf{who} in \textbf{when}.
+The technique, as the name suggests, makes the computation of XOR gates essentially free.
+Say the garbler is determining the lables for wire $A$.
+The label associated with truth value $0$, $A_0$, is randomly sampled from $\{0,1\}^n$. 
+Then the label assocated with the truth value is set such that $A_1 \gets A_0 \oplus \Delta$, where $\Delta$ is global, randomly sampled value from $\{0,1\}^n$.
+If the garbler is garbling an XOR gate, then they set $C_0$ to $A \oplus B$, and like wire $A$, the garbler sets $C_1 = C_0 \oplus \Delta$.
+With these wire labels, it turns out that the garbler doesn't need to send a garbled table: the evaluator can compute $C_0$ and $C_1$ by XORing the inputted wire labels.
+The math for this operation is shown below:
+\begin{align*}
+    A \oplus B & = C \\
+    (A \oplus \Delta) \oplus B & = (A \oplus B) \oplus \Delta = C \oplus \Delta \\
+    A \oplus (B \oplus \Delta) & = (A \oplus B) \oplus \Delta = C \oplus \Delta \\
+    (A \oplus \Delta) \oplus (B \oplus \Delta) & = (A \oplus B) \oplus (\Delta \oplus  \Delta) = C 
+\end{align*}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Wire Label & Value\\
+    \hline
+    $A_0$ & $A$ \\
+    $A_1$ & $A \oplus \Delta$ \\
+    $B_0$ & $B$ \\
+    $B_1$ & $B \oplus \Delta$ \\
+    $C_0$ & $A \oplus B$ \\
+    $C_1$ & $C_0 \oplus \Delta$ \\
+    \hline
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|}
+    \hline
+    \hline
+    \end{tabular}
+    \caption{Example XOR garbled gate wires using PP, GRR3 and Free XOR.}
+\end{table}
+
+The Free XOR technique is also compatible with GRR3, but since XOR doesn't require a garbled table, GRR3 is only used on AND gates.
+
+Using the Free XOR technique, the size of the garbled table is zero for all XOR gates and of size $3$ for AND gates.
+This fact incentivizes the construction of circuits that optimize the number of XOR gates, minimize the number AND gates (while minimizing the size of the entire circuit of course).
+One interesting implication of using the Free XOR technique is that an added assumption must be made to our encryption algorithm.
+Since $\Delta$ is part of the key and part of the the payload\footnote{The payload is the value that is being encrypted} of the encryption algorithm, the encryption algorithm must be secure under the circularity assumption.
+Fortunately, modern encryption uses AES-128, which is presumed to be secure under the circularity assumption.
+
+%\begin{itemize}
+%    \item post Fairplay
+%    \item KolesnikovSchneider
+%    \item $A,A \oplus \Delta$.
+%    \item Note same delta every gate
+%    \item Choose $C = A \oplus B$
+%    \item XOR is then free: walk through that computatoin
+%    \item Still works with GRR3
+%    \item Because $\Delta$ is in the key and in the payload, requires circularity assumption
+%    \item Incentivizes gates with as many xors as possible (has been done with AES -- why it's so fast)
+%    \item Evaluator must konw what type of gate is being exectued: we have been assuming all along that the evaluator and garbler know the function.
+%\end{itemize}
+
+\section{Garbled Row Reduction 2}
+Garbled row reduction 2 (GRR2) reduces the size of the garbled table for AND gates to $2$ ciphertexts, but it is not compatible with Free XOR, so XOR gates also require two ciphertexts.
+The approach of GRR2 is quite different from GRR2. 
+At a high level, it creates two third degree polynomials, one based on the input wires which should output $C_0$, and a second polynomial which should output $C_1$.
+Since the polynomials are of three degrees, they are each uniquely generated by $3$ points. 
+To construct the polynomials, the garbler uses $x,y,z$ for the first polynomail and $u,v,w$ for the second polynomial.
+The garbler sends $x,y,u,v$ to the evaluator, who can interpolate the polynomial and plug in values $a,b,c$.
+
+GRR2 is incompatible with Free XOR because the ciphertext values cannot be set to the xor of the inputer wires (e.g. $C \gets A \oplus B$), since the value of $C$ is always determined by the polynomial.
+
+\textbf{Add to this, but no need to spend too much time on it since it's not used}
+
+%\begin{itemize}
+%    \item use unique deg-2 polynomial
+%    \item use 2 second degree polynomials
+%    \item then interpolate
+%    \item can't do free xor.
+%    \item because we have lost control of $C_0$ and $C_1$ (they are dependent on the polynomial)
+%\end{itemize}
+
+\section{FleXOR}
+Before the creation of FlexXOR, MPC was at an awkward point where some circuits with a large amount of xors could be computed faster with Free XOR and circuits with fewer XORS could be computed faster with GRR2.
+FleXOR serves as a method to reconcile GRR2 with Free XOR, solving the problem where the ciphertext values of AND gates are independent of $\Delta$.
+
+FleXOR's construction is straightforward: use GRR2 on AND gates, and use Free XOR on XOR gates, correcting the delta value where necessary.
+To correct the delta value, FleXOR adds in a unary gate that maps $A, A \oplus \Delta_1 \to A', A' \oplus \Delta_2$.
+
+Suppose we have the following situation: we computing an XOR gate with input wires $A,B$ and output wire $C$.
+Input wires $A$ and $B$ have each come from a different AND gate, so their labels are the result of the polynomial interpolation of GRR2.
+To perform Free XOR, $A,B$ and $C$ need to be using the same delta value. 
+The garbler adds an extra gate between $A$ and $B$ and the $XOR$ gate that adjusts their XOR value to the correct value.
+The unary\footnote{Unary means has one input and one output.} gate maps $A,A \oplus \Delta_1 \to A', A' \oplus \Delta_2$, where $\Delta_2$ is the correct delta value for the XOR gate.
+
+A garbled AND table costs $2$ ciphertexts, and a garbled XOR table costs $0,1$ or $2$ ciphertexts depending on how many ciphertexts need to be corrected.
+This turns the creation of the circuit into a combinatorial optimization problem, where the offset of each wire needs to be determined to minimize the total cost of each XOR gate and be subject to the compatibility of GRR2 for AND gates.
+Without doing too much (if any) optimization of the circuit, FleXOR usually requires $0$ or $1$ ciphertext in practice.
+
+%\begin{itemize}
+%    \item switch delta value: $A,A \oplus \Delta_1 \to A', A' \oplus \Delta_2$
+%    \item cost a single ciphertext (after using GRR3 trick)
+%    \item total cost 0,1,2 dependent on how many distinct deltas
+%    \item make wire label outputs of AND gates based on polynomial interpolation (GRR2)
+%    \item So we can do both free xor (which cost 0 CTs) and GRR2 (which cost 2 CTs per And gate + delta correction)
+%    \item turns into combinatorial optimization problem: determine offset for each wire to minimize total cost of each xor gate + subject to compatibility of 2-CT row-reduction of AND gates.
+%    \item in practice, seemed to usually require 0 or 1
+%    \item still has circularity problem because based on free zor
+%\end{itemize}
+
+\section{Half Gates}
+Half Gates is the most recent improvement Yao's garbled circuit.
+The goal of Half Gates is to make AND gates cost two ciphertexts, while preserving properties necessary for Free XOR. 
+I'm going to introduce Half Gates in a different way from the original paper.
+
+We consider the case of an AND gate $c = a \wedge b$, where the generator knows the value of $a$. 
+If $a = 0$, then the generator will create a unary gate that always outpost false, $c$. 
+Otherwise if $a = 1$, then the generator create a unary identity gate that always outputs $b$. 
+Table \ref{tbl:halfgate-gg-garb} shows the garbled gates for different values of $a$. 
+
+%\begin{align*}
+%& \text{If $a = 0$, then } 0 \wedge b = 0 \text{, so output } H(B) \oplus C. \\
+%& \text{If $a = 1$, then } 1 \wedge b = b \text{, so output } H(B \oplus \Delta) \oplus C \oplus a\Delta .
+%\end{align*}
+\begin{table}[h]
+    \label{tbl:halfgate-gg-garb}
+    \centering
+    \begin{tabular}{|c|}
+    \hline
+    Garbled Table for $a = 0$ \\
+    \hline
+    $H(B) \oplus C$ \\
+    $H(B) \oplus C$ \\
+    \hline
+    \end{tabular}
+    \begin{tabular}{|c|}
+    \hline
+    Garbled Table for $a = 1$ \\
+    \hline
+    $H(B) \oplus C$ \\
+    $H(B) \oplus C \oplus \Delta$ \\
+    \hline
+    \end{tabular} $\;\rightarrow$
+     \begin{tabular}{|c|}
+    \hline
+    Garbled Table for any $a$ \\
+    \hline
+    $H(B) \oplus C$ \\
+    $H(B) \oplus C \oplus a\Delta$ \\
+    \hline
+    \end{tabular}
+    \caption{Generator's Garbled Half Gate for $a = 0$, $a = 1$, and written more succinctly with $a\Delta$ for $a \in \{0,1\}$. If $a = 0$, then $a\Delta = 0$.  Otherwise if $a = 1$, then $a\Delta = \Delta$.}
+\end{table}
+
+Since the evaluator has the wire label corresponding to b (either $B$ or $B \oplus \Delta$), the evaluator can compute the label of the output wire of the AND gate by xoring the rows in the garbled table by $H(B)$ or $H(B \oplus \Delta)$ to get $C$ or $C \oplus \Delta$ respectively. 
+
+A further improvement can be garnered by using the garbled row-reduction trick.
+We choose $C$ such that the first of the top row of the garbled table is the all zeros ciphertext. 
+The top row may not necessarily be $H(B) \oplus C$, since for security the rows are permuted. 
+Because the top row is all 0s, it does not need to be sent to the evaluator. 
+If the evaluator should decrypt the cipher text on the top row (as directed by point and permute), then the evaluator assumes the cipher text to be all 0s. Overall, computing $a \wedge b = c$ requires two having operations by the generator, a single hash operation by the evaluator, and the communication of one ciphertext. 
+
+We now consider computing $a \wedge b = c$, where the evaluator somehow already knows the value of $a$.
+If $a = 0$, then the evaluator should acquire $C$. 
+Otherwise if $a = 1$, then the evaluator should acquire $C \oplus b\Delta$, in which case it is sufficient for the evaluator to obtain $\Omega = C \oplus B$ (then xor $\Omega$ with the wire label corresponding to $b$).
+Table \ref{tbl:halfgate-gg-eval} shows cipher texts which the garbler gives to the evaluator.
+
+This table is different from other garbled tables. 
+First, the table does not need to be permuted. 
+Secondly, evaluation is different.
+If $a = 0$, then the evaluator uses wire label $A$ to decrypt the top row of the table and acquire $C$. 
+If $a = 1$, then the evaluator uses $A \oplus \Delta$ to decrypt the second row, yielding $C \oplus B$.
+The evaluator then xors wire label $B + b\Delta$ by $C \oplus B$ to obtain $C \oplus b\Delta$. 
+As before, the ciphertext  on the top row does not need to be communicatd by using the garbled row-reduction trick.
+The generator sets $C$ such that $H(A) \oplus C = 0$ (i.e. $C = H(A)$). 
+The total cost of this half gate is the same as before: two hashes by the generator, one hash by the evaluator, and once cipher text. 
+
+\begin{table}[h]
+    \label{tbl:halfgate-gg-eval}
+    \centering
+    \begin{tabular}{|c|}
+    \hline
+    Garbled Table for any $A$ \\
+    \hline
+    $H(A) \oplus C$ \\
+    $H(A \oplus \Delta) \oplus C \oplus B$ \\
+    \hline
+    \end{tabular}
+    \caption{Evaluator's half gate garbled table.}
+\end{table}
+
+We now put the two half gates together to form an AND gate. 
+Consider the following where $r$ is a random bit generated by the generator:
+\begin{equation}
+a \wedge b = a \wedge (r \oplus r \oplus b) = (a \wedge r) \oplus (a \wedge (r \oplus b)).
+\end{equation}
+The first AND gate, $a \wedge r$, can be computed with a generator-half-gate - the generator ``knows'' $r$. 
+Furthermore, if we can let the evaluator know the value of $r \oplus b$, then the second AND gate, $(a \wedge (r \oplus b)$, can be computed with an evaluator-half-gate - the evaluator ``knows'' $r \oplus b$. 
+And the final XOR can be computed with free xor at the cost of no ciphertexts. 
+
+It is secure for the garbler to give $r \oplus b$ to the evaluator, since $r$ is random and blinds the value of $b$. 
+The value of $r \oplus b$, while only a single bit, can be communicated to the evaluator for free: use the select bit (from the point and permute technique) of the false wire label on wire $b$ (so $r$ is the select bit on the true wire label of wire $b$).
+
+The overall cost of using Half Gates for AND gates is four calls to $H$ for the generator, two calls to $H$ for the evaluator, and the communication of $2$ ciphertexts. 
+Half Gates guarantees only two ciphertexts are needed per AND gate, but the tradeoff is the additional computation for both parties (i.e. computing $H$).
+With FleXOR, the number of ciphertexts that need to be communicated may vary, but there is less computation required.
+
+When MPC becomes used in real operations, the circuit will likely not be optimized for XOR gates (reducing the number of AND gates). 
+In this case, where an arbitrary function is being computed, it is hypothesized that Half Gates will outperform FleXOR. 
+But in many of the cases being examined now - most notably computing AES - the circuit has been optimized heavily to have very few AND gates, hence the benefits of Half Gates are less noticeable.\footnote{At present, the AES circuit is 80\% XOR gates} 
+
+\begin{table}[h]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+\begin{adjustbox}{width=1\textwidth}
+  \begin{tabular}{|p{5cm}|c|c|c|c|c|c|c|}
+    \hline
+    \multirow{2}{5cm}{\centering \textbf{Garbled Circuit Improvement}} & 
+    \multicolumn{2}{c|}{\textbf{Size (x$\lambda$)}} & 
+    \multicolumn{2}{c|}{\textbf{Eval Cost}} & 
+    \multicolumn{2}{c|}{\textbf{Garble Cost}} &
+    \multirow{2}{3cm}{\centering \textbf{Assumption}} \\
+    \cline{2-7}
+    & \textbf{XOR} & \textbf{AND} & \textbf{XOR} & \textbf{AND}  & \textbf{XOR} & \textbf{AND} & \\
+    \hline
+    Classical & 1365 & 1260 & 1024 & $\mu$ s & a & b & a\\ \hline
+    Point and Permute & TBD & TBD & TBD & $\mu$ s & a & b & a\\ \hline
+    GRR3 & TBD & TBD & TBD & $\mu$ s  & a & b& a\\ \hline
+    Free XOR & TBD & TBD & TBD & $\mu$ & a & bs& a  \\ \hline
+    GRR2 XOR & TBD & TBD & TBD & $\mu$ & a & bs  & a\\ \hline
+    FleXOR& TBD & TBD & TBD & $\mu$ & a & bs & a \\ \hline
+    Half Gates & 2 & 0 & 2 & 0 & 4 & 0 & a \\ \hline
+  \end{tabular}
+  \end{adjustbox}
+  \caption{Summary of Garbled Circuit Improvements. GRR3 stands for garbled row reduction 3 and GRR2 stands for garbled row reduction 2}
+\end{table}
+
+

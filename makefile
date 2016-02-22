@@ -1,12 +1,19 @@
-# A makefile for compiling simple latex files
+TARGETS = thesis
 
-SRC=$(wildcard *.tex)
-PDF=$(SRC:.tex=.pdf)
+LATEX   = pdflatex
+BIBTEX  = bibtex
 
-all: $(PDF)
-%.pdf: %.tex
-	latexmk --pdf $<
-	latexmk -c
-	# write-good $< || true
-	
-clean: ; latexmk -C; rm -f *.bbl
+all:  $(TARGETS) debug
+
+$(TARGETS):
+	$(LATEX) $@
+	-$(BIBTEX) $@ > $(BIBTEX)_out.log
+	$(LATEX) $@
+	$(LATEX) $@
+	$(LATEX) $@
+
+debug:
+	-grep Warning *.log
+
+clean:
+	rm -f *.aux *.bbl *.blg *.log *.dvi *.bak *.gz *.idx *.out *~ $(TARGETS:%=%.pdf)
