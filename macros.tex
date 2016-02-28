@@ -1,5 +1,7 @@
 % Alex L's macros 
 % taken and co-opted from a variety of sources
+\newcommand{\NN}{\mathcal{N}}
+\newcommand{\compindist}{\approx_C}
 
 % definition counter
 \newcounter{defcounter}
@@ -18,6 +20,8 @@
 % colors: red, magenta, blue, orange
 \newcounter{al}
 \newcommand{\al}[1]{\textcolor{blue}{\{AL-\arabic{al}: #1\}}\addtocounter{al}{1}}
+\newcounter{cat}
+\newcommand{\cat}[1]{\textcolor{magenta}{\{CAT-\arabic{cat}: #1\}}\addtocounter{cat}{1}}
 
 
 \newcommand{\ignore}[1]{}
@@ -29,6 +33,7 @@
 %\newcommand{\Inputs}{\ensuremath{\textsf{Inputs}}\xspace}
 %\newcommand{\Outputs}{\ensuremath{\textsf{Outputs}}\xspace}
 %\newcommand{\Components}{\ensuremath{\textsf{Components}}\xspace}
+
 
 % my commands for JustGarble Notation
 \newcommand{\Gates}{\text{Gates}}

@@ -7,6 +7,38 @@
 % \onehalfspacing
 \doublespacing
 
-Introduction goes here
+Secure Function Evaluation (SFE) is the study and creation of protocols for securely computing a function between multiple parties. 
+Secure, in this context, means that the protocol prevents each party from learning anything about the other parties. 
+
+The idea is best communicated through an example: suppose Alice and Bob are millionaires and wish to determine who is wealthier. 
+But Alice and Bob are also secretive, and do not want to disclose their exact amount of wealth. 
+Is there some method by which they can determine who has more money?
+
+\al{check if using greater than or less than function}
+Alice and Bob can solve their problem by specifying a function $f$; in this case $f$ takes two inputs $x$ and $y$ and outputs $1$ if $x < y$, and $0$ otherwise ($f$ is the less than function).
+If Alice and Bob can secretly give $f$ their amount of wealth and then retrieve the answer from $f$, then their problem is solved: they have securely computed who is wealthier.
+
+The goal of SFE broadly is to give Alice, Bob and their friends the ability to securely compute an arbitrary function at their will. 
+For the protocl to be secure, it needs to have the following informal properties:
+\begin{itemize}
+    \item \textbf{Privacy:} Each party's input is kept secret.
+    \item \textbf{Correctness:} The correct answer to the computation is computed.
+\end{itemize}
+
+Originally, the goal of the research community was to develop a secure protocol, define security, and prove the protocol is secure.
+In more recent times, the focus has shifted to making SFE protocols faster.
+
+If SFE could be made fast enough, it could serve a wide range of applications.
+For example, imagine that two companies who operate in a similar industry want to work together, but they don't want to disclose any company research which the other doesn't know.
+These companies could a run set intersection function (a function that given two inputs finds their intersection, or overlap), to determine what information they can disclose without giving away important information.
+
+Another example is running algorithms on confidential medical data. 
+Consider the case where various hosptitals want to joinly run algorithms on their data for medical research.
+The hosptical need guarantees, for both legal and ethical reasons, that the data will not be disclosed as the algorithm is being run, as medical data can be very sensitive. 
+The hopsitals use could use SFE to run computation on all of their data, mainintaining the privacy of their patients.
+
+Since research into SFE has focused on creating a method by which an arbitrary function can be computed securely, the application of SFE may be beyond what we can presently conceive of. 
+It's not unlikely that SFE will become a standard in the internet, where when you access the internet, behind the scenes your access is being is plugged into an SFE protocol, sent off to another computer to do some processing. 
+For this future to be realized, work need to be done to make SFE faster and more flexible.
 
 

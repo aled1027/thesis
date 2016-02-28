@@ -29,10 +29,9 @@
 %\usepackage{biblatex-chicago}
 %\bibliography{thesis}
 
-\title{Two Party Computation}
+\title{Implementing Improvements for Secure Function Evaluation}
 \author{Alex Ledger}
-% The month and year that you submit your FINAL draft TO THE LIBRARY (May or December)
-\date{May 2015}
+\date{May 2016}
 \division{Mathematics and Natural Sciences}
 \advisor{Adam Groce}
 \department{Mathematics}
@@ -81,8 +80,13 @@ You can always change the way your abbreviations are formatted. Play around with
 \pagestyle{fancyplain} % turns page numbering back on
 
 \input{intro}
-\input{background}
+\input{primitives}
+\input{classic}
 \input{improving_mpc}
+\input{chaining}
+\input{implementation}
+\input{experiment}
+\input{related}
 \input{conclusion}
 
 \appendix
@@ -106,6 +110,7 @@ You can always change the way your abbreviations are formatted. Play around with
 % \bibliographystyle{plainnat}
 % replace ``plainnat'' with the style of choice. You can refer to files in the bsts or APA 
 % subfolder, e.g. 
+%\bibliographystyle{acm}  % or
 \bibliographystyle{APA/apa-good}  % or
 \bibliography{thesis}
 % Comment the above two lines and uncomment the next line to use biblatex-chicago.
