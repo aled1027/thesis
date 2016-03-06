@@ -1,34 +1,50 @@
 %!TEX root = thesis.tex
 \chapter{Cryptographic Primitives}
-Secure Function Evaluation (SFE) can be split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
-It turns out that many protocols that work for MPC often don't work for 2PC and vice versa.
+Secure function evaluation (SFE) is the study of computing functions in a secure fashion. 
+SFE can be split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
 This thesis will focus primarily on 2PC protocols, but many of the methods are applicable to MPC as well.
 
-2PC protocols are complex cryptographic protocols that rely on a number of crypographic primitives.
+2PC protocols are complex cryptographic protocols that rely on a number of cryptographic primitives.
 In order to understand 2PC, it is not crucial to understand how the cryptographic primitives work, but it is important to understand their inputs, outputs and security guarantees. 
 This first chapter will give an overview of the cryptographic primitives used in 2PC protocols.
-\al{stopped here}
 
 \section{Computational Indistinguishability} 
 \label{sctn:computational-indistinguishability}
+Computational Indistinguishability is a method of mathematically justifying the hardness of an algorithm to break. 
+At a high level, we say that two sets are indistinguishable, if there is no efficient algorithm that can tell the two sets apart. 
+We present the definition formally here, but it is best understood when it is used to define and prove the security of particular schemes. 
+In section \al{add label/ref} we use computationally indistinguishability to show that an encryption scheme is secure, and in section \al{add label/ref} we use it to show a 2PC protocol is secure. 
+\al{does the term ''break`` seem meaningful here? At some point, at least, I should be clear about what it means.}
 
-\al{what is computationally Indistinguishability and why is it important?}
+We formally define computational indistinguishability as follows.
 
-\al{set /NN}
+ \al{should this be a definition section?}
+ 
+ \begin{definition}
+ \label{defn:computational-indistinguishability}
 Let $\mathcal{X} = \{X(n,a)\}_{n \in \NN, a \in \{0,1\}^*}$ and $\mathcal{Y} = \{Y(n,a)\}_{n \in \NN, a \in \{0,1\}^*}$ be distribution ensembles.
-$\mathcal{X}$ and $\mathcal{Y}$ are computationall indistinguishable there is no polynomial-time algorithm that can tell $\mathcal{X}$ and $\mathcal{Y}$ apart with better than neglibible probability.
-More formally, $\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $\mathcal{X} \compindist \mathcal{Y}$, if and only if for all non-uniform polynomial-time distinguisher $D$, there exists a function $\mu(\cdot)$ that is neglibible in $n$, such that for all $a \in \{0,1\}^*$, 
+$\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $\mathcal{X} \compindist \mathcal{Y}$, if and only if for all non-uniform polynomial-time distinguisher $D$, there exists a function $\mu(\cdot)$ that is negligible in $n$, such that for all $a \in \{0,1\}^*$, 
 \begin{equation}
     |Pr[D(X(n,a)) = 1] - Pr[D(Y(n,a)) = 1]| < \mu(n)
 \end{equation}
 \cite{lindell2009secure}.
+\end{definition}
+
+\begin{definition}
+\label{defn:negible}
+A function $\mu : \NN \to \RR$ is negligible if for all positive polynomial $p(\cdot)$, there exists positive integer $N_p$ such that for all $x > N_p$, 
+\begin{equation}
+    |\mu(x)| < \frac{1}{p(x)}.
+\end{equation}
+\cite{goldreich}
+\end{definition}
 
 \section{Encryption}
 Encryption is the process of encoding a message such that only parties with the key can read the message.
 As we discuss 2PC, we will be using symmetric-key encryption, the case where encryption and decryption use the same key.
 A symmetric-key encryption protocol is composed of two parts.
 The first part is the encryption algorithm which obfuscates the message, and the second part is the decryption algorithm which unobfuscates the disguised message.
-The encryption algorithm is denoted $\Enc$, and the decyprtion algorithm is denoted as either $\Dec$ or $\EncInv$.
+The encryption algorithm is denoted $\Enc$, and the decryprtion algorithm is denoted as either $\Dec$ or $\EncInv$.
 \begin{equation}
     \label{eqn:encryption}
     \begin{split}
@@ -37,17 +53,16 @@ The encryption algorithm is denoted $\Enc$, and the decyprtion algorithm is deno
     \end{split}
 \end{equation}
 where $pt$ is the original message or the \emph{plaintext}, $ct$ is the encrypted message or the \emph{ciphertext}, and $k$ is the secret key.
-For the algorithm to be effective, the secret key $k$ must be a random string of $0$s and $1$s of length $\lambda$.
-\footnote{The notion of randomness in cyptoraphy has a precise definition, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseuodorandom. Pseudorandom also has precise cryptographyic definition.}
-$\lambda$ is the security parameter of our protocol.
-If we increase $\lambda$, thereby increasing the size of the key, then the encyrption algorithm becomes harder for an adversary to break.
-I will not go into details about how encryption algorithms are instantiated; I will merely treat them as algorithms which we can use at our leisure.
+For the algorithm to be effective, the secret key $k$ must be randomly sampled from $\{0,1\}^\lambda$, where $\lambda$ is the security parameter of our protocol.\footnote{The notion of randomness in cryptography is precisely defined, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseudorandom. Pseudorandomness is also precisely defined.}
+\al{does footnote go before or after period? ShouldI have footnotes?}
+If  $\lambda$ is increased, thereby increasing the size of the key, then the encryption algorithm becomes harder to break.
+We will not go into details about how encryption algorithms are instantiated; we will merely treat them as algorithms which we can use at our leisure.
 
-We say that encryption scheme is secure \footnote{Specifcally, this is the definition of a chosen-plaintext-attack secure encryption scheme. There exists weaker and stronger definitions of security, but chosen-plaintext-attack security is frequently used for 2PC}, if the following game is true:
+We say that encryption scheme is secure \footnote{Specifically, this is the definition of a chosen-plaintext-attack secure encryption scheme. There exists weaker and stronger definitions of security, but chosen-plaintext-attack security is frequently used for 2PC}, if the following game is true:
 \al{give the game and reference computational indistinguishability}
 
 It is useful for 2PC to define a specific type of symmetric-key encryption algorithm called a Dual-Key Cipher (DKC) \cite{bellare2012foundations}.
-A DKC requires two secret keys to encrypt and decrypt the message, in constrast to classic encryption which only requires one.
+A DKC requires two secret keys to encrypt and decrypt the message, in contrast to classic encryption which only requires one.
 It is easy to instantiate a DKC if one has a secure encryption scheme: let $k_0$ and $k_1$ be the two secret keys and instantiate the DKC as follows:
 \begin{equation}
     \begin{split}
@@ -60,7 +75,7 @@ For more information, see \cite{bellare2012foundations}.
 
 \section{Boolean Circuit} 
 A function for an 2PC protocol is represented by a boolean circuit.
-A boolean circuit takes as input $x \in \{0,1\}^n$ and performs a series of small opreations on the inputs, and outputs a sequence of $y \in \{0,1\}^m$. 
+A boolean circuit takes as input $x \in \{0,1\}^n$ and performs a series of small operations on the inputs, and outputs a sequence of $y \in \{0,1\}^m$. 
 You may have encountered circuits and logical operators in another context, where the inputs and outputs were True and False.
 For our usage, True will correspond to the value $1$, and False will corresond to the value $0$. 
 
