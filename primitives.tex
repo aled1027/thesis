@@ -1,5 +1,6 @@
 %!TEX root = thesis.tex
 \chapter{Cryptographic Primitives}
+\al{check usage of i.e. and e.g.. Pretty sure I abused them at some points}
 Secure function evaluation (SFE) is the study of computing functions in a secure fashion. 
 SFE can be split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
 This thesis will focus primarily on 2PC protocols, but many of the methods are applicable to MPC as well.
@@ -58,8 +59,21 @@ For the algorithm to be effective, the secret key $k$ must be randomly sampled f
 If  $\lambda$ is increased, thereby increasing the size of the key, then the encryption algorithm becomes harder to break.
 We will not go into details about how encryption algorithms are instantiated; we will merely treat them as algorithms which we can use at our leisure.
 
-We say that encryption scheme is secure \footnote{Specifically, this is the definition of a chosen-plaintext-attack secure encryption scheme. There exists weaker and stronger definitions of security, but chosen-plaintext-attack security is frequently used for 2PC}, if the following game is true:
-\al{give the game and reference computational indistinguishability}
+We say that an encryption scheme is secure \footnote{Specifically, this is the definition of a chosen-plaintext-attack secure encryption scheme. There exists weaker and stronger definitions of security, but chosen-plaintext-attack security is frequently used for 2PC}, if the following game is true:
+
+% TODO WORK HERE
+\al{Get crypto book and finish this}
+
+\begin{definition}
+Define the following game:
+What are the inputs?
+\begin{enumerate}
+\item Adversary picks two messages $m_0$ and $m_1$, and gives $m_0$ and $m_1$ to the sender. 
+\item The sender samples $k \gets \{0,1\}^{\lambda}$ and $b \gets \{0,1\}$. The sender gives $m_b$ to the adversary. 
+\item The adversary may spend a polynomial amount of time doing computation. Eventually, the output $b'$, their guess as to which message they received.
+\end{enumerate}
+\end{definition}
+% END WORK HERE
 
 It is useful for 2PC to define a specific type of symmetric-key encryption algorithm called a Dual-Key Cipher (DKC) \cite{bellare2012foundations}.
 A DKC requires two secret keys to encrypt and decrypt the message, in contrast to classic encryption which only requires one.
@@ -74,8 +88,8 @@ This construction of a DKC is slow, and there are many faster methods for instan
 For more information, see \cite{bellare2012foundations}.
 
 \section{Boolean Circuit} 
-A function for an 2PC protocol is represented by a boolean circuit.
-A boolean circuit takes as input $x \in \{0,1\}^n$ and performs a series of small operations on the inputs, and outputs a sequence of $y \in \{0,1\}^m$. 
+A function in a 2PC protocol is represented as a boolean circuit.
+A boolean circuit takes as input $x \in \{0,1\}^n$, performs a series of small operations on the inputs, and outputs $y \in \{0,1\}^m$.  
 You may have encountered circuits and logical operators in another context, where the inputs and outputs were True and False.
 For our usage, True will correspond to the value $1$, and False will corresond to the value $0$. 
 
@@ -83,7 +97,6 @@ The small operations done inside of a circuit are performed by a \emph{gate}.
 A gate is composed of three wires: two input wires and one output wire, where a \emph{wire} can have a value either $0$ or $1$.
 A gate performs a simpler operation on the two inputs, resulting in a single output bit.
 Table \ref{tab:xor} gives the mapping of an XOR gate.
-\al{TODO add xor gate}
 
 \begin{table}[h]
 \label{tab:xor}
@@ -99,24 +112,42 @@ x & y & xor(x,y) \\ \hline
 \caption{The mapping of an XOR gate.}
 \end{table}
 
-A circuit is a combination of multiple gates that are stringed together, and it turns out that circuits are quite powerful: in fact, a circuit built out of only AND gates, XOR gates and NOT gates can compute any function or algorithm \al{Find citation}.
-In other words, if there's some algorithm that do it, then there is some circuit that can do it as well.
+A circuit is a combination of gates that are stringed together.
+It turns out that circuits are quite powerful: in fact, a circuit composed only of AND gates, XOR gates and NOT gates can compute any function or algorithm \cite{Goldreich}.
+In other words, if there's some algorithm that can do it, then there is some circuit that can do it as well.
 Figure \ref{fig:less_than_circuit} shows the circuit representation of the less than function, $f$ as specified in equation \ref{eqn:less_than}.
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.75]{images/drawing.png}
     \label{fig:less_than_circuit}
-    \caption{A circuit that computes the less or equal to function, equivalent to $f$ for input of two one-bit values. \al{TODO, add truth table?}}
+    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.}
 \end{figure}
 
+\begin{table}[h]
+\label{tab:less_than}
+\centering
+\begin{tabular}{ | l | c || r |}
+\hline
+x & y & $x < y$ \\ \hline
+0 & 0 & 0 \\ \hline
+0 & 1 & 1 \\ \hline
+1 & 0 & 0 \\ \hline
+1 & 1 & 0 \\ \hline
+\end{tabular}
+\caption{The truth table of the less than circuit.}
+\end{table}
+
 \section{Oblivious Transfer}
+\al{more sources here - get from CompGC paper}
 Oblivious Transfer (OT) is a two-party protocol where one party (sender) has two inputs, $m_0$ and $m_1$, and the other party (receiver) has a bit $b \in \{0,1\}$. 
-OT enables the receiver to acquire $m_b$ from the sender without revealing which message was received, i.e. the value of $b$.
-Morever, the receiver learned nothing about the message that wasn't received, i.e. anything about $m_{1-b}$.
+OT enables the receiver to acquire $m_b$ from the sender without revealing which message is received, i.e., the value of $b$.
+Moreover, the receiver learns nothing about the message that isn't received, i.e. anything about $m_{1-b}$.
 
 Here we give the Naor-Pinkas protocol of $1-2$ oblivious transfer.
-The protocol relies on the DDH assumption \al{give a source that the reader can check}.
+The protocol relies on the DDH assumption.\footnote{The Decisional Diffie-Hellman (DDH) assumption is a computational hardness assumption involving discrete logarithms in cyclic groups. For more information, see \cite{Boneh1998}.}
+
+\al{Should I give the full protocol? Probably shouldn't have a screenshot of wikipedia in the thesis}
 
 \begin{figure}
     \centering
@@ -125,7 +156,7 @@ The protocol relies on the DDH assumption \al{give a source that the reader can 
 \end{figure}
 
 Oblivious transfer has been improved in two relevant ways for 2PC protocols. 
-These improvments are called OT-extension and OT-preprocessing. 
-In OT-extension, a constant number of OT's can be run, to generate a polynomial number of exchanged values.
-In OT-preprocessing, the OT's can happen before the actual protocol, during what is called the offline phase, and then when the OT's are needed during the online phase, simpler and efficient communication realizes the exchanged values.
-This is useful because the actual OT step requires a large amount of communciation to be sent between the sender and receiver, resulting in OT often being the bottleneck of 2PC protocols.
+These improvements are called OT-extension and OT-preprocessing. 
+In OT-extension a constant number of OT's can be run to generate a polynomial number of exchanged values.
+In OT-preprocessing the OT's occur before the actual protocol, during what is called the offline phase, and then when the OT's needed during the online phase, simpler and efficient communication realizes the exchanged values.
+This is useful because the OT step requires a large amount of communication to be sent between the sender and receiver, often resulting in OT being the bottleneck of 2PC protocols.
