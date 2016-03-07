@@ -124,15 +124,12 @@ They imagine an ideal world, where the function $f$ must be computed securely, a
 For an easy to understand security definition of 2PC with malicious adversaries, we refer to reader to \cite{lindell2009}.
 
 \section{Yao's Garbled Circuit}
-We now give an implementation of a generic 2PC protocol created by Yao \cite{yao}.
-The protocol works for two parties; we will call party 1 Alice, denoted $A$, and party 2 Bob, denoted $B$, who have inputs $x$ and $y$ respectively.
-Suppose $f$ is the function that Alice and Bob wish to compute.
+We now give an implementation of a generic 2PC scheme created by Yao \cite{yao}.
+The scheme is designed for two parties, Alice and Bob, who have inputs $x$ and $y$ respectively.
+We suppose that Alice and Bob wish to compute the function $f : \{0,1\}^n \to \{0,1\}^m$. 
 
-Yao's protocol depends on first encoding the function $f$ as a circuit, and then Alice and Bob together evaluate the circuit.
-\al{Add sentence about the high level}
-
-% (complexity - add to end) The number of round is constant.
-% 1 OT per input wire of party B + enc/dec for each gate.
+\al{This should probably be 2-4 sentences, instead of one}
+At a high level, Yao's scheme works by having Alice build the corresponding circuit for $f$, encrypting the circuit gate by gate, sending the encrypted circuit to Bob, who uses values corresponding to the inputs to decrypt the circuit.
 
 \begin{algorithm}
 \caption{Garble Circuit}
@@ -151,6 +148,7 @@ Yao's protocol depends on first encoding the function $f$ as a circuit, and then
     \State Let $w_k$ be $g$'s output wire.
     \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
     \State $T_g[u,v] = \Enc_{W_i^u}( \Enc_{W_j^v} ( W_k^{g(u,v)}))$
+    \al{use DKC}
     \EndFor
     \State $f(x,\cdot).tables[g] = T_g$.
 \EndFor
@@ -178,6 +176,7 @@ Yao's protocol depends on first encoding the function $f$ as a circuit, and then
 	\State \textbf{Require} $w_i$ and $w_j$ have been assigned garbled values.
 	\State \textbf{Require} $w_k$ has not been assigned a garbled value.
     	\For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
+        \al{use DKC}
 		\State $temp = \Dec_{w_j}(\Dec_{w_i}(tables[g][u,v]))$
 		\If{$temp$ decrypted correctly}
 			\State $w_k = temp$
@@ -188,18 +187,20 @@ Yao's protocol depends on first encoding the function $f$ as a circuit, and then
 \end{algorithm}
 
 \subsection{Step 0: Setup}
-Alice and Bob want to compute the function $f(x,y)$, where $x,y \in \{0,1\}^*$.
-Alice is the garbler, and will create the circuit.
+Alice and Bob wish to compute the function $f$, which is represented by a circuit (see section \ref{secn:circuit}).
+Alice is the garbler, and will create and encrypt the circuit.
 Bob is the evaluator, and will compute the circuit.
-Alice first hardwires her inputs into the circuit, yielding a circuit that computes $f(x,\cdot)$.
 
 \subsection{Step 1: Garbling the Circuit}
-Alice garbles each gate, according to the algorithm outlined in Algorithm \ref{lag:garble}, which produces a table $T_g$ for each gate $g$.
-The table enables the computation of $g$, if one is given either $W^0_i$ or $W^1_i$ and either $W^0_j$ or $W^1_j$ where wire $i$ and $j$ are the input wires to $g$.
-Figure \ref{example} gives an example of a table for an AND gate. \textbf{TODO}
+\al{define a wire and a label}
+Alice garbles each gate, according to algorithm \ref{lag:garble}, resulting in a table $T_g$ for each gate $g$.
+The table enables the computation of a single gate $g$, if one is given either $W^0_i$ or $W^1_i$ and either $W^0_j$ or $W^1_j$ where wire $i$ and $j$ are the input wires to $g$.
+Figure \ref{example} gives an example of a table for an AND gate.
+\al{TODO}
 
 \subsection{Step 2: Bob's Input and Computing the Circuit}
-Alice sends the garbled circuit to bob, which consists of the garbled tables, $f(x,\cdot).tables$, and the rules for connecting the gates together.
+Alice sends the garbled circuit to Bob. 
+The garbled circuit consists of a garbled table for each gate, $f(x,\cdot).tables$, and the rules for connecting the gates together.
 In order for Bob to compute the circuit, he needs the garbled values of all input wires.
 Once he has the garbled values of the input wires, he can decrypt the first few gates, and acquire the decryption keys of the other gates until he has the keys to decrypt all of the gates in the circuit, yielding the output.
 Bob can acquire the garbled values of the input wires from Alice using 1-out-of-2 oblivious transfer on each input wire (see section \ref{sctn:oblivious_transfer}).
@@ -212,12 +213,13 @@ To do.
 
 \subsection{Notes about complexity}
 1 OT per (input?) wire.
+4 cts per gate.
 How much encryption?
 Not good enough for practice.
 
 \section{GMW}
 Where Yao's protocol is premised on encrypting gates individually, GMW's protocol for garbling circuits is premised on secret sharing, and performing operations on the shared secrets. 
-Secret sharing, in its general idea, is class of methods for distributing a secret to a group of participants, where each participants is allocated a \textit{share} of the secret. 
+Secret sharing, in general, is a class of methods for distributing a secret to a group of participants, where each participants is allocated a \textit{share} of the secret. 
 The secret can only be reconstructed when a sufficient number of the participants combine their shares, but any pool of insufficient shares yields no information about the secret.
 
 GMW begins by having Alice and Bob secret share their inputs, so each party now has a collection of \textit{shares}. 
@@ -280,4 +282,4 @@ Finally, Alice and Bob publicize their shares to each other, at which point each
 \end{algorithm}
 
 \al{see mike rosulek first few slides for good images. }
-\al{illustrative about translating bits over to wire labels}
+\al{illustration about translating bits over to wire labels}
