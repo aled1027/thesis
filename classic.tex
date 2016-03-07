@@ -1,38 +1,47 @@
 
 \chapter{Classic 2PC}
-Secure Function Evaluation was first proposed by Andrew Yao in an oral presentation on secure function evaluation.
-After Yao's presentation, two methods for performing 2PC and MPC  were developed.
-One method was developed by Yao himself, and the other was developed by a group of researchers, Beaver, Micali and Widgerson.
+\al{this paragraph is a little weak}
+Secure Function Evaluation was first proposed in an oral presesntation by Andrew Yao \cite{yao-original}.
+Since Yao's presentation, multiple methods for performing SFE were developed.
+One method was developed by Yao himself and is Yao's garbled circuits.
+Another was developed by a group of researchers, Beaver, Micali and Widgerson.
 The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, which has since been termed garbled circuit.
 At this point, it is unclear which method is better, so researchers continue to study both methods.
 \al{get source}
 
-write which section does what
+This chapter explains the two most prominent methods of SFE for the two party case, referred to as Two-Party Protocol (2PC).
+The first part of the chapter will motivate and describe desirable properties of a 2PC protocol, culminating in a definition. 
+The second part of the chapter will describe in Yao's Garbled Circuits, a method for performing 2PC, and give a proof of security. 
+The third part will provide an overview of GMW's method.
 
 \section{2PC Security Motivation}
-Think back to Alice and Bob in section xxx. 
-Alice and Bob were millionaires who wished to determine who was wealthier without disclosing how much wealth they had.
-Formally, we say that Alice has input $x$ and Bob has input $y$ ($x$ and $y$ are the wealth of each party), and they want to compute the greater than function $f$, such that 
-\al{add this piecewise function - i guess it got deleted from whereever it was before}
+Think back to Alice and Bob from the introduction. 
+Alice and Bob are millionaires who wish to determine who is wealthier without disclosing how much wealth they have.
+Formally, we say that Alice has input $x$ and Bob has input $y$ ($x$ and $y$ are integers corresponding to the wealth of each party), and they want to compute the less than function $f$, such that 
 \begin{equation}
-    f = .
-\end{equation}
+f(x,y) = \left\{
+\begin{array}{lr}
+    1 & \text{if } x < y \text{;} \\
+    0 & \text{otherwise.}
+\end{array}
+\right.
+\end{equation} 
 
 We call the overarching interaction between Alice and Bob protocol $\Pi$, and $\Pi$ consists of all messages exchanged and computations performed.
 Based on the setup of the problem, we can list a few properties that Alice and Bob wish $\Pi$ to have.
 \begin{description}
     \item[Privacy] 
         Parties only learn their output. 
-        Any information learned by a single during the execution of $\Pi$ must be deduced from the output. 
-        For example, in the case of Alice and Bob, if Alice learns that they had more money, then they learn that $y < x$, which is some information about $y$, but is deduced from the output so it is reasonable. 
+        Any information learned by a single party during the execution of $\Pi$ must be deduced from the output. 
+        For example, in the case of Alice and Bob, if Alice learns that they had more money, then they learn that $y < x$, which is some information about $y$, but it is deduced from the output so it is reasonable. 
         It would be unreasonable if during the execution of $\Pi$ Alice learns that $1,000,000 < y < 2,000,000$, as that information is not deducable from $f(x,y)$.
     \item[Correctness] 
         Each party receives the correct output.
-        In the case of Alice and Bob, this simply means that they learn correclty who has more money.
+        In the case of Alice and Bob, this simply means that they learn correctly who has more money.
     \item[Fairness] 
         Each party receives their input if and only if the other party receives their input.
-        In the case of Alice and Bob, this means that Alice receives their input if and only if Bob recieves their input.
-        This property prevents the case where Alice sends her input to Bob, Bob computes $f$ with Alice's input and their own input, and then Bob refuses to send his input to Alice. 
+        In the case of Alice and Bob, this means that Alice receives their input if and only if Bob receives their input.
+        This property prevents the case where Alice sends her input to Bob, Bob computes $f$ with Alice's input and their own input, and then Bob refuses to send their input to Alice. 
         Hence Bob has learned to output of $f$, but Alice hasn't. 
         We do not want to this scenario to happen, so we require that each party receive their input if and only if the party does. 
         We do not require that all parties always receive their inputs, because a party could abort from the execution in the middle of the protocol.
@@ -47,64 +56,32 @@ Based on the setup of the problem, we can list a few properties that Alice and B
 \end{description}
 One possible method for constructing a definition of security would be to list a number of properties a secure protocol must have.
 This approach is unsatisfactory for a number of reasons.
-One reason is that an important property of security may be missed.
-Many different applications of 2PC have different requirements, and which means that an important requirement may be missed in corner cases.
-Ideally, a good definition of 2PC works for all applications, henc capturing all of those requirements.
+
+One reason is that an import security property that is only releveant in certain cases may be missed.
+There are many applications of 2PC, and in some cases, there may be certain properties that critical to security.
+Ideally, a good definition of 2PC works for all applications, hence capturing all desirable properties.
 A second reason that the property based definition is unsatisfactory is that the definition should be simple.
 If the definition is simple, then it should be clear that \textit{all} possible attacks against the protocol are prevented by the definition.
+A definition based on properties in this respect as it becomes the burden of the prover of security to show that all relevevant properties are covered \cite{lindell2009secure}.
 
 \section{2PC Security Definition}
 A number of definitions formalize what it means for a 2PC protocol to be secure.
-Yao, in his 1982 paper on secure function evaluation, says a 2PC protocol is secure if it has the property:
+Yao, in his 1982 paper on secure function evaluation, says a 2PC protocol is secure if:
 
 \begin{blockquote}
 If one participant behaves according the the protocol, the probability that the other participant successfully cheats is at most $\gamma$ for $\gamma \in \{0,1\}$.
+\cite{get-source}
 \end{blockquote}
 
 TODO mention that this doesn't use the properties.
 
-Since Yao's original definition, many other definitions for the security of 2PC protocols have been proposed.
-Here we give Goldreich's definition of 2PC, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on multiparty computation \cite{goldreich2, lindell2009}.
-
-%As more complex protocols were developed, both for MPC, and in other areas of cryptography, property based definitions became difficult to work with.
-%The main problem that it was unclear precisely what assumptions were being made about what each party could and couldn't do. 
-%For example, in Yao's definition above, it's not clear that the parties' inputs are kept secret if both parties behave according to the protocol.
-%At the least, the definition doesn't give any guarantee.
-%For a while, cryptographers added in additional properties to definitions, but eventually it became clear that there was always the possibility that a certain property was being missed.
-
-%This led to the creation to indistinguishability and simulation based definitions of security.
-%The idea is that the adversary cannot tell what is going on, based on the information that they receive, so the best that the adversary can possible do is guess what is happening.
-%For example, a definition of a secure encryption scheme could be:
-%\textbf{Might give the definition of encryption in the section above. If we do, just reference that section. That might be preferable}
-
-%\begin{blockquote}
-%\begin{itemize}
-%	\item Adversary picks two messages, $m_0$ and $m_1$. 
-%	\item We pick a random bit $b \in \{0,1\}$. Encrypt $m_b$, and send the encrypted version to the adversary (i.e. send $c = \Enc(m_b)$).
-%	\item Adversary outputs a bit $b'$ where $b' = 0$ if they believe the encrypted messages was $m_0$, and $b' = 1$ if they think the encrypted message was $m_1$. 
-%	\item Finally, we consider the encryption scheme secure if
-%	$$Pr[\text{Adversary outputs $b' = b$}] \approx_C \frac{1}{2}.$$
-%\end{itemize}
-%\end{blockquote}
-%
-%The cryptography research community now tends to prefer simulation based definitions. 
-%The idea behind simulation based definitions is that we have ideal world, in which the protocol is run perfectly and securely, and then we have the real world protocol, the one that Alice and Bob run. 
-%Then, for some adversary, we randomly choose either the real ideal or real world and run the MPC computation with the adversary in that world.
-%The adversaries attempts to determine which world the protocol is being run in.
-%Finally, the protocol is secure if the adversary can't do any better than guessing which world they are in.
-%As a consequence, the real world is indistinguishable from the ideal world, hence cryptographers feel confident that the protocol is secure. 
-%The idea being that if the adversary could learn more information in the real world, say information about other parties' inputs, then they would know that they are in the real world, hence the protocol is insecure. 
-%
-%The biggest problem with simulation based definitions is that it is difficult and labor intensive to prove with the definition.
-%The property based definitions are the most straightforward to prove, and the most familiar to proofs used in mathematics.
-%
-
-%The definition is designed for static, semi-honest adversaries. 
+Since Yao's original definition, many other definitions of security of 2PC protocols have been proposed.
+Here we give Goldreich's definition, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on multiparty computation \cite{goldreich, lindell2009secure}.
 
 \begin{description}
 \item [Setup:] \hfill
     \begin{itemize}
-        \item Let $f = (f_1, f_2)$ be a probabilistic, polynomial time functionality. 
+        \item Let $f = (f_1, f_2)$ be a probabilistic, polynomial time functionality where Alice and Bob compute $f_1, f_2: \{0,1\}^n \to \{0,1\}^m$ respectively.
 
         \item Let $\Pi$ be a two party protocol for computing $f$. 
 
@@ -118,7 +95,7 @@ Here we give Goldreich's definition of 2PC, which is given in his textbook \text
     \item Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. Also note that for two party computation.
 \end{itemize}
 \item [Definition:]
-We say that $\Pi$ securely computes $f$ in the presence of static semi-honest adversaries if there exists probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following are true:
+    We say that $\Pi$ securely computes $f$ in the presence of static\footnote{\al{TODO} Mention what static means} semi-honest adversaries if there exists probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following are true:
 \begin{equation} 
     \label{eqn:secdef1}
     \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
@@ -129,16 +106,15 @@ We say that $\Pi$ securely computes $f$ in the presence of static semi-honest ad
 \end{equation}
 
 \item[Intuition:]
-    We think of $\viewrv^{\Pi}_i$ as all of the information that the $i$th has to operate with, such that any conclusion that the $i$th party can come to could be determined from $view^{\Pi}_i$.
-    Moreover, $\outputrv^{\Pi}_i$ is simply a complicated way of writing the output of the $i$th party. 
-    The value of $\outputrv^{\Pi}_i$ is computable from the tuple $\viewrv^{\Pi}_i$.
+We think of $\viewrv^{\Pi}_i$ as all of the information that the $i$th party has to operate with, such that any conclusion that the $i$th party can come to could be determined from $view^{\Pi}_i$.
+Moreover, $\outputrv^{\Pi}_i$ is simply the output of the $i$th party. 
+The value of $\outputrv^{\Pi}_i$ is computable from the tuple $\viewrv^{\Pi}_i$.
 
-    Let's dig a little deeper into the meanings of equation \ref{eqn:secdef1} and \ref{eqn:secdef2}.
-    They state that a probabilistic, polynomial time algorithm, denoted $S_1$ and $S_2$, which is given access \textit{only} to the party's input and output can compute the view of a party.
-    For example, the definition requires that $S_1$ on input $(x, f(x,y))$ must be able to compute $\viewrv^{\Pi}_i(x,y)$, in particular the messages received by party 1, such that the generated view is indistinguishable from the actual view.
+Equations \ref{eqn:secdef1} and \ref{eqn:secdef2} state that a probabilistic, polynomial time algorithm, denoted $S_1$ and $S_2$, which is given access \textit{only} to the party's input and output can compute the view of a party.
+The definition requires that $S_1$ on input $(x, f(x,y))$ must be able to compute $\viewrv^{\Pi}_i(x,y)$, in particular the messages received by party 1, such that the generated view is indistinguishable from the actual view.
 If there exists an algorithm that can perform the aforementioned task, then $\Pi$ does not adequately conceal information, so we should not consider $\Pi$ to be secure.
 
-    Finally, the definition requires that $|x| = |y|$; however, this constraint can be overcome in practice by padding the shorter input.
+Finally, the definition requires that $|x| = |y|$; however, this constraint can be overcome in practice by padding the shorter input.
 \end{description}
 
 The definition of security provided here only applies when adversaries are semi-honest (see \ref{semihonest section}).
@@ -152,7 +128,8 @@ We now give an implementation of a generic 2PC protocol created by Yao \cite{yao
 The protocol works for two parties; we will call party 1 Alice, denoted $A$, and party 2 Bob, denoted $B$, who have inputs $x$ and $y$ respectively.
 Suppose $f$ is the function that Alice and Bob wish to compute.
 
-Yao's protocol depends on first encoding the function $f$ as a circuit, as discussed in more detail in section \ref{sctn:circuits}, and then Alice and Bob together evaluate the circuit.
+Yao's protocol depends on first encoding the function $f$ as a circuit, and then Alice and Bob together evaluate the circuit.
+\al{Add sentence about the high level}
 
 % (complexity - add to end) The number of round is constant.
 % 1 OT per input wire of party B + enc/dec for each gate.
