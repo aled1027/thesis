@@ -8,7 +8,7 @@ This thesis will focus primarily on 2PC protocols, but many of the methods are a
 In order to understand 2PC, it is not crucial to understand how the cryptographic primitives work, but it is important to understand their inputs, outputs and security guarantees. 
 This first chapter will give an overview of the cryptographic primitives used in 2PC protocols.
 
-\section{A Brief Introduction to Cryptography} 
+\section{Introducing Cryptographic Security} 
 The goal of this section is to explain cryptographic security, starting at an intuitive level and moving outward. 
 We do not present cryptographic security in a comprehensive fashion; rather, we explain cryptographic security with the goal of explaining 2PC protocols and their security.
 For more information on cryptographic security, we encourage the reader to peruse \cite{katzlindelltextbook}. 
@@ -47,7 +47,7 @@ Probabilistic means that the algorithms have access to a string of uniform rando
 In order to reason about the security of cryptographic schemes, it is useful to think about breaking a scheme in terms of a probability. 
 For example, we want to be able to say that the best adversary, that is best probabilistic polynomial-time algorithm, has some probability $p$ of breaking the scheme. 
 We note that $p$ is nonzero, since the adversary can always guess and be right with some nonzero probability. 
-To achieve a probablity-based formalism, we introduce a negligible function.
+To achieve a probability based formalism, we introduce a negligible function.
 Informally, a negligible function is smaller than the reciprocal of all polynomial functions. 
 Formally, a negligible function is:
 
@@ -71,15 +71,76 @@ Pr[\text{A correctly answers $P$}] & = {2^{- \lambda}}
 \end{align*}
 Since $2^{- \lambda}$ is a negligible function, we say that the adversary has a negligible probability of breaking the scheme. 
 
-Real world - Ideal world?
+In summary, we model an adversary as a probabilistic polynomial-time algorithm. 
+This limits the computational power of the adversary to what is reasonably computable in reality. 
+Moreover, we can scale the security of a scheme or problem by changing $\lambda$, the security parameter. 
+A higher security parameter makes the scheme more difficult to break. 
 
-How does this idea relate to computational indistinguishability
+\section{Encryption}
 
-We now introduce the idea of computational indistinguishability. 
+Encryption is the process of obfuscating a message, and then later reversing the process. 
+Say Alice has a message that she wants to send to Bob, but somewhere between Alice and Bob sits Eve, who wants to learn about the message.
+An encryption scheme enables Alice to send her message to Bob with confidence that Eve cannot learn any information about the message. 
+
+An encryption scheme is composed of three algorithms: $\Enc$, $\EncInv$ and $\Gen$. 
+$\Enc$ the obfuscating algorithm, $\EncInv$ is the un-obfuscating algorithm and $\Gen$ generates a key. 
+In order to perform encryption, more information is needed beyond the message itself: we call this extra information the key.\footnote{Some encryption schemes require more information that just the key.}.
+The key, denoted $k$, is a random\footnote{The notion of randomness in cryptography is precisely defined, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseudorandom. Pseudorandomness is also precisely defined.} string of $\lambda$ bits, that is $k$ is randomly sampled from $\{0,1\}^{\lambda}$  where $\lambda$ is the security parameter of the encryption scheme. 
+As per the discussion on security parameters, as $\lambda$ increases and $k$ grows in length, an encryption scheme should become harder to break.
+
+Hence, $\Enc$, the encryption algorithm, takes a message and key as input and outputs an obfuscated message. 
+$\EncInv$, the decryption algorithm, takes the encrypted message and key as input and outputs the original message. 
+We often refer to the original message as the plaintext or $pt$, and encrypted message as the ciphertext or $ct$. 
+
+\begin{equation}
+    \label{eqn:encryption}
+    \begin{split}
+    	\Gen(1^n) & = k \\
+        \Enc_k (pt) & = ct  \\
+        \EncInv_k(ct) & = pt
+    \end{split}
+\end{equation}
+
+We are not concerned with how the encryption schemes are implemented or on what problems they rely; rather, we use the encryption schemes as subroutines, so we are concerned with the security guarantees that they offer.
+
+We say that an encryption scheme is secure if an adversary cannot tell the difference between two messages, that is any two messages are indistinguishable. 
+\al{add more here - like how adversary can encrypt any message they want}
+\al{also add that an encryption scheme is formally the tuple $\Pi$}
+\footnote{Specifically, this is the definition of chosen-plaintext-attack security. There exist weaker and strong definitions of security, but chosen-plaintext security is frequently used for 2PC.}
+
+\begin{definition}
+An encryption scheme is secure under a chosen-plaintext attack if for all probabilistic polynomial-time adversaries $A$, there exist a neglible function $\mu$ such that
+\begin{equation}
+Pr[E_{\A, \Pi}(n) = 1] \leq \frac{1}{2} + \mu(n)
+\end{equation}
+where $E$ is the following experiment:
+\begin{enumerate}
+\item Generate key $k$ by running $\Gen(1^n)$. 
+\item The adversary $\A$ is given $1^n$ and oracle access to $\Enc_k$., and outputs a pair of messages $m_0$ and $m_1$ of the same length.
+\item A uniform bit $b \in \{0,1\}$ is selected, and then a ciphertext $c \gets \Enc_k(m_b)$ is computed and given to $\A$.  
+\item $\A$ continues to have oracle access to $\Enc_k$, and outputs a bit $b'$. 
+\item The output of the experiment is defined to be $1$ if $b' = b$ and $0$ otherwise. In the former case, we say that $\A$ succeeds.
+\end{enumerate}
+\end{definition}
+
+It is useful for 2PC to define a specific type of symmetric-key encryption algorithm called a \textit{dual-key cipher} (DKC) \cite{bellare2012foundations}.
+A DKC requires two keys to encrypt and decrypt the message, in contrast to classic encryption which only requires one.
+It is easy to instantiate a DKC if one has a secure encryption scheme: let $k_0$ and $k_1$ be two keys and instantiate the DKC as follows:
+\begin{equation}
+    \begin{split}
+        \EncDKC_{k_0, k_1}(pt) = \Enc_{k_1} ( \Enc_{k_0} ( pt )) \\
+        \EncDKCInv_{k_0, k_1}(ct) = \EncInv_{k_0} ( \EncInv_{k_1} ( ct )) 
+    \end{split}
+\end{equation}
+This construction of a DKC is slow, and there are many faster methods for instantiating DKCS.
+For more information, see \cite{bellare2012foundations}.
+
+\section{Computational Indistinguishability}
+\al{paragraph to transition to indistinguishability} 
+
+\al{paragraph with high level explanation of indistinguishability}
 Informally, two probability distributions are computationally indistinguishable if no polynomial-time algorithm can tell them apart. 
-\al{TODO}
-This is a useful idea because ...
-For concreteness, imagine that ...
+For concreteness, imagine that ... \al{maybe use random ~ random numbers I pick example}
 
 Formally, computational indistinguishability is:
 
@@ -94,47 +155,6 @@ $\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $
 \end{definition}
 
 The unary input $1^n$, tells the algorithm $D$ to run in polynomial time in $n$.
-
-\section{Encryption}
-\al{add in from google drive}
-\begin{equation}
-    \label{eqn:encryption}
-    \begin{split}
-        \Enc_k (pt) & = ct  \\
-        \Dec_k(pt) = \EncInv_k(ct) & = pt
-    \end{split}
-\end{equation}
-where $pt$ is the original message or the \emph{plaintext}, $ct$ is the encrypted message or the \emph{ciphertext}, and $k$ is the secret key.
-For the algorithm to be effective, the secret key $k$ must be randomly sampled from $\{0,1\}^\lambda$, where $\lambda$ is the security parameter of our protocol.\footnote{The notion of randomness in cryptography is precisely defined, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseudorandom. Pseudorandomness is also precisely defined.}
-\al{does footnote go before or after period? ShouldI have footnotes?}
-If  $\lambda$ is increased, thereby increasing the size of the key, then the encryption algorithm becomes harder to break.
-We will not go into details about how encryption algorithms are instantiated; we will merely treat them as algorithms which we can use at our leisure.
-
-\begin{definition}
-\al{Get crypto book and finish this}
-We say that an encryption scheme is secure if:\footnote{Specifically, this is the definition of a chosen-plaintext-attack secure encryption scheme. There exists weaker and stronger definitions of security, but chosen-plaintext-attack security is frequently used for 2PC}
-
-Define the following game:
-What are the inputs?
-\begin{enumerate}
-\item Adversary picks two messages $m_0$ and $m_1$, and gives $m_0$ and $m_1$ to the sender. 
-\item The sender samples $k \gets \{0,1\}^{\lambda}$ and $b \gets \{0,1\}$. The sender gives $m_b$ to the adversary. 
-\item The adversary may spend a polynomial amount of time doing computation. Eventually, the output $b'$, their guess as to which message they received.
-\end{enumerate}
-\end{definition}
-% END WORK HERE
-
-It is useful for 2PC to define a specific type of symmetric-key encryption algorithm called a \textit{dual-key cipher} (DKC) \cite{bellare2012foundations}.
-A DKC requires two keys to encrypt and decrypt the message, in contrast to classic encryption which only requires one.
-It is easy to instantiate a DKC if one has a secure encryption scheme: let $k_0$ and $k_1$ be two keys and instantiate the DKC as follows:
-\begin{equation}
-    \begin{split}
-        \EncDKC_{k_0, k_1}(pt) = \Enc_{k_1} ( \Enc_{k_0} ( pt )) \\
-        \EncDKCInv_{k_0, k_1}(ct) = \EncInv_{k_0} ( \EncInv_{k_1} ( ct )) 
-    \end{split}
-\end{equation}
-This construction of a DKC is slow, and there are many faster methods for instantiating DKCS.
-For more information, see \cite{bellare2012foundations}.
 
 \section{Boolean Circuit} 
 A function in a 2PC protocol is represented as a boolean circuit.
