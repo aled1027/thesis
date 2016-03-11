@@ -1,7 +1,7 @@
 %!TEX root = thesis.tex
 \chapter{Cryptographic Primitives}
 Secure Compuation (SC) is the study of computing functions in a secure fashion. 
-SC can be split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
+SC is split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
 This thesis will focus primarily on 2PC protocols, but many of the methods are applicable to MPC as well.
 
 2PC protocols are complex cryptographic protocols that rely on a number of cryptographic primitives.
@@ -9,7 +9,6 @@ In order to understand 2PC, it is not crucial to understand how the cryptographi
 This first chapter will give an overview of the cryptographic primitives used in 2PC protocols.
 
 \section{A Brief Introduction to Cryptography} 
-What does it mean for a cryptographic scheme to be secure? 
 The goal of this section is to explain cryptographic security, starting at an intuitive level and moving outward. 
 We do not present cryptographic security in a comprehensive fashion; rather, we explain cryptographic security with the goal of explaining 2PC protocols and their security.
 For more information on cryptographic security, we encourage the reader to peruse \cite{katzlindelltextbook}. 
@@ -22,31 +21,35 @@ If an adversary \textit{breaks} a scheme, then the adversary has learned informa
 The goal of defining security in cryptography is to build a formal definition that matches real world needs and intuitions. 
 A good starting place is to consider perfect security. 
 A scheme is perfectly secure if no matter what the adversary does, they cannot break the scheme.
-In particular, we imagine that the adversary has unlimited computational power, and they can still not break the scheme.
+Even if the adversary has unlimited computational power, in terms of time and space, an adversary cannot break a perfectly secure scheme. 
 
-However, this is not the most useful way to think of security, because it makes it very difficult to make useful and fast schemes. 
-We loosen the definition of security by saying that the adversary must run in polynomial time. 
-This substantially reduces the possibilities of the adversary, but is also realistic. 
-An algorithm that does not run in polynomial-time takes a substantial amount of time to run, given a sufficiently large input. 
+However, perfect security is not the most useful way to think of security, because it makes forces schemes to be slow and communication intensive.
+We relax the definition of security by requiring that the adversary run in polynomial time. 
+This substantially reduces the power of the adversary, and it matches our intuition. 
+We are really only concerned with what adversaries can reasonably achieve, as opposed to theoretically possible. 
 
-It is also useful to be able to scale how secure a scheme is. 
-A cryptographic scheme that was secure in the early 2000s probably should not be considered now. 
-What was considered a reasonable adversary back then is simply different from adversaries now. 
+Because computers have improved drastically over the years, what was previously considered a reasonable adversary is not what is considered a reasonable adversary today. 
+Modern computing advances have created easy access to faster computation, meaning that modern adversaries can solve harder problems than they could in previous years. 
 As a concrete example, consider an giving an adversary the following problem: find the factors of $N$. 
 The average computer today can solve the problem for a larger $N$ than the average computer a decade ago.
 
-To model this idea, we introduce a \textit{security parameter}, denoted as $\lambda$.
+Changing computational power makes it important to scale how hard a cryptographic scheme is to break.
+To this end, we introduce a \textit{security parameter}, denoted as $\lambda$.
 A security parameter is a positive integer that represents how hard a scheme is to break. 
 A larger security parameter should mean that the scheme is more difficult to break. 
 More specifically, the security parameter is correlates to the input-size of the problem underlying the cryptographic scheme. 
 For example, if the underlying problem is factoring large number $N$, then $N = \lambda$. 
 As $N$ and $\lambda$ scale up, the factoring problem becomes more difficult and the scheme becomes hard to break. 
 
-The following formalizes the previous discussion.
-In order to reason about the security of cryptographic schemes, it is useful to think about breaking the scheme in terms a probability. 
-To achieve this, we introduce a negligible function.
-Intuitively, a negligible function is smaller than all polynomial functions. 
-Formally, a negligible function is defined as follows:
+Finally, we acknowledge that adversaries have access to some random values, hence we strengthen adversaries to be probabilistic algorithms. 
+Probabilistic means that the algorithms have access to a string of uniform random bits, with the implication being that the algorithm is capable of guessing. 
+
+In order to reason about the security of cryptographic schemes, it is useful to think about breaking a scheme in terms of a probability. 
+For example, we want to be able to say that the best adversary, that is best probabilistic polynomial-time algorithm, has some probability $p$ of breaking the scheme. 
+We note that $p$ is nonzero, since the adversary can always guess and be right with some nonzero probability. 
+To achieve a probablity-based formalism, we introduce a negligible function.
+Informally, a negligible function is smaller than the reciprocal of all polynomial functions. 
+Formally, a negligible function is:
 
 \begin{definition}
 \label{defn:negible}
@@ -70,6 +73,8 @@ Since $2^{- \lambda}$ is a negligible function, we say that the adversary has a 
 
 Real world - Ideal world?
 
+How does this idea relate to computational indistinguishability
+
 We now introduce the idea of computational indistinguishability. 
 Informally, two probability distributions are computationally indistinguishable if no polynomial-time algorithm can tell them apart. 
 \al{TODO}
@@ -77,17 +82,18 @@ This is a useful idea because ...
 For concreteness, imagine that ...
 
 Formally, computational indistinguishability is:
+
 \begin{definition}
 \label{defn:computational-indistinguishability}
 Let $\mathcal{X} = \{X_n\}_{n \in \NN}$ and $\mathcal{Y} = \{Y_n\}_{n \in \NN}$ be distribution ensembles.
 $\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $\mathcal{X} \compindist \mathcal{Y}$, if for all probabilistic polynomial-time algorithms $D$, there exists a negligible function $\mu$ such that:
 \begin{equation}
-	\al{Not right yet. page 277 in book}
-    |Pr[D(1^n, x) = 1] - Pr[D(Y) = 1]| < \mu(n)
+    |Pr_{x \gets X_n} [D(1^n, x) = 1] - Pr_{y \gets Y_n} [D(1^n, y) = 1]| < \mu(n)
 \end{equation}
-\cite{lindell2009secure}.
+\cite{katzlindelltextbook}.
 \end{definition}
 
+The unary input $1^n$, tells the algorithm $D$ to run in polynomial time in $n$.
 
 \section{Encryption}
 \al{add in from google drive}
