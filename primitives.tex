@@ -10,54 +10,43 @@ This first chapter will give an overview of the cryptographic primitives used in
 
 \section{A Brief Introduction to Cryptography} 
 What does it mean for a cryptographic scheme to be secure? 
-THe goal of this section is to explain cryptographic security, starting at an intuitive level and moving outward. 
-We do not present cryptographic security in a comprehensive fashion; rather we explain security with the goal of explaining 2PC protocols and their security.
-For more information on cryptographic security, we encourage the reader to peruse \cite{textbook}. 
+The goal of this section is to explain cryptographic security, starting at an intuitive level and moving outward. 
+We do not present cryptographic security in a comprehensive fashion; rather, we explain cryptographic security with the goal of explaining 2PC protocols and their security.
+For more information on cryptographic security, we encourage the reader to peruse \cite{katzlindelltextbook}. 
 
-\al{this paragraph is weak, but on the right track}
-Cryptographic schemes are premised on problems. 
-At the simples level, as long as the underlying problem is difficult to solve, then the cryptographic scheme is secure.
-One can imagine that there are two types of problems.
-The first type of problem is solvable if one has access to infinite computational time and space\footnote{Space, in computer science, refers to computer memory}. 
-The second type of problem, a subset of the former, is solvable with reasonable computational time and space. 
-Reasonable time and space could mean various things - a few hours, a few lifetimes, a few computers or a few universes - depending on the context. 
-The reason that I make the distinction between problems that are solved with reasonable resources and those that aren't, is because these are the types of problems that cryptography is concered with. 
-Cryptographers are not concerned if you can solve a problem in a couple hundred years, because that's not relevent to the security of today. 
+We define a few intuitive terms to get started.
+A \textit{cryptographic scheme} is a series of instructions designed to perform a specific task. 
+An \textit{adversary} is an algorithm that tries to \textit{break} the scheme. 
+If an adversary \textit{breaks} a scheme, then the adversary has learned information about inputs to the scheme that they shouldn't. 
 
-Cryptographers need to be precise about how difficult the problem underlying a cryptograpic scheme is, and this is acheived in two ways. 
-The first way is to restrict what algorithms trying to solve the problem to polynomial-time algorithms.
-A polynomial-time algorithm requires $p(n)$ steps, hwere $p$ is some polynomial and $n$ is the size of the input to the problem. 
-Often, polynomial-time algorithms are called \textit{efficient} because they generally not \textit{brute-forcing} a solution to the problem; instead, they use some trick or shortcut to efficiently find an answer.
+The goal of defining security in cryptography is to build a formal definition that matches real world needs and intuitions. 
+A good starting place is to consider perfect security. 
+A scheme is perfectly secure if no matter what the adversary does, they cannot break the scheme.
+In particular, we imagine that the adversary has unlimited computational power, and they can still not break the scheme.
 
-The second adaptation that cryptographers make to problems is tuning the difficulty of the problem. 
-Consider that the problem underlying a cryptographic scheme is finding the factors of $N$, where $N$ is some known large number.
-This problem may be made easier or harder by changining how large $N$ is. 
-In fact, if $N < 10,000$, then your laptop can find the answer in mere seconds. 
-If $N$ is really large, finding the factors using the best known current methods could take decades. 
+However, this is not the most useful way to think of security, because it makes it very difficult to make useful and fast schemes. 
+We loosen the definition of security by saying that the adversary must run in polynomial time. 
+This substantially reduces the possibilities of the adversary, but is also realistic. 
+An algorithm that does not run in polynomial-time takes a substantial amount of time to run, given a sufficiently large input. 
 
-\al{get these to flow better}
-If a cryptographic scheme is premised on factoring a large number, and it turns out that there is some efficient, reasonably fast algorithm for factoring large numbers, then we would say that the cryptographic scheme is broken. 
-More formally, a cryptographic scheme is broken if the problem underlying it may be solved efficiently.
+It is also useful to be able to scale how secure a scheme is. 
+A cryptographic scheme that was secure in the early 2000s probably should not be considered now. 
+What was considered a reasonable adversary back then is simply different from adversaries now. 
+As a concrete example, consider an giving an adversary the following problem: find the factors of $N$. 
+The average computer today can solve the problem for a larger $N$ than the average computer a decade ago.
 
-To formalize the idea of scalable security, we introduce the \textit{security parameter} and denote the security parameter as $\lambda$. 
-The security parameter corresonds to the difficulty of the underlying problem of a cryptgraphic scheme. 
-When the security parameter increases, the cryptographic scheme becomes harder to break.
+To model this idea, we introduce a \textit{security parameter}, denoted as $\lambda$.
+A security parameter is a positive integer that represents how hard a scheme is to break. 
+A larger security parameter should mean that the scheme is more difficult to break. 
+More specifically, the security parameter is correlates to the input-size of the problem underlying the cryptographic scheme. 
+For example, if the underlying problem is factoring large number $N$, then $N = \lambda$. 
+As $N$ and $\lambda$ scale up, the factoring problem becomes more difficult and the scheme becomes hard to break. 
 
-
-
-\label{sctn:computational-indistinguishability}
-We formally define computational indistinguishability as follows.
-
-\begin{definition}
-\label{defn:computational-indistinguishability}
-\al{Adam noted that a might be redundant, and the counting parameter might be confusing}
-Let $\mathcal{X} = \{X(n,a)\}_{n \in \NN, a \in \{0,1\}^*}$ and $\mathcal{Y} = \{Y(n,a)\}_{n \in \NN, a \in \{0,1\}^*}$ be distribution ensembles.
-$\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $\mathcal{X} \compindist \mathcal{Y}$, if and only if for all non-uniform polynomial-time distinguisher $D$, there exists a function $\mu(\cdot)$ that is negligible in $n$, such that for all $a \in \{0,1\}^*$, 
-\begin{equation}
-    |Pr[D(X(n,a)) = 1] - Pr[D(Y(n,a)) = 1]| < \mu(n)
-\end{equation}
-\cite{lindell2009secure}.
-\end{definition}
+The following formalizes the previous discussion.
+In order to reason about the security of cryptographic schemes, it is useful to think about breaking the scheme in terms a probability. 
+To achieve this, we introduce a negligible function.
+Intuitively, a negligible function is smaller than all polynomial functions. 
+Formally, a negligible function is defined as follows:
 
 \begin{definition}
 \label{defn:negible}
@@ -67,6 +56,38 @@ A function $\mu : \NN \to \RR$ is negligible if for all positive polynomial $p(\
 \end{equation}
 \cite{goldreich}
 \end{definition}
+
+Examples of negligible functions include $2^{-n}$, $2^{- \sqrt{2}}$ and $n^{- \log n}$. 
+
+To put a negligible function to use, say an adversary is attacking a cryptographic scheme that is equivalent to solving a problem $P$ with input-size $\lambda$ and $2^{\lambda}$ possible answers. 
+Moreover, say that $P$ is known to be NP-hard such that there is no polynomial time algorithm to solve $P$. 
+Then, the best that the adversary can do is to guess the answer to $P$.
+Hence the probability that the adversary that finds the answer the $P$, or breaks the scheme, is 
+\begin{align*}
+Pr[\text{A correctly answers $P$}] & = {2^{- \lambda}}
+\end{align*}
+Since $2^{- \lambda}$ is a negligible function, we say that the adversary has a negligible probability of breaking the scheme. 
+
+Real world - Ideal world?
+
+We now introduce the idea of computational indistinguishability. 
+Informally, two probability distributions are computationally indistinguishable if no polynomial-time algorithm can tell them apart. 
+\al{TODO}
+This is a useful idea because ...
+For concreteness, imagine that ...
+
+Formally, computational indistinguishability is:
+\begin{definition}
+\label{defn:computational-indistinguishability}
+Let $\mathcal{X} = \{X_n\}_{n \in \NN}$ and $\mathcal{Y} = \{Y_n\}_{n \in \NN}$ be distribution ensembles.
+$\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $\mathcal{X} \compindist \mathcal{Y}$, if for all probabilistic polynomial-time algorithms $D$, there exists a negligible function $\mu$ such that:
+\begin{equation}
+	\al{Not right yet. page 277 in book}
+    |Pr[D(1^n, x) = 1] - Pr[D(Y) = 1]| < \mu(n)
+\end{equation}
+\cite{lindell2009secure}.
+\end{definition}
+
 
 \section{Encryption}
 \al{add in from google drive}
