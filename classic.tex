@@ -1,17 +1,17 @@
 
 \chapter{Classic 2PC}
 \al{this paragraph is a little weak}
-Secure Function Evaluation was first proposed in an oral presesntation by Andrew Yao \cite{yao-original}.
-Since Yao's presentation, multiple methods for performing SFE were developed.
-One method was developed by Yao himself and is Yao's garbled circuits.
-Another was developed by a group of researchers, Beaver, Micali and Widgerson.
+Secure Computation (SC) was first proposed in an oral presesntation by Andrew Yao \cite{yao-original}.
+Since Yao's presentation, multiple methods for performing SC were developed.
+One method was developed by Yao himself and is called garbled circuit.
+Another was developed by a group of researchers, Goldreich, Micali and Widgerson \al{cite}.
 The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, which has since been termed garbled circuit.
 At this point, it is unclear which method is better, so researchers continue to study both methods.
 \al{get source}
 
-This chapter explains the two most prominent methods of SFE for the two party case, referred to as Two-Party Protocol (2PC).
+This chapter explains the two most prominent methods of SC for the two party case, referred to as Two-Party Protocol (2PC).
 The first part of the chapter will motivate and describe desirable properties of a 2PC protocol, culminating in a definition. 
-The second part of the chapter will describe in Yao's Garbled Circuits, a method for performing 2PC, and give a proof of security. 
+The second part of the chapter will describe in Yao's Garbled Circuits, a method for performing 2PC, and discuss security of 2PC.
 The third part will provide an overview of GMW's method.
 
 \section{2PC Security Motivation}
@@ -76,7 +76,7 @@ If one participant behaves according the the protocol, the probability that the 
 TODO mention that this doesn't use the properties.
 
 Since Yao's original definition, many other definitions of security of 2PC protocols have been proposed.
-Here we give Goldreich's definition, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on SFE \cite{goldreich, lindell2009secure}.
+Here we give Goldreich's definition, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on SC \cite{goldreich, lindell2009secure}.
 
 \begin{description}
 \item [Setup:] \hfill
