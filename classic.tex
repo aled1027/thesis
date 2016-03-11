@@ -124,12 +124,13 @@ They imagine an ideal world, where the function $f$ must be computed securely, a
 For an easy to understand security definition of 2PC with malicious adversaries, we refer to reader to \cite{lindell2009}.
 
 \section{Yao's Garbled Circuit}
+\al{struggling a bit with the organization of this section}
 We now give an implementation of a generic 2PC scheme created by Yao \cite{yao}.
 The scheme is designed for two parties, Alice and Bob, who have inputs $x$ and $y$ respectively.
 We suppose that Alice and Bob wish to compute the function $f : \{0,1\}^n \to \{0,1\}^m$. 
 
 \al{This should probably be 2-4 sentences, instead of one}
-At a high level, Yao's scheme works by having Alice build the corresponding circuit for $f$, encrypting the circuit gate by gate, sending the encrypted circuit to Bob, who uses values corresponding to the inputs to decrypt the circuit.
+At a high level, Yao's scheme has the following steps: (1) Alice builds and encrypts the circuit representing $f$. (2) Alice sends the garbled (encrypted) circuit to Bob. (3) Bob receives the input labels via Oblivious Transfer. (4) Bob uses the input labels to decrypt the circuit. (5) Bob sends the output of the circuit to Alice.
 
 \begin{algorithm}
 \caption{Garble Circuit}

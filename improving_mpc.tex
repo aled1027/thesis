@@ -394,4 +394,11 @@ But in many of the cases being examined now - most notably computing AES - the c
   \caption{Summary of Garbled Circuit Improvements. GRR3 stands for garbled row reduction 3 and GRR2 stands for garbled row reduction 2}
 \end{table}
 
+\section{Improving Oblivious Transfer}
+\al{Fix this up}
+Oblivious transfer has been improved in two relevant ways for 2PC protocols. 
+These improvements are called OT-extension and OT-preprocessing. 
+In OT-extension a constant number of OT's can be run to generate a polynomial number of exchanged values.
+In OT-preprocessing the OT's occur before the actual protocol, during what is called the offline phase, and then when the OT's needed during the online phase, simpler and efficient communication realizes the exchanged values.
+This is useful because the OT step requires a large amount of communication to be sent between the sender and receiver, often resulting in OT being the bottleneck of 2PC protocols.
 

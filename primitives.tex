@@ -1,8 +1,7 @@
 %!TEX root = thesis.tex
 \chapter{Cryptographic Primitives}
-\al{check usage of i.e. and e.g.. Pretty sure I abused them at some points}
-Secure function evaluation (SFE) is the study of computing functions in a secure fashion. 
-SFE can be split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
+Secure Compuation (SC) is the study of computing functions in a secure fashion. 
+SC can be split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
 This thesis will focus primarily on 2PC protocols, but many of the methods are applicable to MPC as well.
 
 2PC protocols are complex cryptographic protocols that rely on a number of cryptographic primitives.
@@ -11,18 +10,11 @@ This first chapter will give an overview of the cryptographic primitives used in
 
 \section{Computational Indistinguishability} 
 \label{sctn:computational-indistinguishability}
-Computational Indistinguishability is a method of mathematically justifying the hardness of an algorithm to break. 
-At a high level, we say that two sets are indistinguishable, if there is no efficient algorithm that can tell the two sets apart. 
-We present the definition formally here, but it is best understood when it is used to define and prove the security of particular schemes. 
-In section \al{add label/ref} we use computationally indistinguishability to show that an encryption scheme is secure, and in section \al{add label/ref} we use it to show a 2PC protocol is secure. 
-\al{does the term ''break`` seem meaningful here? At some point, at least, I should be clear about what it means.}
-
 We formally define computational indistinguishability as follows.
 
- \al{should this be a definition section?}
- 
- \begin{definition}
- \label{defn:computational-indistinguishability}
+\begin{definition}
+\label{defn:computational-indistinguishability}
+\al{Adam noted that a might be redundant, and the counting parameter might be confusing}
 Let $\mathcal{X} = \{X(n,a)\}_{n \in \NN, a \in \{0,1\}^*}$ and $\mathcal{Y} = \{Y(n,a)\}_{n \in \NN, a \in \{0,1\}^*}$ be distribution ensembles.
 $\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $\mathcal{X} \compindist \mathcal{Y}$, if and only if for all non-uniform polynomial-time distinguisher $D$, there exists a function $\mu(\cdot)$ that is negligible in $n$, such that for all $a \in \{0,1\}^*$, 
 \begin{equation}
@@ -41,11 +33,7 @@ A function $\mu : \NN \to \RR$ is negligible if for all positive polynomial $p(\
 \end{definition}
 
 \section{Encryption}
-Encryption is the process of encoding a message such that only parties with the key can read the message.
-As we discuss 2PC, we will be using symmetric-key encryption, the case where encryption and decryption use the same key.
-A symmetric-key encryption protocol is composed of two parts.
-The first part is the encryption algorithm which obfuscates the message, and the second part is the decryption algorithm which unobfuscates the disguised message.
-The encryption algorithm is denoted $\Enc$, and the decryprtion algorithm is denoted as either $\Dec$ or $\EncInv$.
+\al{add in from google drive}
 \begin{equation}
     \label{eqn:encryption}
     \begin{split}
@@ -59,12 +47,10 @@ For the algorithm to be effective, the secret key $k$ must be randomly sampled f
 If  $\lambda$ is increased, thereby increasing the size of the key, then the encryption algorithm becomes harder to break.
 We will not go into details about how encryption algorithms are instantiated; we will merely treat them as algorithms which we can use at our leisure.
 
-We say that an encryption scheme is secure \footnote{Specifically, this is the definition of a chosen-plaintext-attack secure encryption scheme. There exists weaker and stronger definitions of security, but chosen-plaintext-attack security is frequently used for 2PC}, if the following game is true:
-
-% TODO WORK HERE
-\al{Get crypto book and finish this}
-
 \begin{definition}
+\al{Get crypto book and finish this}
+We say that an encryption scheme is secure if:\footnote{Specifically, this is the definition of a chosen-plaintext-attack secure encryption scheme. There exists weaker and stronger definitions of security, but chosen-plaintext-attack security is frequently used for 2PC}
+
 Define the following game:
 What are the inputs?
 \begin{enumerate}
@@ -75,9 +61,9 @@ What are the inputs?
 \end{definition}
 % END WORK HERE
 
-It is useful for 2PC to define a specific type of symmetric-key encryption algorithm called a Dual-Key Cipher (DKC) \cite{bellare2012foundations}.
-A DKC requires two secret keys to encrypt and decrypt the message, in contrast to classic encryption which only requires one.
-It is easy to instantiate a DKC if one has a secure encryption scheme: let $k_0$ and $k_1$ be the two secret keys and instantiate the DKC as follows:
+It is useful for 2PC to define a specific type of symmetric-key encryption algorithm called a \textit{dual-key cipher} (DKC) \cite{bellare2012foundations}.
+A DKC requires two keys to encrypt and decrypt the message, in contrast to classic encryption which only requires one.
+It is easy to instantiate a DKC if one has a secure encryption scheme: let $k_0$ and $k_1$ be two keys and instantiate the DKC as follows:
 \begin{equation}
     \begin{split}
         \EncDKC_{k_0, k_1}(pt) = \Enc_{k_1} ( \Enc_{k_0} ( pt )) \\
@@ -121,7 +107,7 @@ Figure \ref{fig:less_than_circuit} shows the circuit representation of the less 
     \centering
     \includegraphics[scale=0.75]{images/drawing.png}
     \label{fig:less_than_circuit}
-    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.}
+    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.\al{define symbols and google circuit diagrams latex / tree diagrams}}
 \end{figure}
 
 \begin{table}[h]
@@ -140,23 +126,11 @@ x & y & $x < y$ \\ \hline
 
 \section{Oblivious Transfer}
 \al{more sources here - get from CompGC paper}
+\al{Give a nice metaphor of using OT - what happens. Don't need to give the protocol}
 Oblivious Transfer (OT) is a two-party protocol where one party (sender) has two inputs, $m_0$ and $m_1$, and the other party (receiver) has a bit $b \in \{0,1\}$. 
 OT enables the receiver to acquire $m_b$ from the sender without revealing which message is received, i.e., the value of $b$.
 Moreover, the receiver learns nothing about the message that isn't received, i.e. anything about $m_{1-b}$.
 
-Here we give the Naor-Pinkas protocol of $1-2$ oblivious transfer.
 The protocol relies on the DDH assumption.\footnote{The Decisional Diffie-Hellman (DDH) assumption is a computational hardness assumption involving discrete logarithms in cyclic groups. For more information, see \cite{Boneh1998}.}
 
-\al{Should I give the full protocol? Probably shouldn't have a screenshot of wikipedia in the thesis}
 
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.3]{images/ot_wiki}
-    \caption{Semi-honest Naor-Pinkas oblivious transfer.}
-\end{figure}
-
-Oblivious transfer has been improved in two relevant ways for 2PC protocols. 
-These improvements are called OT-extension and OT-preprocessing. 
-In OT-extension a constant number of OT's can be run to generate a polynomial number of exchanged values.
-In OT-preprocessing the OT's occur before the actual protocol, during what is called the offline phase, and then when the OT's needed during the online phase, simpler and efficient communication realizes the exchanged values.
-This is useful because the OT step requires a large amount of communication to be sent between the sender and receiver, often resulting in OT being the bottleneck of 2PC protocols.
