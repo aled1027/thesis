@@ -78,35 +78,45 @@ A higher security parameter makes the scheme more difficult to break.
 
 \section{Encryption}
 
-Encryption is the process of obfuscating a message, and then later reversing the process. 
+Encryption is the process of obfuscating a message, and then later un-obfuscating the message.
 Say Alice has a message that she wants to send to Bob, but somewhere between Alice and Bob sits Eve, who wants to learn about the message.
 An encryption scheme enables Alice to send her message to Bob with confidence that Eve cannot learn any information about the message. 
 
-An encryption scheme is composed of three algorithms: $\Enc$, $\EncInv$ and $\Gen$. 
+An encryption scheme is composed of three algorithms: $\Enc$, $\EncInv$ and $\Gen$; formally, we say an encryption scheme is a tuple $\Pi = (\Gen, \Enc, \EncInv)$\footnote{We use $\Pi$ here to denote the encryption scheme, because it is a protocol. Protocol starts with a p.}.
 $\Enc$ the obfuscating algorithm, $\EncInv$ is the un-obfuscating algorithm and $\Gen$ generates a key. 
-In order to perform encryption, more information is needed beyond the message itself: we call this extra information the key.\footnote{Some encryption schemes require more information that just the key.}.
+The key is extra information that $\Enc$ and $\EncInv$ use to obfuscate and un-obfuscate the message respectively. 
 The key, denoted $k$, is a random\footnote{The notion of randomness in cryptography is precisely defined, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseudorandom. Pseudorandomness is also precisely defined.} string of $\lambda$ bits, that is $k$ is randomly sampled from $\{0,1\}^{\lambda}$  where $\lambda$ is the security parameter of the encryption scheme. 
 As per the discussion on security parameters, as $\lambda$ increases and $k$ grows in length, an encryption scheme should become harder to break.
 
-Hence, $\Enc$, the encryption algorithm, takes a message and key as input and outputs an obfuscated message. 
-$\EncInv$, the decryption algorithm, takes the encrypted message and key as input and outputs the original message. 
-We often refer to the original message as the plaintext or $pt$, and encrypted message as the ciphertext or $ct$. 
+$\Enc$, the encryption algorithm, takes a message and the key as input and outputs an obfuscated message. 
+$\EncInv$, the decryption algorithm, takes the encrypted message and the key as input and outputs the original message. 
+We refer to the original message as the plaintext or $pt$ and the encrypted message as the ciphertext or $ct$. 
 
 \begin{equation}
     \label{eqn:encryption}
     \begin{split}
-    	\Gen(1^n) & = k \\
-        \Enc_k (pt) & = ct  \\
-        \EncInv_k(ct) & = pt
+    	\Gen(1^n) & \rightarrow k \\
+        \Enc_k (pt) & \rightarrow ct  \\
+        \EncInv_k(ct) & \rightarrow pt
     \end{split}
 \end{equation}
 
-We are not concerned with how the encryption schemes are implemented or on what problems they rely; rather, we use the encryption schemes as subroutines, so we are concerned with the security guarantees that they offer.
+We are not concerned with how encryption schemes are implemented or on what problems they rely; rather, we use encryption schemes as subroutines, so we are concerned with the security guarantees that they offer.
 
-We say that an encryption scheme is secure if an adversary cannot tell the difference between two messages, that is any two messages are indistinguishable. 
-\al{add more here - like how adversary can encrypt any message they want}
-\al{also add that an encryption scheme is formally the tuple $\Pi$}
-\footnote{Specifically, this is the definition of chosen-plaintext-attack security. There exist weaker and strong definitions of security, but chosen-plaintext security is frequently used for 2PC.}
+We say that an encryption scheme is secure if an adversary cannot tell the difference between two messages.
+We define security using a thought experiment. 
+In the thought experiment, the adversary has access to the encryption algorithm with key hardcoded in. 
+This means that the adversary can encrypt any message they want, and see how the message would encrypt. 
+The goal of the adversary at this point in the thought experiment is to find a pattern or weakness in the encryption algorithm that they can exploit.
+The adversary eventually picks any two messages $m_0$ and $m_1$ which they did not give to their ecnryption algorithm and see how they encrypt.
+The adversay shows us $m_0$ and $m_1$.
+We choose one of the messages\footnote{We select the message uniformly at random.}, encrypt the message, and send the resulting ciphertext to the adversary.
+The adversary's goal now is to determine which message we encrypted.
+They still may use their encryption algorithm with the key hardcoded in.
+Evenutally the adversary must output either $0$ or $1$ indicating that they think we selected $m_0$ or $m_1$ respectively.
+If the adversary picks correctly, then we say that the adversary wins; otherwise, we say that the adversary loses.
+
+Finall and informally, the encryption scheme is considered secure if the probability that the adversary wins is $\frac{1}{2} + \mu(\lambda)$, i.e. the best the adversary can do is guess.
 
 \begin{definition}
 An encryption scheme is secure under a chosen-plaintext attack if for all probabilistic polynomial-time adversaries $A$, there exist a neglible function $\mu$ such that
@@ -123,17 +133,21 @@ where $E$ is the following experiment:
 \end{enumerate}
 \end{definition}
 
-It is useful for 2PC to define a specific type of symmetric-key encryption algorithm called a \textit{dual-key cipher} (DKC) \cite{bellare2012foundations}.
-A DKC requires two keys to encrypt and decrypt the message, in contrast to classic encryption which only requires one.
-It is easy to instantiate a DKC if one has a secure encryption scheme: let $k_0$ and $k_1$ be two keys and instantiate the DKC as follows:
+It is useful for 2PC to create an encryption scheme that requires two keys to encryption and decrypt.
+An encryption scheme with two keys is called a \textit{dual-key cipher} (DKC) \cite{bellare2012foundations}.
+It is easy to instantiate a DKC if one has a secure single-key encryption scheme: let $k_0$ and $k_1$ be two keys and instantiate the DKC as follows:
 \begin{equation}
     \begin{split}
         \EncDKC_{k_0, k_1}(pt) = \Enc_{k_1} ( \Enc_{k_0} ( pt )) \\
         \EncDKCInv_{k_0, k_1}(ct) = \EncInv_{k_0} ( \EncInv_{k_1} ( ct )) 
     \end{split}
 \end{equation}
-This construction of a DKC is slow, and there are many faster methods for instantiating DKCS.
-For more information, see \cite{bellare2012foundations}.
+
+If the encrytion scheme used to create the DKC is secure, then it is easy to see to that the DKC is also secure.
+We are formally considering the statement: $\Enc$ secure $\implies$ DKC secure. 
+Consider the contrapositive: DKC insecure $\implies$ $\Enc$ insecure. 
+If the DKC is insecure, then an adversary can find two messages, $m_0$ and $m_1$ such that their ciphertexts are distinguishable. 
+\al{Figure this out, need to break the old intro crypto work}
 
 \section{Computational Indistinguishability}
 \al{paragraph to transition to indistinguishability} 
