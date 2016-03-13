@@ -150,11 +150,13 @@ If the DKC is insecure, then an adversary can find two messages, $m_0$ and $m_1$
 \al{Figure this out, need to break the old intro crypto work}
 
 \section{Computational Indistinguishability}
-\al{paragraph to transition to indistinguishability} 
+This section introduces the idea of computational indistinguishability. 
+We do not use computational indistinguishability immedidiately, but it will important later for defining security of a 2PC protocol.
 
-\al{paragraph with high level explanation of indistinguishability}
-Informally, two probability distributions are computationally indistinguishable if no polynomial-time algorithm can tell them apart. 
-For concreteness, imagine that ... \al{maybe use random ~ random numbers I pick example}
+Informally, two probability distribution are indistinguishable if no polynomial-time algorithm can tell them apart.
+The thought experiment is like this: an algorithm is  that there are two distributions, it is given one of the distributions.
+If the algorithm correctly determines which distribution it was given, then it wins, otherwise the algorithm loses.
+The algorithm, since it must run in polynomial time, can only sample a polynomial number of values from the distributions.
 
 Formally, computational indistinguishability is:
 
@@ -168,7 +170,10 @@ $\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $
 \cite{katzlindelltextbook}.
 \end{definition}
 
-The unary input $1^n$, tells the algorithm $D$ to run in polynomial time in $n$.
+We quickly break down the definition.
+The unary input $1^n$ tells the algorithm $D$ to run in polynomial time in $n$.
+The probability distributions $X_n$ and $Y_n$ are restricted by $n$, which in this context is the security parameter.
+The phrases $x \gets X_n$ and $y \gets Y_n$ mean that the probability is taken over samples from the distributions.
 
 \section{Boolean Circuit} 
 A function in a 2PC protocol is represented as a boolean circuit.
@@ -202,9 +207,33 @@ Figure \ref{fig:less_than_circuit} shows the circuit representation of the less 
 
 \begin{figure}[h]
     \centering
+\begin{circuitikz} \draw
+    (0,2) node[and port] {};
+\end{circuitikz}
+\caption{An AND gate.}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+\begin{circuitikz} \draw
+    (0,2) node[xor port] {};
+\end{circuitikz}
+\caption{An XOR gate.}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+\begin{circuitikz} \draw
+    (0,2) node[not port] {};
+\end{circuitikz}
+\caption{A NOT gate.}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
     \includegraphics[scale=0.75]{images/drawing.png}
     \label{fig:less_than_circuit}
-    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.\al{define symbols and google circuit diagrams latex / tree diagrams}}
+    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.\al{make with tikz}}
 \end{figure}
 
 \begin{table}[h]
