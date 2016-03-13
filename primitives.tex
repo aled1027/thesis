@@ -251,12 +251,23 @@ x & y & $x < y$ \\ \hline
 \end{table}
 
 \section{Oblivious Transfer}
-\al{more sources here - get from CompGC paper}
-\al{Give a nice metaphor of using OT - what happens. Don't need to give the protocol}
-Oblivious Transfer (OT) is a two-party protocol where one party (sender) has two inputs, $m_0$ and $m_1$, and the other party (receiver) has a bit $b \in \{0,1\}$. 
-OT enables the receiver to acquire $m_b$ from the sender without revealing which message is received, i.e., the value of $b$.
-Moreover, the receiver learns nothing about the message that isn't received, i.e. anything about $m_{1-b}$.
+Oblivious Transfer (OT) is a communicating protocol that underlies many more complicated cryptosystems.
+At the highest level, Alice potentially sends two messages to Bob, and Bob only recieves one of the messages.
 
-The protocol relies on the DDH assumption.\footnote{The Decisional Diffie-Hellman (DDH) assumption is a computational hardness assumption involving discrete logarithms in cyclic groups. For more information, see \cite{Boneh1998}.}
+Consider the following thought experiment: Alice and Bob want to exchange a message.
+Alice has two messages $m_0$ and $m_1$, and she Alice wants to send one of them Bob but does not care which one.
+Bob knows that he wants message $m_b$ where $b \in \{0,1\}$.
+Alice gives both messages to the trusted post-office. 
+Bob also goes to the trusted post office, and says that he wants $m_b$. 
+The post office gives $m_b$ to Bob, throws the other message ($m_{1-b}$) in the trash, and does not tell Alice which message they gave to Bob.
+Now, Alice has sent a message to Bob, but is oblivious as to which message was sent.
+
+Oblivious Transfer is a useful protocol and is a fundamental component of 2PC protocols.
+Oblivious Transfer protocols guarantee the following security properties:
+\begin{enumerate}
+    \item Alice does not know whether Bob recieved $m_0$ or $m_1$.
+    \item Bob does not know anything about $m_{1-b}$, the message that he did not receive.
+\end{enumerate}
+
 
 
