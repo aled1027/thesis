@@ -107,7 +107,7 @@ The distribution of the its possible outputs is given by $\{S_A(x, f(x,y)\}_{x \
 Let us break this distribution down: $S_A$ is a fixed single algorithm.
 $x$ is Alice's input, and $f(x,y)$ is the output of the function.
 The set is indexed by all possible $x$, so all possible inputs that Alice could have.
-In sum, $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$ represents the possible information that an algorithm could deduced from all possible $x$ and $f(x,y)$.
+In summary, $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$ represents the possible information that an algorithm could deduced from all possible $x$ and $f(x,y)$.
 We think of $\{S_B(y, f(x,y)\}_{y \in \{0,1\}^*}$ for Bob's input similarly.
 
 For constructing the probability distributions of the real world, we need to consider what information Alice and Bob have at their disposal.
@@ -123,24 +123,16 @@ That is, the probability distributions $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$ and
 
 With this intuition in mind, we give Goldreich's definition of 2PC security from his textbook \textit{Foundations of Cryptography Volume II}\cite{goldreich}.
 
-\begin{description}
-\item [Setup:] \hfill
-    \begin{itemize}
-        \item Let $f = (f_1, f_2)$ be a probabilistic, polynomial time functionality where Alice and Bob compute $f_1, f_2: \{0,1\}^n \to \{0,1\}^m$ respectively.
+\begin{definition}
+Let $f = (f_1, f_2)$ be a probabilistic, polynomial time functionality where Alice and Bob compute $f_1, f_2: \{0,1\}^n \to \{0,1\}^m$ respectively.
+Let $\Pi$ be a two party protocol for computing $f$. 
+Define $\viewrv_i^{\Pi}(n,x,y)$ (for $i \in \{1,2\}$) as the view of the $i$th party on input $(x,y)$ and security parameter $n$.
+$\viewrv_i^{\Pi}(n,x,y)$ equals the tuple $(1^n, x, r^i, m_1^i, \ldots, m_t^i)$, where $r^i$ is the contents of the $i$th party's internal random tape, and $m_j^i$ is the $j$th message that the $i$th party received.
+Define $output^{\Pi}_i(n,x,y)$ as the output of the $i$th party on input $(x,y)$ and security parameter $n$.
+Also denote $ \outputrv^{\Pi}(n,x,y) = (\outputrv^{\Pi}_1(n,x,y), \outputrv^{\Pi}_2(n,x,y)).$
+Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. Also note that for two party computation.
 
-        \item Let $\Pi$ be a two party protocol for computing $f$. 
-
-        \item Define $\viewrv_i^{\Pi}(n,x,y)$ (for $i \in \{1,2\}$) as the view of the $i$th party on input $(x,y)$ and security parameter $n$.
-        $\viewrv_i^{\Pi}(n,x,y)$ equals the tuple $(1^n, x, r^i, m_1^i, \ldots, m_t^i)$, where $r^i$ is the contents of the $i$th party's internal random tape, and $m_j^i$ is the $j$th message that the $i$th party received.
-    
-        \item Define $output^{\Pi}_i(n,x,y)$ as the output of the $i$th party on input $(x,y)$ and security parameter $n$.
-        Also denote
-        $$ \outputrv^{\Pi}(n,x,y) = (\outputrv^{\Pi}_1(n,x,y), \outputrv^{\Pi}_2(n,x,y)).$$
-
-    \item Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. Also note that for two party computation.
-\end{itemize}
-\item [Definition:]
-    We say that $\Pi$ securely computes $f$ in the presence of static\footnote{\al{TODO} Mention what static means} semi-honest adversaries if there exists probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following are true:
+We say that $\Pi$ securely computes $f$ in the presence of static\footnote{\al{TODO} Mention what static means} semi-honest adversaries if there exist probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following hold:
 \begin{equation} 
     \label{eqn:secdef1}
     \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
@@ -149,34 +141,26 @@ With this intuition in mind, we give Goldreich's definition of 2PC security from
     \label{eqn:secdef2}
     \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_2(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
 \end{equation}
+\end{definition}
 
-\item[Intuition:]
-We think of $\viewrv^{\Pi}_i$ as all of the information that the $i$th party has to operate with, such that any conclusion that the $i$th party can come to could be determined from $view^{\Pi}_i$.
-Moreover, $\outputrv^{\Pi}_i$ is simply the output of the $i$th party. 
-The value of $\outputrv^{\Pi}_i$ is computable from the tuple $\viewrv^{\Pi}_i$.
+The definition requires that $|x| = |y|$; however, this constraint can be overcome by padding the shorter input.
 
-Equations \ref{eqn:secdef1} and \ref{eqn:secdef2} state that a probabilistic, polynomial time algorithm, denoted $S_1$ and $S_2$, which is given access \textit{only} to the party's input and output can compute the view of a party.
-The definition requires that $S_1$ on input $(x, f(x,y))$ must be able to compute $\viewrv^{\Pi}_i(x,y)$, in particular the messages received by party 1, such that the generated view is indistinguishable from the actual view.
-If there exists an algorithm that can perform the aforementioned task, then $\Pi$ does not adequately conceal information, so we should not consider $\Pi$ to be secure.
-
-Finally, the definition requires that $|x| = |y|$; however, this constraint can be overcome in practice by padding the shorter input.
-\end{description}
-
-The definition of security provided here only applies when adversaries are semi-honest (see \ref{semihonest section}).
-Definitions of security in settings with malicious adversaries require substantially more complexity.
-As a result, these definitions are often simulation based definitions.
-They imagine an ideal world, where the function $f$ must be computed securely, and by a series of comparisons, show that the real world where $\Pi$ computes $f$ is essentially the same as the ideal world.
-For an easy to understand security definition of 2PC with malicious adversaries, we refer to reader to \cite{lindell2009}.
+A definition of 2PC security with malicious parties is substantially more complex.
+For more information on a malicious security definition, we refer the reader to \cite{lindell2009}.
 
 \section{Yao's Garbled Circuit}
-\al{struggling a bit with the organization of this section}
-\al{Property that if encryption fails, we know. something that easily added to any encryption scheme and not a big deal, but super useful}
-We now give an implementation of a generic 2PC scheme created by Yao \cite{yao}.
-The scheme is designed for two parties, Alice and Bob, who have inputs $x$ and $y$ respectively.
-We suppose that Alice and Bob wish to compute the function $f : \{0,1\}^n \to \{0,1\}^m$. 
+We now discuss a popular 2PC scheme called garbled circuits.
+At a high level, garbled circuits work by having one party, say Alice, design a circuit that computes $f$ and encrypt (garble) that circuit.
+Alice sends the encrypted circuit to Bob, along with some values corresponding to her and Bob's inputs, and Bob decrypts the circuit, acquring the output of $f(x,y)$ at the end.
 
-\al{This should probably be 2-4 sentences, instead of one}
-At a high level, Yao's scheme has the following steps: (1) Alice builds and encrypts the circuit representing $f$. (2) Alice sends the garbled (encrypted) circuit to Bob. (3) Bob receives the input labels via Oblivious Transfer. (4) Bob uses the input labels to decrypt the circuit. (5) Bob sends the output of the circuit to Alice.
+A circuit is garbled gate-wise.
+Recall that a gate takes as input two bits and outputs a single bit. 
+A garbled gate takes as input two \textit{wire labels} and outputs a single \textit{wire label}.
+Wire labels are 128-bit ciphertexts, that is they are the encryption of something.
+Each wire has two possible wire labels, where one label represents $0$ and the other label represents $1$.
+For wire $i$ the 128-bit labels are denoted as $W_i^0$ and $W_i^1$. 
+
+\al{Property that if encryption fails, we know. something that easily added to any encryption scheme and not a big deal, but super useful}
 
 \begin{algorithm}
 \caption{Garble Circuit}
