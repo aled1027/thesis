@@ -1,4 +1,4 @@
-
+%!TEX root = thesis.tex
 \chapter{Classic 2PC}
 \al{this paragraph is a little weak}
 Secure Computation (SC) was first proposed in an oral presesntation by Andrew Yao \cite{yao-original}.
@@ -17,7 +17,7 @@ The third part will provide an overview of GMW's method.
 \section{2PC Security Motivation}
 Think back to Alice and Bob from the introduction. 
 Alice and Bob are millionaires who wish to determine who is wealthier without disclosing how much wealth they have.
-Formally, we say that Alice has input $x$ and Bob has input $y$ ($x$ and $y$ are integers corresponding to the wealth of each party), and they want to compute the less than function $f$, such that 
+More formally, Alice has input $x$ and Bob has input $y$ ($x$ and $y$ are integers corresponding to the wealth of each party), and they wish to compute the less than function $f$, such that 
 \begin{equation}
 f(x,y) = \left\{
 \begin{array}{lr}
@@ -33,49 +33,56 @@ Based on the setup of the problem, we can list a few properties that Alice and B
     \item[Privacy] 
         Parties only learn their output. 
         Any information learned by a single party during the execution of $\Pi$ must be deduced from the output. 
-        For example, in the case of Alice and Bob, if Alice learns that they had more money, then they learn that $y < x$, which is some information about $y$, but it is deduced from the output so it is reasonable. 
-        It would be unreasonable if during the execution of $\Pi$ Alice learns that $1,000,000 < y < 2,000,000$, as that information is not deducable from $f(x,y)$.
+        For example, if Alice learns that she had more money after computing $f$, then she learns that $y < x$; however, this information about $y$ is deducible from the output therefore it is reasonable.
+        It would be unreasonable if Alice learns that $1,000,000 < y < 2,000,000$, as that information is not deducible from $f(x,y)$.
     \item[Correctness] 
         Each party receives the correct output.
         In the case of Alice and Bob, this simply means that they learn correctly who has more money.
-    \item[Fairness] 
-        Each party receives their input if and only if the other party receives their input.
-        In the case of Alice and Bob, this means that Alice receives their input if and only if Bob receives their input.
-        This property prevents the case where Alice sends her input to Bob, Bob computes $f$ with Alice's input and their own input, and then Bob refuses to send their input to Alice. 
-        Hence Bob has learned to output of $f$, but Alice hasn't. 
-        We do not want to this scenario to happen, so we require that each party receive their input if and only if the party does. 
-        We do not require that all parties always receive their inputs, because a party could abort from the execution in the middle of the protocol.
-        \footnote{Technically this is incorrect since we assume that each party is semihonest, but the property generalizes more easily when this requirement when considering aborts.}
-    \item[Semi-honesty]
-        Each party must obey the protocol.
-        We are assuming that Alice and Bob are semi-honest agents, which means that Alice and Bob are not malicious, trying to steal information from each other. 
-        They are simply trying to compute $f$, but would use the information that they receive in order to deduce information about the other party.
-        In contrast, we could imagine the scenario where Alice and Bob are untrustworthy: they would send lies, send the wrong input, or deviate in any number of ways to get the upper hand in the protocol.
-        While assuming semi-honesty is not the most realistic scenario, most cryptographic protocols secure with semi-honest agents can be transformed into stronger protocols protecting against malicious agents.
-        Morever, the semi-honest protocols are more intuitive.
+        In particular, correctness means that Alice and Bob \textit{both} learn the output.
+
 \end{description}
+
 One possible method for constructing a definition of security would be to list a number of properties a secure protocol must have.
 This approach is unsatisfactory for a number of reasons.
 
-One reason is that an import security property that is only releveant in certain cases may be missed.
+One reason is that an import security property that is only relevant in certain cases may be missed.
 There are many applications of 2PC, and in some cases, there may be certain properties that critical to security.
 Ideally, a good definition of 2PC works for all applications, hence capturing all desirable properties.
 A second reason that the property based definition is unsatisfactory is that the definition should be simple.
 If the definition is simple, then it should be clear that \textit{all} possible attacks against the protocol are prevented by the definition.
-A definition based on properties in this respect as it becomes the burden of the prover of security to show that all relevevant properties are covered \cite{lindell2009secure}.
+A definition based on properties in this respect as it becomes the burden of the prover of security to show that all relevant properties are covered \cite{lindell2009secure}.
+
+We must also think about the aims of each party involved in the protocol. 
+Can we trust that parties are going to obey the protocol? 
+It's relevant in the two party case, but if there are more than three parties, parties may either act independently or collude. 
+These considerations are called the \textit{security setting}.
+There are two primary security settings: the semi-honest setting and the malicious setting. 
+The work presented in this thesis uses the semi-honest setting. 
+In the semi-honest setting, we assume that each party obeys the protocol but tries to learn as much as possible from the information they are given.
+This means that parties do not lie about their information, they do not abort, they do not send or withhold messages out of order, or deviate in any way from what is specified in the protocol. 
+In contrast, the malicious setting considers that each party is liable to lie and cheat; parties can take any action to learn more information.
+
+The malicious setting is much more realistic. 
+Parties that are involved in cryptographic protocols are liable to lie and cheat, for why else would they even be engaged in the cryptographic protocol in the first place?
+There are two main reasons why the semi-honest setting is useful.
+The first is that many protocols can be constructed for the semi-honest setting, and then improved to function in the malicious setting.
+There is a strong history of this occurring with protocols.
+It's simply easier to think through and create protocols for the semi-honest setting; at the very least, it's a valuable starting point for building complex cryptosystems.
+In the case of 2PC, there exist malicious protocols, and in fact, the primary 2PC protocol that this thesis uses, garbled circuits, can be improved to be malicious secure without too much difficulty. 
+
+The second reason that the semi-honest setting is that it does have use cases in the real world.
+There are some scenarios where parties want to compute a function amongst themselves, and trust each other to act semi-honestly.
+One example is hospitals sharing medical data.
+Hospitals are legally, and arguably ethically, restricted from sharing medical data, but this data can have great value especially when aggregated with datasets from other hospitals.
+2PC offers hospitals the means to ``share'' their data, perform statistics and other operations on it, while keeping the data entirely private. 
+Other examples where semi-honesty is sufficient include mutually trusting companies and government agencies.
 
 \section{2PC Security Definition}
-A number of definitions formalize what it means for a 2PC protocol to be secure.
-Yao, in his 1982 paper on secure function evaluation, says a 2PC protocol is secure if:
+\al{talk a lot more here - lots of motivation and high level explanation}
 
-\begin{blockquote}
-If one participant behaves according the the protocol, the probability that the other participant successfully cheats is at most $\gamma$ for $\gamma \in \{0,1\}$.
-\cite{get-source}
-\end{blockquote}
+We use simulator based definition.
 
-TODO mention that this doesn't use the properties.
 
-Since Yao's original definition, many other definitions of security of 2PC protocols have been proposed.
 Here we give Goldreich's definition, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on SC \cite{goldreich, lindell2009secure}.
 
 \begin{description}
@@ -125,6 +132,7 @@ For an easy to understand security definition of 2PC with malicious adversaries,
 
 \section{Yao's Garbled Circuit}
 \al{struggling a bit with the organization of this section}
+\al{Property that if encryption fails, we know. something that easily added to any encryption scheme and not a big deal, but super useful}
 We now give an implementation of a generic 2PC scheme created by Yao \cite{yao}.
 The scheme is designed for two parties, Alice and Bob, who have inputs $x$ and $y$ respectively.
 We suppose that Alice and Bob wish to compute the function $f : \{0,1\}^n \to \{0,1\}^m$. 
