@@ -78,12 +78,50 @@ Hospitals are legally, and arguably ethically, restricted from sharing medical d
 Other examples where semi-honesty is sufficient include mutually trusting companies and government agencies.
 
 \section{2PC Security Definition}
-\al{talk a lot more here - lots of motivation and high level explanation}
+% http://crypto.stackexchange.com/questions/3814/simulation-based-security
+% page 620 of Goldreich volume 2
+In this section we discuss at a high level the definition of 2PC security, and then give the formal definition. 
+The definition of security for 2PC protocols is the most complicated cryptographic theory that we have encountered thus far. 
 
-We use simulator based definition.
+Recall our setup: Alice and Bob are semi-honest parties with inputs $x$ and $y$ respectively who wish to compute the function $f: \{0,1\}^n \times \{0,1\}^n \to \{0,1\}^m \times \{0,1\}^m$.
+Informally, we say $\Pi$ is scure if when $\Pi$ is executed in the real world, each party learns the same information as if they had completed the protocol in an ideal world.
+The ideal world is where there is a trustred third party Carlo who receives the inputs $x$ from Alice and $y$ from Bob, computes the $f(x,y)$, and sends the output to Alice and Bob.
+Carlo is honest and trusted, so we don't mind that he knows the inputs, and he is trusted to not share the inputs with the opposoring party.
+This is the ideal world: the function is compute correctly, and no information about the inputs is shared to other parties.
 
+In the real world, Alice and Bob do not have luxury of enlisting Carlo to perform their computation for them; instead, they use the 2PC protocol $\Pi$. 
+To be confident that $\Pi$ is secure, we show that $\Pi$ in the real world is \textit{essentially the same} as Alice, Bob and Carlo acting in the ideal world.
+Specifically, Alice and Bob should not learn any more information in the real world than they do in the ideal world.
+If they do learn more information, then somewhere the protocol $\Pi$ is leaking information that cannot be deduced from the output of $f$. 
+We show that the ideal is world is essentially the same as the ideal world by using the concept of computational indistinguishability presented in chapter 1.
+To use computational indistinguishability, we need to build probability distrubtions of the information deducible in the real and ideal world.
+Next, we construct probability distributions of the information that Alice and Bob can deduce from the ideal and real world.
 
-Here we give Goldreich's definition, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on SC \cite{goldreich, lindell2009secure}.
+To construct the probability distribution of the ideal world, we introduce \textit{simulators} $S_A$ and $S_B$.
+$S_A$ and $S_B$ are probabilistic polynomial-time algorithms who are essentially adversaries, like the adversary in the definition of encryption from chapter 1, that specifically attack the ideal world.
+Simulator $S_A$ takes as input $x$, Alice's input, and $f(x,y)$, the output of the function because that is the information that Alice has access to in the ideal world.
+Likewise, $S_B$ takes input $y$ and $f(x,y)$, since that the is information that Bob has access to in the ideal world.
+
+Given a simulator $S_A$, think about what the simulator can do.
+The distribution of the its possible outputs is given by $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$.
+Let us break this distribution down: $S_A$ is a fixed single algorithm.
+$x$ is Alice's input, and $f(x,y)$ is the output of the function.
+The set is indexed by all possible $x$, so all possible inputs that Alice could have.
+In sum, $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$ represents the possible information that an algorithm could deduced from all possible $x$ and $f(x,y)$.
+We think of $\{S_B(y, f(x,y)\}_{y \in \{0,1\}^*}$ for Bob's input similarly.
+
+For constructing the probability distributions of the real world, we need to consider what information Alice and Bob have at their disposal.
+Recall that Alice and Bob are semi-honest, which means that Alice and Bob follow all instruction of $\Pi$ correctly but they also will use any information they receive along the way.
+More precisely, Alice and Bob obey the protocol, but also maintain a record of all intermediate computations.
+We call Alice's record of intermediate computations Alice's \textit{view}, $\viewrv_A(x, y)$, which depends on inputs $x$ and $y$
+And now we create the probability distribution for Alice: $\{\viewrv_A(x, y)\}_{x, y \in \{0,1\}^*}\}$.
+This distribution represents the Alice's information from the intermediate computation indexed over all possible inputs $x$ and $y$.
+Likewise, we call Bob's record of intermediate computations Bob's view,  $\viewrv_B(x, y)$, and his probability distribution of intermediate computations is $\{\viewrv_B(x, y)\}_{x,y \in \{0,1\}^*}\}$
+
+To wrap it up, if $\Pi$ in the real world is the same as the Alice, Bob and Carlo in the ideal world, then the simulator $S_A$ and $S_B$ should only be able to learn what can be learned from the intermediate computations. 
+That is, the probability distributions $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$ and $\{\viewrv_A(x, y)\}_{x, y \in \{0,1\}^*}\}$ should be essentially the same, i.e., computationally indstinguishable.
+
+With this intuition in mind, we give Goldreich's definition of 2PC security from his textbook \textit{Foundations of Cryptography Volume II}\cite{goldreich}.
 
 \begin{description}
 \item [Setup:] \hfill
