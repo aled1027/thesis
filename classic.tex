@@ -79,17 +79,10 @@ Other examples where semi-honesty is sufficient include mutually trusting compan
 
 \section{2PC Security Definition}
 \al{talk a lot more here - lots of motivation and high level explanation}
-Many definitions formalize security for a 2PC protocol.
-In his 1982 paper on secure computation, Yao says a 2PC protocol is secure if:
 
-\begin{blockquote}
-If one participant behaves according the the protocol, the probability that the other participant successfully cheats is at most $\gamma$ for $\gamma \in \{0,1\}$.
-\cite{get-source}
-\end{blockquote}
+We use simulator based definition.
 
-\al{mention that this doesn't use the properties - old note?}
 
-Since Yao's original definition, many other definitions of security of 2PC protocols have been proposed.
 Here we give Goldreich's definition, which is given in his textbook \textit{Foundations of Cryptography Volume II}, and is reproduced in various papers, most notably Lindell and Pinkas 2009 survey paper on SC \cite{goldreich, lindell2009secure}.
 
 \begin{description}
