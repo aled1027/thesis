@@ -19,13 +19,11 @@
   \noindent\ignorespaces}{%
   \par\medskip}
 
-% Author Macros
-% colors: red, magenta, blue, orange
+% Author Macros -- colors: red, magenta, blue, orange
 \newcounter{al}
 \newcommand{\al}[1]{\textcolor{blue}{\{AL-\arabic{al}: #1\}}\addtocounter{al}{1}}
 \newcounter{cat}
 \newcommand{\cat}[1]{\textcolor{magenta}{\{CAT-\arabic{cat}: #1\}}\addtocounter{cat}{1}}
-
 \newcommand{\ignore}[1]{}
 
 % From CompGC paper
@@ -36,9 +34,11 @@
 %\newcommand{\Outputs}{\ensuremath{\textsf{Outputs}}\xspace}
 %\newcommand{\Components}{\ensuremath{\textsf{Components}}\xspace}
 
-
-% my commands for JustGarble Notation
 \newcommand{\Gates}{\text{Gates}}
+\newcommand{\C}{\sf {C}}
+\newcommand{\GC}{\sf {GC}}
+\newcommand{\AllInputLabels}{\sf {AllInputLabels}}
+\newcommand{\InputLabels}{\sf {InputLabels}}
 \newcommand{\InputWires}{\text{InputWires}}
 \newcommand{\OutputWires}{\text{OutputWires}}
 \newcommand{\Wires}{\text{Wires}}
@@ -54,8 +54,6 @@
 \newcommand{\compIndist}{\approx_D}
 \newcommand{\outputrv}{{\sf output}}
 \newcommand{\viewrv}{{\sf view}}
-
-% Garbled circuits notations
 \newcommand{\CompGC}{\textsf{CompGC}\xspace}
 \newcommand{\JustGarble}{\textsf{JustGarble}\xspace}
 \newcommand{\Naive}{\textsf{Naive}\xspace}
