@@ -1,28 +1,20 @@
 \chapter{Improving MPC}
-A number of improvements have been made to Yao's garbled circuit since its inception in 1986.
-The first scheme for a garbled circuit, the one described in section \ref{garbled_circuit_scheme} has the following requirements: \textbf{include chart here}.
+A number of improvements have been made to  arbled circuits from their original form.
+The first scheme for a garbled circuit described in chapter 2 requires has steep computational and communication requirements.
 Let's look into how much work is required in classical garbled circuits.
-\textbf{mention that we look gate-wise}
-The first metric that we look at is the size of the garbled table.
-\textbf{check this definition}:The garbled table, if you call recall from earlier, is the set of ciphertexts that is sent from the garbler to the evaluator, like in figure \ref{the fig thats a garbled table}.
-Hence the size refers to the number of ciphertexts that an evaulator needs to compute a single gate.
-The XOR column gives the size of the garbled table for an xor gate, and naturaly the AND columns gives the of the garbled table for an AND gate.
-The cost associated with the size of a garbled table manifests in effecting the amount of bandwidth that needs to be transmitted between the garbler and evaluator.
-In order to evaluate the gate, the evaluator needs the entire garbled table (\textbf{research idea: what if they don't? what if they can know when to request more information, to reduce the average amount of bandwidth? maybe this could be used to reduce calls to OT?)}, so reducing the size of the garbled table reduces bandwidth.
-It turns out that bandwidth contributes a large hit to the total time required to perform mpc with garlbed circuits, and as a result, many of the improvements to garbled circuits have specifically targted reducing the size of the garbled table down from 4 ciphertexts.
-\textbf{maybe mention lower bound?}
 
-The second metric we use to analyze garbled circuits is eval cost.
-Eval cost is the amount of computation that the evaluator must perform in order to process a single gate.
-In the classical setting, the evaluator goes down the garbled table decrypting each ciphertext until one of the decrypts correctly. 
-In the worst case, this requires 8 decryptions, because each wire is encrypted twice, once with the key from the first input wire and then again with the key from second input wire.
-If a dual-key cipher (an encryption scheme that takes two keys, see section \ref{dkc section}), then the evaluator only needs to perform four decryptions in the worst case.
-The metric that we consider is the garble cost of a gate. 
-The garble cost of a gate is amount of computation that the garbler needs to perform.
-The improvements to MPC have generally increased the garble cost; having the garbler do more work, can reduce the size of the garble table which reduces bandwidth, and can reduce the amount of computation the evaluator needs to perform \textbf{fact check this}.
-Before the research of \cite{our_paper} and the research presented in this thesis, there were not substantial benefits to garbler preprocessing, that is having the garbler do work \textit{before} the actual computation time. 
-We call this having the garbler do offline work, because they can do the work at their leisure, like at night when computers are less used.
-Then the online work, when the actual comptuation is performed, is reduced.
+When considering the computational and communication costs, we consider the costs per gate.
+We consider \al{x} metrics which describe the costs of garbled circuits.
+
+First, we consider bandwidth per circuit.
+Recall from chapter 2 that the fourth column of the garbled table is sent from the garbler to the evaluator\footnote{In chapter 2, Alice was the garbler and Bob was the evaluator. For clarify in chapter 3 and beyond, we use the term garbler to allude to the person who garbles the circuit, and we use the term evaluator to describe the person who evaluates, or decrypts, the garbled circuit.}.
+The size of the garble table is thought of in terms of ciphertexts. 
+In classical garbled circuits, the garbled table has $4$ ciphertexts and all $4$ ciphertexts are communicated from the garbler to the evaluator.
+We generally consider bandwidth to be the most important factor, as the high latency of the internet is generally the bottleneck of executing garbled circuits.
+
+Second, we consider evaluator-side computation, which is determine by the number decryptions the evaluator performs per gate.
+Third, consider garbler-side computation.
+Many improvements to MPC increase the amount of garbler-side computation; having the garbler do more work can reduce the size of the garbled table which reduces bandwidth.
 
 As we walk through the improvements to Yao's garbled circuit, we are going to think about the improvements affect the three metrics described above.
 It should also be noted before we begin that these are improvements to the the computation of a single gate.
