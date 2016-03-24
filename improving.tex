@@ -65,25 +65,37 @@ We start with the earliest improvement and move chronological to the most recent
 \section{Point and Permute}
 \al{add in that rows need to be permuted!}
 
-Beaver, Micali and Rogaway contributed the first major improvement to Yao's garbled circuit in 1990.
-Recall that garbled table needs to randomly permuted - that is, the rows of the garbled table are reorganized into a random order by the garbler before the table is sent to the evaluator \footnote{This is required for security. See chapter 2 for more information}.
-Upon receiving the circuit, the garbler  ...
+Beaver, Micali and Rogaway contributed the first major improvement to garbled circuits in 1990.
+Recall that the garbled table is randomly permuted - that is, the rows of the garbled table are reordered randoml by the garbler before the table is sent to the evaluator \footnote{This is required for security. See chapter 2 for more information}.
+Upon receiving the circuit, the garbler attempts to decrypt each row of the garbled table until a decryption succeeds \footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see chapter 1.}.
 
-Now the evaulator trial decrypts each of the $4$ ciphertexts until there is a valid decryption .
-\footnote{There exists encryption/decryption schemes that in addition to decrypting a ciphertext will also output a bit indicating if the decryption occurred correctly. Using schemes like this, the evaluator can decrypt all $4$ ciphertexts until one of them decrypts correctly, as indicated by the extra bit output by the decryption algorithm.}
-
-The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which single ciphertext to decrypt.
-Using point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label in a wire \textbf{Is it clear what a wire label is, as opposed to a wire? Should be by now.}
-The assignment of the select bit is independent of the truth value of the wire, so two things can happen. 
-First, the garbler can permute the garbled table based on the select bits, and second, the select bits can be sent to the evaluator.
+The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which ciphertext to decrypt.
+In point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire lables of the same wire have opposite bits.
+That is, if the zeroith wire label has select bit 1, then the first wire label has select bit 0.
+The garbler permutes the garbled table based on the select bits, and sends the select bits to the evaluator.
 Upon receving the garbled table, the evaluator knows exactly which ciphertext to decrypt based on the select bits of the input wires.
 
-Point and permute slightly increases the amoount of garbler-side computation to substantially decrease the amount of evaluator computation.
-The garbler needs to sample $n+q$\footnote{Recall from \textbf{todo some previous section} that $n+q$ = number of wires.} additional random bits.
-Without point and permute, the evaluator needs to decrypt $2.5$ ciphertexts on average, hence we estimate that there are roughly $1.5(n+q)$ fewer decryptions required.
-The overall bandwidth is increased by $2$ bits per wire, from $256$ bits to $258$ bits: a small constant increase. \footnote{The value is constant in the sense that it is independent of the security parameter.}
+Tables \ref{tbl:point-and-permute} show an example of point and permute.
+$A, B$ and $C$ are wires, where $A_0$ and $A_1$ are the zeroith and first wire label of wire $A$ respectively.
+The left table shows the select bits of the input wires $A$ and $B$.
+The garbler gives $A_0$ select bit 0, determining that $A_1$ has select bit 1.
+Likewise, the garbler gives $B_0$ select bit 1, determining that $B_1$ has select bit 0.
 
-\begin{table}[h]
+The garbler then permutes the garbled table based on the select bits. 
+The permuted table is shown on the left in table \ref{tbl:point-and-permute}.
+When evaluating this gate, the evaluator has $A_*$ and $B_*$ with select bits $a$ and $b$.
+The evaluator decrypts the ciphertext in the row corresponding $a$ and $b$.
+
+Intuitively, point and permute is secure because the select bits are independent of the truth value (also known as semantic value) of a the wire.
+This allows the garbler to permute the table based on the select bits, and the garbler can send the evaluator the select bits.
+
+Point and permute slightly increases garbler-side computation to substantially decrease evaluator-side computation.
+The garbler samples $4$ additional random bits, and the evaluator performs a single decryption.
+Without point and permute, the evaluator needs to decrypt $2.5$ ciphertexts on average, hence the garbler performs roughly $1.5$ fewer decryptions per gate.
+The overall bandwidth is increased by $4$ bits per gate: a small constant increase. \footnote{The value is constant in the sense that it is independent of the security parameter.}
+
+\begin{table}
+    \label{tbl:point-and-permute}
     \centering
     \begin{tabular}{|c|c|}
         \hline
@@ -106,36 +118,24 @@ The overall bandwidth is increased by $2$ bits per wire, from $256$ bits to $258
         (1,1) & $\Enc_{A_1, B_0}(C_0)$ \\
         \hline
     \end{tabular}
-    \qquad
-    \begin{tabular}{|c|}
-        \hline
-        $C_0 \gets \{0,1\}^n$ \\
-        $C_1 \gets \{0,1\}^n$ \\
-        \hline
-    \end{tabular}
+    %\qquad
+    %\begin{tabular}{|c|}
+    %    \hline
+    %    $C_0 \gets \{0,1\}^n$ \\
+    %    $C_1 \gets \{0,1\}^n$ \\
+    %    \hline
+    %\end{tabular}
     \caption{Garbled Gate for Point and Permute}
-    \caption{Example garbled gate using point and permute. The gate being computed is given in figure \textbf{Make it 23:30 in mike's talk}}
+    %\caption{Example garbled gate using point and permute. The gate being computed is given in figure \textbf{Make it 23:30 in mike's talk}}
 \end{table}
 
-\textbf{add chart if you want}
-
-%\begin{itemize}
-%    \item relative position of ciphertexts in table leaks information
-%    \item so we have to permute the ciphertexts
-%    \item when evaluating, trial decrypt all 4 until 1 works
-%    \item beaver micali rogaway 90
-%    \item randomly assign color (r,b) to each pair of wire label
-%    \item Order the 4 cts canonically, by \emph{color} of keys: ((r,r),(r,b),(b,r),(b,b))
-%    \item evaluate by decrypting ciphertexts indexed by your colors
-%    \item Can use one-time-security encyption (e.g. OTP)
-%    \item color independent of semantic value
-%    \item show chart
-%\end{itemize}
-
 \section{Garbled Row Reduction 3}
-Garbled Row Reduction 3 (GRR3) is technique proposed by \textbf{who} which decreases the number of ciphertexts that need be communicated between the garbler and evaluator.
-To use GRR3, the garbler must also use the point and permute method.
-Using Garbled Row Reduction, the garbler sets the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$.
+Garbled Row Reduction 3 (GRR3) reduces the size of the garbled table from 4 ciphertexts to three 3 ciphertexts.
+In classical garbled circuits, the garbler 
+
+
+In GRR3, the garbler uses the point and permute method.
+After the garbler finds select bits and permutes the garbled table, they the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$.
 \footnote{In previous constructions the value for the ciphertext was chosen randomly.}
 Upon evaluating the garbled gate, if the evaluator sees that the select bits of the input wires indicate to decrypt the first row, the evaluator simply assumes the ciphertext be of value $O^n$. 
 
