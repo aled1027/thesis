@@ -144,7 +144,7 @@ When evaluating the garbled gate, if the evaluator sees that the select bits of 
 Otherwise, the evaluator decrypts the indicated row of the garbled table as per usual.
 
 Tables \ref{tbl:grr3} gives an example of garbling an XOR gate.
-The left table shows the select bits of $A_0, A_1, B_0$ and $B_1$.
+The left table shows the select bits of wire labels $A_0, A_1, B_0$ and $B_1$.
 The right table shows the garbled table, in which the top row, the row associated with select bits $(0,0)$, is missing.
 The bottom table shows the values of $C_0$ and $C_1$.
 The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
@@ -193,63 +193,39 @@ This events occur with probabilty $\frac{1}{4}$, so we can extrapolate that the 
 Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, a $25\%$ reduction.
 
 \section{Free XOR}
-The Free XOR technique was developed by \textbf{who} in \textbf{when}.
-The technique, as the name suggests, makes the computation of XOR gates essentially free.
-Say the garbler is determining the lables for wire $A$.
-The label associated with truth value $0$, $A_0$, is randomly sampled from $\{0,1\}^n$. 
-Then the label assocated with the truth value is set such that $A_1 \gets A_0 \oplus \Delta$, where $\Delta$ is global, randomly sampled value from $\{0,1\}^n$.
-If the garbler is garbling an XOR gate, then they set $C_0$ to $A \oplus B$, and like wire $A$, the garbler sets $C_1 = C_0 \oplus \Delta$.
-With these wire labels, it turns out that the garbler doesn't need to send a garbled table: the evaluator can compute $C_0$ and $C_1$ by XORing the inputted wire labels.
-The math for this operation is shown below:
+The Free XOR technique makes the computation of XOR gates free, in the sense that no garbled table need to be communicated.
+The evaluator can compute $C_*$ from only $A_*$ and $B_*$.
+
+Like GRR3, the free xor techniques takes advantage of carefully crafted wire labels, even input wires.
+To start, the garbler randomly samples a ciphertext $\Delta$ from $\{0,1\}^n$.
+For each input wire $A$, let $A_0$ be randomly sampled from $\{0,1\}^n$ as before, and set $A_1 = A_0 \oplus \Delta$.
+
+If the garbler is garbling an XOR gate, then the garbler does not constructed a garbled table or use select bits.
+The garlber sets $C_0 = A_0 \oplus B_0$ and sets $C_1 = C_0 \oplus \Delta$.
+
+The evaluator, when evaluating an XOR gate, simply computes $C_* = A_* \oplus B_*$.
+As simple as it is, the evaluator will always acquire the correct value for $C_*$ based on the semantic value of $A_*$ and $B_*$.
+The math for each of the four cases is shown:
 \begin{align*}
-    A \oplus B & = C \\
-    (A \oplus \Delta) \oplus B & = (A \oplus B) \oplus \Delta = C \oplus \Delta \\
-    A \oplus (B \oplus \Delta) & = (A \oplus B) \oplus \Delta = C \oplus \Delta \\
-    (A \oplus \Delta) \oplus (B \oplus \Delta) & = (A \oplus B) \oplus (\Delta \oplus  \Delta) = C 
+    A_0 \oplus B_0 & = C_0 \\
+    A_0 \oplus B_1 & = A_0 \oplus (B_0 \oplus \Delta) = (A_0 \oplus B_0) \oplus \Delta = C_1 \\
+    A_1 \oplus B_0 & = (A_0 \oplus \Delta) \oplus B_0 = (A_0 \oplus B_0) \oplus \Delta = C_1 \\
+    A_1 \oplus B_1 & = (A_0 \oplus \Delta) \oplus (B_0 \oplus \Delta) = (A_0 \oplus B_0) = C_0
 \end{align*}
+For any wire $A$, since $A_1$ is dependent on $A_0$, we often simplify notation such that the wire labels for $A$ are $A$ and $A \oplus \Delta$, omitting the subscript.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|c|c|}
-        \hline
-        Wire Label & Value\\
-        \hline
-        $A_0$ & $A$ \\
-        $A_1$ & $A \oplus \Delta$ \\
-        $B_0$ & $B$ \\
-        $B_1$ & $B \oplus \Delta$ \\
-        $C_0$ & $A \oplus B$ \\
-        $C_1$ & $C_0 \oplus \Delta$ \\
-        \hline
-    \end{tabular}
-    \qquad
-    \begin{tabular}{|c|}
-        \hline
-        \hline
-    \end{tabular}
-    \caption{Example XOR garbled gate wires using PP, GRR3 and Free XOR.}
-\end{table}
+Free XOR is compatible with point and permute and GRR3; however, since XOR does not require a garbled table, GRR3 is only used on AND gates.
 
-The Free XOR technique is also compatible with GRR3, but since XOR doesn't require a garbled table, GRR3 is only used on AND gates.
-
-Using the Free XOR technique, the size of the garbled table is zero for all XOR gates and of size $3$ for AND gates.
-This fact incentivizes the construction of circuits that optimize the number of XOR gates, minimize the number AND gates (while minimizing the size of the entire circuit of course).
+\al{discuss security. Why is free xor secure?}
 One interesting implication of using the Free XOR technique is that an added assumption must be made to our encryption algorithm.
 Since $\Delta$ is part of the key and part of the the payload\footnote{The payload is the value that is being encrypted} of the encryption algorithm, the encryption algorithm must be secure under the circularity assumption.
-Fortunately, modern encryption uses AES-128, which is presumed to be secure under the circularity assumption.
+Fortunately, the popular encryption scheme AES-128 is presumed to be secure under the circularity assumption.
 
-%\begin{itemize}
-%    \item post Fairplay
-%    \item KolesnikovSchneider
-%    \item $A,A \oplus \Delta$.
-%    \item Note same delta every gate
-%    \item Choose $C = A \oplus B$
-%    \item XOR is then free: walk through that computatoin
-%    \item Still works with GRR3
-%    \item Because $\Delta$ is in the key and in the payload, requires circularity assumption
-%    \item Incentivizes gates with as many xors as possible (has been done with AES -- why it's so fast)
-%    \item Evaluator must konw what type of gate is being exectued: we have been assuming all along that the evaluator and garbler know the function.
-%\end{itemize}
+Free XOR dramatically reduces bandwidth.
+But since XOR gates are much cheaper than AND gates, circuits with more XOR gates perform faster.
+Many programs have been made to optimize the number of XOR gates and minimize the number of AND gates (while minimizing the size of the entire circuit of course).
+The garbler-side computation is reduced: constructing the xor garbled table does not require 3 encryptions and 1 decryption.
+Evaluator-side computation is reduced likewise: xor gates do not requre any decryption.
 
 \section{Garbled Row Reduction 2}
 Garbled row reduction 2 (GRR2) reduces the size of the garbled table for AND gates to $2$ ciphertexts, but it is not compatible with Free XOR, so XOR gates also require two ciphertexts.
