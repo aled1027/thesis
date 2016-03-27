@@ -131,15 +131,25 @@ The overall bandwidth is increased by $4$ bits per gate: a small constant increa
 
 \section{Garbled Row Reduction 3}
 Garbled Row Reduction 3 (GRR3) reduces the size of the garbled table from 4 ciphertexts to three 3 ciphertexts.
-In classical garbled circuits, the garbler 
+In classical garbled circuits, the wire labels for each wire are chosen prior to garbling any gates.
+In GRR3, the input wire labels are sampled in the beginning, and the other wire labels are chosen as each garbled table is created.
 
-
+Suppose that a gate with input wires $A$ and $B$ and output wire $C$ is being garbled.
 In GRR3, the garbler uses the point and permute method.
-After the garbler finds select bits and permutes the garbled table, they the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$.
-\footnote{In previous constructions the value for the ciphertext was chosen randomly.}
-Upon evaluating the garbled gate, if the evaluator sees that the select bits of the input wires indicate to decrypt the first row, the evaluator simply assumes the ciphertext be of value $O^n$. 
+After the garbler samples select bits and permutes the garbled table, they set the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$, the string of $n$ zeros.
+That is, $C_*$, the wire label on the top row, is set to $\EncInv_{A_*, B_*}(0^n)$.
+The garbler sends the bottom three rows of the garbled table to the evaluator.
 
-\begin{table}[h]
+When evaluating the garbled gate, if the evaluator sees that the select bits of the input wires indicate to decrypt the first row, the evaluator simply assumes the ciphertext be of value $O^n$. 
+Otherwise, the evaluator decrypts the indicated row of the garbled table as per usual.
+
+Tables \ref{tbl:grr3} gives an example of garbling an XOR gate.
+The left table shows the select bits of $A_0, A_1, B_0$ and $B_1$.
+The right table shows the garbled table, in which the top row, the row associated with select bits $(0,0)$, is missing.
+The bottom table shows the values of $C_0$ and $C_1$.
+The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
+
+\begin{table}
     \centering
     \begin{tabular}{|c|c|}
         \hline
@@ -169,15 +179,18 @@ Upon evaluating the garbled gate, if the evaluator sees that the select bits of 
         \hline
     \end{tabular}
     \caption{Example garbled gate using point and permute and garbled row reduction 3. The gate being computed is given in figure \textbf{Make it 23:30 in mike's talk}}
+    \label{tbl:grr3}
 \end{table}
 
-Discuss security.
+\al{add more to this paragraph}
+In considering the security of GRR3, we consider the effect of always setting one the wire labels, $C_*$, to $0^n$.
+Since the evaluator does not know whether $C_0$ or $C_1$ is set to $0^n$, the evaluator does not learn any information.
 
-GRR3 does not have a significant effect on garbler side compuation.
-The difference being that for constructing some wire lables, the garbler may need to compute $\Enc^{-1}$ instead of generating random bits. 
-The evaluator needs to perform slightly less computation: in the event that the first row needs to be decrypted, the evaluator doesn't need to perform the decryption algorithm. 
-This events occur with probabilty $\frac{1}{4}$, so we can extrapolate that the evaluator needs to perform $\frac{1}{4}$ fewer decryptions than wwould be necessary if only PP were being used.
-GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, a $25\%$ reduction.
+GRR3 offers good performance benefits.
+It increases garbler side computation by requiring an additional decryption operation.
+However, evaluator perform slightly less computation: in the event that the first row is to be decrypted, the evaluator does not perform the decryption algorithm. 
+This events occur with probabilty $\frac{1}{4}$, so we can extrapolate that the evaluator performs $\frac{1}{4}$ fewer decryptions.
+Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, a $25\%$ reduction.
 
 \section{Free XOR}
 The Free XOR technique was developed by \textbf{who} in \textbf{when}.
