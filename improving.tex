@@ -69,17 +69,19 @@ We start with the earliest technique and move chronological to the most recent i
 \end{table}
 
 \section{Point and Permute}
-\al{add in that rows need to be permuted!}
+\al{add to chapter 2 that rows need to be permuted!}
 
-Beaver, Micali and Rogaway contributed the first major improvement to garbled circuits in 1990.
-Recall that the garbled table is randomly permuted - that is, the rows of the garbled table are reordered randoml by the garbler before the table is sent to the evaluator \footnote{This is required for security. See chapter 2 for more information}.
-Upon receiving the circuit, the garbler attempts to decrypt each row of the garbled table until a decryption succeeds \footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see chapter 1.}.
+The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which row of the garbled table to decrypt.
+Recall that the garbled table is randomly permuted - that is, garbler randomly reorders the rows of the garbled table before sending the garbled table to the evaluator \footnote{This is required for security. See chapter 2 for more information}.
+Upon receiving the circuit, the evaluator trial decrypts each row of the garbled table until a decryption succeeds \footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see chapter 1.}.
 
-The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which ciphertext to decrypt.
-In point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire lables of the same wire have opposite bits.
-That is, if the zeroith wire label has select bit 1, then the first wire label has select bit 0.
-The garbler permutes the garbled table based on the select bits, and sends the select bits to the evaluator.
-Upon receving the garbled table, the evaluator knows exactly which ciphertext to decrypt based on the select bits of the input wires.
+Point and permute enables the evaluator to bypass the trial decryption step, so that they decrypt the correct wire label the first time.
+When garbling a gate, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire lables of the same wire have opposite bits.
+More formally, $b$ is randomly sampled from $\{0,1\}$.
+Then $A_0$ gets select bit $b$ and $A_1$ gets select bit $1-b$.
+The garbler permutes the garbled table based on the select bits, and appends the select bits each wire label.
+When the evaluator ungarbles the gate, they use the select bits appended to each of the two input wire labels to determine which row to decrypt.
+For example, if the select bits on the end of the input wire labels are 1 and 0, then the evaluator decryps the third row.
 
 Tables \ref{tbl:point-and-permute} show an example of point and permute.
 $A, B$ and $C$ are wires, where $A_0$ and $A_1$ are the zeroith and first wire label of wire $A$ respectively.
@@ -93,12 +95,14 @@ When evaluating this gate, the evaluator has $A_*$ and $B_*$ with select bits $a
 The evaluator decrypts the ciphertext in the row corresponding $a$ and $b$.
 
 Intuitively, point and permute is secure because the select bits are independent of the truth value (also known as semantic value) of a the wire.
-This allows the garbler to permute the table based on the select bits, and the garbler can send the evaluator the select bits.
+Thus it is secure for the garbler to permute the table based on the select bits, and it secure for the garbler to send the select bits to th evaluator.
 
 Point and permute slightly increases garbler-side computation to substantially decrease evaluator-side computation.
 The garbler samples $4$ additional random bits, and the evaluator performs a single decryption.
 Without point and permute, the evaluator needs to decrypt $2.5$ ciphertexts on average, hence the garbler performs roughly $1.5$ fewer decryptions per gate.
-The overall bandwidth is increased by $4$ bits per gate: a small constant increase. \footnote{The value is constant in the sense that it is independent of the security parameter.}
+The overall bandwidth is increased by $4$ bits per gate: a tiny constant increase. \footnote{The value is constant in the sense that it is independent of the security parameter.}
+
+\al{Is this not an XOR/And gate? Make it one of them}
 
 \begin{table}
     \label{tbl:point-and-permute}
@@ -136,22 +140,23 @@ The overall bandwidth is increased by $4$ bits per gate: a small constant increa
 \end{table}
 
 \section{Garbled Row Reduction 3}
+\al{check notation for get/sample in figure. $\gets$ is used for both}
 Garbled Row Reduction 3 (GRR3) reduces the size of the garbled table from 4 ciphertexts to three 3 ciphertexts.
-In classical garbled circuits, the wire labels for each wire are chosen prior to garbling any gates.
-In GRR3, the input wire labels are sampled in the beginning, and the other wire labels are chosen as each garbled table is created.
+In a classical garbled circuit scheme, the wire labels for each wire are chosen prior to garbling any gates.
+In GRR3, the garbler samples values for the input wire labels prior to garbling, and the garbler gives all other wire labels values as they generate each garbled table.
 
-Suppose that a gate with input wires $A$ and $B$ and output wire $C$ is being garbled.
-In GRR3, the garbler uses the point and permute method.
-After the garbler samples select bits and permutes the garbled table, they set the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$, the string of $n$ zeros.
-That is, $C_*$, the wire label on the top row, is set to $\EncInv_{A_*, B_*}(0^n)$.
+Suppose the garbler is garbling an XOR gate with input wires $A$ and $B$ and output wire $C$.
+The garbler begins by using the point and permute method, sampling select bits and permuting the garbled table.
+In GRR3, the garbler then set the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$, the string of $n$ zeros.
+Specifcally, $C_*$, the wire label on the top row, is set to $\EncInv_{A_*, B_*}(0^n)$.
 The garbler sends the bottom three rows of the garbled table to the evaluator.
-
-When evaluating the garbled gate, if the evaluator sees that the select bits of the input wires indicate to decrypt the first row, the evaluator simply assumes the ciphertext be of value $O^n$. 
-Otherwise, the evaluator decrypts the indicated row of the garbled table as per usual.
+When evaluating the garbled gate, if the evaluator sees that the select bits of the input wires indicate to decrypt the first row, then the evaluator simply assumes the row to have value $0^n$ and decrypts it as usual.
+In that case, the garbler set $C_*$ to $\EncInv_{A_*, B_*}(0^n)$.
+Otherwise if the select bits indicate to decrypt the second, third or fourth row, the garbler decrypts the row as per usual.
 
 Tables \ref{tbl:grr3} gives an example of garbling an XOR gate.
 The left table shows the select bits of wire labels $A_0, A_1, B_0$ and $B_1$.
-The right table shows the garbled table, in which the top row, the row associated with select bits $(0,0)$, is missing.
+The right table shows the garbled table, in which the top row, the row associated with select bits $(0,0)$, is missing, as the row is assumed to have value $0^n$.
 The bottom table shows the values of $C_0$ and $C_1$.
 The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
 
@@ -188,15 +193,13 @@ The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
     \label{tbl:grr3}
 \end{table}
 
-\al{add more to this paragraph}
-In considering the security of GRR3, we consider the effect of always setting one the wire labels, $C_*$, to $0^n$.
-Since the evaluator does not know whether $C_0$ or $C_1$ is set to $0^n$, the evaluator does not learn any information.
+In considering the security of GRR3, we consider the effect of always setting one of the wire labels, $C_*$, to $0^n$.
+Since the evaluator does not know whether $C_0$ or $C_1$ is set to $0^n$, the evaluator does not learn any information about the semantic representation of $C_*$..
 
 GRR3 offers good performance benefits.
-It increases garbler side computation by requiring an additional decryption operation.
-However, evaluator perform slightly less computation: in the event that the first row is to be decrypted, the evaluator does not perform the decryption algorithm. 
-This events occur with probabilty $\frac{1}{4}$, so we can extrapolate that the evaluator performs $\frac{1}{4}$ fewer decryptions.
-Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, a $25\%$ reduction.
+Garbler-side computation is the same, except that a decryption is performed in place of an encryption in constructing the first row of the garbled table.
+Evaluator-side computation is the same as point and permute: the evaluator performs a single decryption.
+Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, contributin a $25\%$ reduction in bandwidth.
 
 \section{Free XOR}
 The Free XOR technique makes the computation of XOR gates free, in the sense that no garbled table need to be communicated.
@@ -222,7 +225,6 @@ For any wire $A$, since $A_1$ is dependent on $A_0$, we often simplify notation 
 
 Free XOR is compatible with point and permute and GRR3; however, since XOR does not require a garbled table, GRR3 is only used on AND gates.
 
-\al{discuss security. Why is free xor secure?}
 One interesting implication of using the Free XOR technique is that an added assumption must be made to our encryption algorithm.
 Since $\Delta$ is part of the key and part of the the payload\footnote{The payload is the value that is being encrypted} of the encryption algorithm, the encryption algorithm must be secure under the circularity assumption.
 Fortunately, the popular encryption scheme AES-128 is presumed to be secure under the circularity assumption.
@@ -234,34 +236,40 @@ The garbler-side computation is reduced: constructing the xor garbled table does
 Evaluator-side computation is reduced likewise: xor gates do not requre any decryption.
 
 \section{Garbled Row Reduction 2}
+\al{https://web.engr.oregonstate.edu/~rosulekm/scbib/index.php?n=Paper.PSSW09}
 Garbled row reduction 2 (GRR2) reduces the size of the garbled table of AND gates to $2$ ciphertexts.
-Unfortunatley, GRR2 is not compatible with Free XOR, as it require that the zeroith and first wire labels of each wire bear a specific relationship.
-Because GRR2 is incompatible with FreeXOR, it is not often used in practice.
+Unfortunatley, GRR2 is not compatible with Free XOR, and GRR2 is less efficient than Free XOR combined with GRR3 for most circuits, so GRR2 is not often used by itself in practice.
 
-\al{I don't think much more needs to be said, but this should be clearer}
-GRR2 is much different from GRR3.
-When garlbing a gate, GRR2 creates two third degree polynomials.
-One polynomial corresponds to $C_0$, and the other polynomial corresponds to $C_1$.
-As such, that $C_0$ polynomial is defined by the wire labels that result in $C_0$, and likewise the $C_1$ polynomial is defined by the wire labels that result in $C_1$.
-Since each polynomial is of degree three, they are generated by $3$ points.
-The garbler sends over 2 points of each polynomial, and the final point is supplied by the input wire labels to the gate.
-Upon acquriring three points for one of the polynomials, the evaluator interpolates the polynomial, and plugs in values to recover $C_*$.
+Suppose the garbler is garbling an AND gate with input wires $A$ and $B$ and output wire $C$.
+For all $a,b \in \{0,1\}$, let $V_{a,b} = H(A_a, B_b)$.
+Since the evaluator acquires $A_a$ and $B_b$ for specific $a$ and $b$, they are also able to acquire $V_{a,b}$ for the same specific $a$ and $b$.
+The garbler constructs a polynomial $P$ to be the unique 2-degree polynomial passing through the points $(1, V_{0,0}, (2, V_{0,1})$ and $(3, V_{0,1})$ - these $V$'s are selected because the garbler is garbling an AND gate.
+And they set $C_0$ to $P(0)$.
+The garbler next constructs a second polynomial $Q$ to be the unique 2-degree polynomial passing through points $(4, V_{1,1}), (5, P(5))$ and  $(6, P(6))$.
+The garbler then sets $C_1$ to $Q(0)$.
+The garbler sends $(5, P(5))$ and $(6, P(6))$ to the evaluator.
 
-%\begin{itemize}
-%    \item use unique deg-2 polynomial
-%    \item use 2 second degree polynomials
-%    \item then interpolate
-%    \item can't do free xor.
-%    \item because we have lost control of $C_0$ and $C_1$ (they are dependent on the polynomial)
-%\end{itemize}
+When de-garbling, the evaluator holds $a, b, A_a, B_b$ for some $a,b \in \{0,1\}$, $(5, P(5))$ and $(6, P(5))$.
+With this information, the evaluator constructs polynomial $R$ to be unique the degree-2 polynomial passing through points $(2a + b + 1, H(A_a, B_b), (5, P(5))$ and $(6, P(6))$.
+Polynomial $R$ is either $P$ or $Q$, depending on the values of $a$ and $b$.
+The evaluator simply sets $C_*$ to be $R(0)$.
+
+GRR2 is incompatible with Free XOR since it sets $C_0$ and $C_1$ implicitly and unpredictably.
+Free XOR requires that $C_0$ = $C_1 \oplus \Delta$ for some global delta, which is not achievable with the randomly constructed polynomials.
+
+\al{discuss security. Why is free xor secure?}
+GRR2 alters garbler-side computation by having the garbler construct two polynomials instead of encrypting ciphertexts.
+This is slightly more computation than required by FreeXOR and GRR3, but not an undermining amount.
+Evaluator side computation increases slightly, as the evaluator constructs a polynomial instead of of decrypting two ciphertexts.
+
 
 \section{FleXOR}
+\al{passive tone}
 After the creation of GRR2, secure computation was at an awkward point.
-Circuits with many XOR gates were comptuted most quickly with Free XOR, but circuits with many AND gates were computed most quickly with GRR2.
-FleXOR reconciles GRR2 with Free XOR, giving researchers a technique that is universally faster.
+Circuits with many XOR gates were comptuted most quickly with Free XOR and GRR3, but circuits with many AND gates were computed most quickly with GRR2.
+FleXOR reconciles GRR2 with Free XOR, resulting in a scheme that is universally faster.
 
-GRR2 is incompatiable with FreeXOR because the wire labels on output wires of AND gates the result of plugging a value into a polynomial.
-The wire labels are solely dependent on the polynomial, so that $C_1 = C_0 \oplus \Delta_C$ for some random $\Delta_C$ not the global $\Delta$ used for FreeXOR.
+Recall that GRR2 is incompatible with Free XOR because the wire labels are uncontrollably created by random polynomials, where Free XOR requires that $C_1 = C_0 \oplus \Delta$ for some global delta.
 FleXOR solves this problem in a straightforward fashion: correct the delta value of output wires of AND gates such that the output wires use the global delta.
 To correct the value, FleXOR adds a unary gate after each AND gate that corrects the wire label. \footnote{A unary gate is a gate that takes a single input wire and outputs a single wire. The unary gate does not change the semantic meaning of a wire label - that is, whether it represents 0 or 1. The unary gate merely alters the actual value of the wire label or ciphertext.}
 
@@ -276,38 +284,27 @@ Since $A, B$ and $C$ have the same delta value, FreeXOR is used.
 
 The unary gate maps $A,A \oplus \Delta_1 \to A', A' \oplus \Delta$, where $\Delta$ is the correct delta value for the XOR gate.
 
-FreeXOR can be improved by not corrected every output wire of an AND gate.
-For example, if an output wire of an AND gate is immiedatley inputted into another AND gate, it does not need to fixed.
-Moreover, the wires do not need to be corrected to a global delta.
-Free XOR only requires that the three wires involved in the gate, $A, B$ and $C$, use the same delta, so each XOR gate has its own $\Delta$ that is uses. 
+FleXOR is made more efficient by not correcting the outputwire of every AND gate.
+For example, if an output wire of an AND gate is immediately inputted into another AND gate, the wire label does not need to corrected.
+Moreover, the wire labels do not even need to be corrected to a global delta.
+Free XOR only requires that the three wires involved in the XOR gate, $A, B$ and $C$, use the same delta, so each XOR gate has its own $\Delta$.
 For example, $A$ and $C$ may share a delta but $B$ may have a different delta, so it is sufficient to only correct $B$'s delta value.
 
-One issue that FleXOR raises is that circuits can be optimized to perform quickly in it. 
 FleXOR is fastest when AND gates are grouped together and XOR gates are grouped together, since fewer unary gates will be required.
-This optimization turns out to be NP-hard, but fortunately, FleXOR works well without much (or any) optimization to the circuit.
-Reserach reveals that FleXOR requires on average an extra $0$ or $1$ ciphertext per gate.
+Thereby, FleXOR creates an optimization problem: place XOR gates, AND gates and unary gates to minimize bandwidth requirements.
+However, FleXOR's optimzation problem is too computationally expensive, but on the up side, analysis reveals that FleXOR requires on average an extra $0$ or $1$ ciphertext per gate, a relatively small amount.
 That cost comes at the benefit of a Free XOR circuit, and 1 fewer ciphertext for each AND gate.
 
 FleXOR requires slightly more garbler-side computation than FreeXOR and GRR2, since the garbler must create the unary gates.
-The size of the XOR garbled table is $0$, and the size of the AND garbled table is $2$, with the addition of the garbed table of the unary gate.
-The garbled table of the unary gate has $2$ ciphertexts, and the number of unary gates depends on the circuit.
 The evaluator-side computation is the same as FreeXOR and GRR2, with the additional computation of the unary gates, which is small.
+The size of the XOR garbled table is $0$, and the size of the AND garbled table is $2$.
+But there is the additional communication of the unary gates' garbled tables.
+The garbled table of the unary gate has $2$ ciphertexts, and the number of unary gates depends on the circuit.
 
 FleXOR is intuitively secure, since the only additional information beyond GRR2 and FreeXOR is the unary gates.
 The unary gate is secure, since it functions the same as a normal garbled gate except that an input is missing.
 However, FreeXOR requires the circularity assumption, 
 The circularity assumption is discussed in the section on FreeXOR.
-
-%\begin{itemize}
-%    \item switch delta value: $A,A \oplus \Delta_1 \to A', A' \oplus \Delta_2$
-%    \item cost a single ciphertext (after using GRR3 trick)
-%    \item total cost 0,1,2 dependent on how many distinct deltas
-%    \item make wire label outputs of AND gates based on polynomial interpolation (GRR2)
-%    \item So we can do both free xor (which cost 0 CTs) and GRR2 (which cost 2 CTs per And gate + delta correction)
-%    \item turns into combinatorial optimization problem: determine offset for each wire to minimize total cost of each xor gate + subject to compatibility of 2-CT row-reduction of AND gates.
-%    \item in practice, seemed to usually require 0 or 1
-%    \item still has circularity problem because based on free zor
-%\end{itemize}
 
 \section{Half Gates}
 Half Gates is the most recent improvement to garbled circuits.
