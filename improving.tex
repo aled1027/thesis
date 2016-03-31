@@ -1,39 +1,45 @@
 \chapter{Improving MPC}
-A number of improvements have been made to garbled circuits over the last two decades.
-The aim of this chapter is to outline the major improvements made to garbled circuits and discuss the costs and benfits of the improvments.
+\al{cite Mike Rosulek's talk and website}
+\al{Mike's website has all the sources...}
+\al{figure out why GRR3 is secure}
+\al{Ask about notation: $A_0$ verse $W_i^0$}
 
-We consider 3 metrics that describe the costs of garbled circuits.
-First, we consider bandwidth per gate.
-In the classic scheme of garbled circuits, described in chapter 2, the garbler and evaluator communicated 2 pieces of information: wire labels for input wires and the fourth column of the garbled table for each gate \footnote{In chapter 2, Alice was the garbler and Bob was the evaluator. For clarify in chapter 3 and beyond, we use the term garbler to allude to the person who garbles the circuit, and we use the term evaluator to describe the person who evaluates, or decrypts, the garbled circuit.}.
-Sending the input lables is an unavoid able costs, with the major caveat that using oblivious transfer to communicate the evaluator's input labels has substantial costs.
-Oblivious transfer has been improved to require a small, constant amount of communication and minimal computation requirements for garbler and evaluator, if they can perform some computation \textit{before} executing the protocol.
-Improvements to oblivious transfer are discussed in more detail below.
+The aim of this chapter is to outline new techniques that improve the performance of garbled circuits and discuss their costs and benfits.
 
-The garbler and evaluator also commnicate the garbled table\footnote{In this chapter, the garbled table will be used interchangeably with the fourth column of the garbled table.}.
-Classical garbled circuits require that all four rows of the garbled table be communicated, that is 4 ciphertexts.
-Recent research has reduce the number of ciphertexts to approximately $0.5$ depending on the circuit being computed.
-We generally consider bandwidth to be the most important factor, as the high latency of the internet is generally the bottleneck of executing garbled circuits.
+We consider three metrics to understand the costs benefits of the new techniques: size of the garbled table, garbler-side computation and evaluator-side computation
+\footnote{In this chapter, the term garbled table is used interchangeably with the fourth column of the garbled table.}.
+In the classic scheme of garbled circuits, the garbler and evaluator communicate wire labels of input wires and the fourth coumn of the garbled table for each gate.
+Communicating the input labels is an unavoidable cost; this information needs to be exchanged. 
+However, many of the input labels are exchanged with oblivious transfer, discussed in chapter 1, which has been improved.
+We discuss the improvement to oblivious transfer at the end of this chapter.
 
-Second, we consider evaluator-side computation, which is determine by the number decryptions the evaluator performs per gate.
-Third, consider garbler-side computation.
-Many improvements to MPC increase the amount of garbler-side computation; having the garbler do more work can reduce the size of the garbled table which reduces bandwidth.
+New techniques also reduce the size of the garbled table, the other infomration exchanged between the garbler and evaluator.
+\footnote{In chapter 2, Alice was the garbler and Bob was the evaluator. For clarity in chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}.
+In the classical garbled circuit scheme, the evaluator sends all four rows of the garble table to the evaluator.
+New techiniques, wherein the evaluator samples wire labels \textit{intelligently}, reduce the number of rows of the garbled table that are communicated.
+Reducing the size of the garbled table is important, because it is a measure of the bandwidth requirement of the scheme.
+The garbled table amount to most of the communication, and the number of garbled tables scales with the size of the circuit - that is, a larger circuit means more gates means more garbled tables.
+Moreover, bandwidth is the most important factor in assessing the performance of a garbled circuit scheme.
+This is because communication of the internet is slower than local computation.
 
-As we walk through the improvements to Yao's garbled circuit, we are going to think about the improvements affect the three metrics described above.
-It should also be noted before we begin that these are improvements to the the computation of a single gate.
-Speedups to the computation of a gate propagate through the computation of the entire garbled circuit.
-For example, the computation of AES now requires approximatley $40,000$ gates, so reducing the number of ciphertexts being transmitted by $1$ per gate reduces the total ciphertexts communicated by $10,000$.
+We also consider garbler-side computatoin, which is the number of encryptions that the garbler performs in preparing a garbled table.
+In the classical garbled circuit scheme, the garbler performs four encryptions; however, this number is not often reduced.
+Typically, the new techniques increase or alter the computation that the garbler performs.
 
-Table \ref{tbl:gc-costs} is an overview of the cost of all improvements made to garble circuits.
-The table is split into three sections: size, eval cost and garble cost.
-Size is the size of the garbled table per gate.
+Finally, we consider evaluator-side computation, which is the number of decryptions the evaluator performs in ungarbling a gate - that is, finding the output wire label.
+In the Classical garbled circuit scheme, the evaluator trial decrypts each row until one of the decryptions is successful.
+Hence, on average, the evaluator performs 2.5 decryptions.
+New techniques reduce the evaluator-side computation to require a single decryption, a good performance improvement.
+
+Table \ref{tbl:gc-costs} shows an overview of the cost of all improvements made to garble circuits.
+The table is split into three sections: size, eval cost and garble cost, corresponding to three metrics mentioned above.
+Size is the number of rows in the garbled table.
 Eval cost is number of encryptions that the evaluator performs per gate, and decryptions is the number of decryptions that the garbler performs per gate.
-Each section is divided into two columns: AND and XOR.
-The AND columns show the requirements for AND gates, and the XOR columns show the cost for XOR gates.
-The columns are separate, because many of the improvements reduce the costs of one type of gate but not the other.
+Because many of the techniques have different effects on XOR gates and AND gates, each section is divided into two columns showing the metrics for AND gates and XOR gates separately.
 
 The goal of this chapter is primarily to explain each row in this table.
-How the improvement works, and the computational and bandwidth effects of the improvement.
-We start with the earliest improvement and move chronological to the most recent improvement.
+We will understand the technique, and its associated computational and bandwidth costs.
+We start with the earliest technique and move chronological to the most recent improvement.
 
 \begin{table}[t]
     \label{tbl:gc-costs}
