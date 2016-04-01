@@ -215,12 +215,12 @@ The garlber sets $C_0 = A_0 \oplus B_0$ and sets $C_1 = C_0 \oplus \Delta$.
 The evaluator, when evaluating an XOR gate, simply computes $C_* = A_* \oplus B_*$.
 As simple as it is, the evaluator will always acquire the correct value for $C_*$ based on the semantic value of $A_*$ and $B_*$.
 The math for each of the four cases is shown:
-\begin{align*}
+\begin{align}
     A_0 \oplus B_0 & = C_0 \\
     A_0 \oplus B_1 & = A_0 \oplus (B_0 \oplus \Delta) = (A_0 \oplus B_0) \oplus \Delta = C_1 \\
     A_1 \oplus B_0 & = (A_0 \oplus \Delta) \oplus B_0 = (A_0 \oplus B_0) \oplus \Delta = C_1 \\
     A_1 \oplus B_1 & = (A_0 \oplus \Delta) \oplus (B_0 \oplus \Delta) = (A_0 \oplus B_0) = C_0
-\end{align*}
+\end{align}
 For any wire $A$, since $A_1$ is dependent on $A_0$, we often simplify notation such that the wire labels for $A$ are $A$ and $A \oplus \Delta$, omitting the subscript.
 
 Free XOR is compatible with point and permute and GRR3; however, since XOR does not require a garbled table, GRR3 is only used on AND gates.
@@ -325,11 +325,9 @@ If $a = 1$, then $c = a \wedge b = b$, so the garbler creates a unary identity g
 We combine the unary gates into a single garbled table, shown in table \ref{tbl:halfgate-gg-garb}.
 Since the evaluator has $B_*$, the evaluator can compute the label of the output wire of the AND gate by xoring the rows in the garbled table by $H(B)$ or $H(B \oplus \Delta)$ to get $C$ or $C \oplus \Delta$ respectively. 
 
-The GRR3 trick reduces the size of the garbler-half-gate garbled table to $1$ ciphertext.
-Choose $C$ such that the first of the top row of the garbled table is the all zeros ciphertext. 
-The top row may not necessarily be $H(B) \oplus C$, since for security the rows are permuted. 
-Because the top row is all 0s, it does not need to be sent to the evaluator. 
-If the evaluator should decrypt the cipher text on the top row (as directed by point and permute), then the evaluator assumes the cipher text to be all 0s. Overall, computing $a \wedge b = c$ requires two having operations by the generator, a single hash operation by the evaluator, and the communication of one ciphertext. 
+Using point and permute and the GRR3 trick reduces the size of the garbler-half-gate garbled table to $1$ ciphertext.
+The garbler chooses $C_0$ such that the first of the top row of the garbled table is the all zeros ciphertext, and therefore is not sent to the evaluator.
+If the evaluator should decrypt the ciphertext on the top row (as directed by point and permute), then the evaluator assumes the ciphertext to be all 0s.
 
 \begin{table}[]
     \label{tbl:halfgate-gg-garb}
@@ -338,81 +336,68 @@ If the evaluator should decrypt the cipher text on the top row (as directed by p
         \hline
         Garbled Table for $a = 0$ \\
         \hline
-        $H(B) \oplus C$ \\
-        $H(B) \oplus C$ \\
+        $\Enc_{B_0}(C_0)$ \\
         \hline
     \end{tabular}
     \begin{tabular}{|c|}
         \hline
         Garbled Table for $a = 1$ \\
         \hline
-        $H(B) \oplus C$ \\
-        $H(B) \oplus C \oplus \Delta$ \\
+        $\Enc_{B_0}(C_0)$ \\
+        $\Enc_{B_1}(C_1)$ \\
         \hline
     \end{tabular} $\;\rightarrow$
     \begin{tabular}{|c|}
         \hline
         Garbled Table for any $a$ \\
         \hline
-        %$\Enc_B(C)$ \\
-        $H(B) \oplus C$ \\
-        $H(B) \oplus C \oplus a\Delta$ \\
+        $\Enc_{B_0}(C_0)$ \\
+        $\Enc_{B_1}(C_0 \oplus a\Delta)$ \\
         \hline
     \end{tabular}
-    \caption{Generator's Garbled Half Gate for $a = 0$, $a = 1$, and written more succinctly with $a\Delta$ for $a \in \{0,1\}$. If $a = 0$, then $a\Delta = 0$.  Otherwise if $a = 1$, then $a\Delta = \Delta$.}
+    \caption{Left: garbler-half-gate garbled table for $a = 0$. Middle: garbler-half-gate garbled table for $a = 1$. Right: garbler-half-gate garbled table for arbitrary $a$.}
 \end{table}
 
-\al{finished up to here, sort of}
+The evaluator-half-gate is somewhat different from the garbler-half-gate.
+Consider an AND gate where the evaluator \textit{knows} the semanitc value of $a$.
+If $a = 0$, then the evaluator should acquire $C_0$. 
+Otherwise if $a = 1$, then the evaluator should acquire $C_0 \oplus b\Delta$.
+In this case, it suffices for the evaluator to obtain $\Omega = C_0 \oplus B_0$, as the evaluator simply sets $C_*$ to $B_* \oplus \Omega$ which sets $C_*$ equal to $C_0 \oplus b\Delta$.
 
-We now consider computing $a \wedge b = c$, where the evaluator somehow already knows the value of $a$.
-If $a = 0$, then the evaluator should acquire $C$. 
-Otherwise if $a = 1$, then the evaluator should acquire $C \oplus b\Delta$, in which case it is sufficient for the evaluator to obtain $\Omega = C \oplus B$ (then xor $\Omega$ with the wire label corresponding to $b$).
-Table \ref{tbl:halfgate-gg-eval} shows cipher texts which the garbler gives to the evaluator.
-
-% explained at 40:00
-This table is different from other garbled tables. 
-First, the table does not need to be permuted. 
-Secondly, evaluation is different.
-If $a = 0$, then the evaluator uses wire label $A$ to decrypt the top row of the table and acquire $C$. 
-If $a = 1$, then the evaluator uses $A \oplus \Delta$ to decrypt the second row, yielding $C \oplus B$.
-The evaluator then xors wire label $B + b\Delta$ by $C \oplus B$ to obtain $C \oplus b\Delta$. 
-As before, the ciphertext  on the top row does not need to be communicatd by using the garbled row-reduction trick.
-The generator sets $C$ such that $H(A) \oplus C = 0$ (i.e. $C = H(A)$). 
-The total cost of this half gate is the same as before: two hashes by the generator, one hash by the evaluator, and once cipher text. 
+Table \ref{tbl:halfgate-gg-eval} the garbled table for the evaluator-half-gate.
+This table does not need to be permuted, since the evaluator knows $a$.
+Again, we use the GRR3 trick, and set $C_0$ to $\EncInv_{A_0}(0^n)$, eliminating the need to send the top row of the garbled table.
 
 \begin{table}[h]
     \label{tbl:halfgate-gg-eval}
     \centering
     \begin{tabular}{|c|}
         \hline
-        Garbled Table for any $A$ \\
+        Garbled Table for any $a$ \\
         \hline
-        $H(A) \oplus C$ \\
-        $H(A \oplus \Delta) \oplus C \oplus B$ \\
+        $\Enc_{A_0}(C)$ \\
+        $\Enc_{A_1}(C \oplus B)$ \\
         \hline
     \end{tabular}
-    \caption{Evaluator's half gate garbled table.}
+    \caption{Evaluator-half-gate garbled table.}
 \end{table}
 
 We now put the two half gates together to form an AND gate. 
-Consider the following where $r$ is a random bit generated by the generator:
-\begin{equation}
-    a \wedge b = a \wedge (r \oplus r \oplus b) = (a \wedge r) \oplus (a \wedge (r \oplus b)).
-\end{equation}
-The first AND gate, $a \wedge r$, can be computed with a generator-half-gate - the generator ``knows'' $r$. 
-Furthermore, if we can let the evaluator know the value of $r \oplus b$, then the second AND gate, $(a \wedge (r \oplus b)$, can be computed with an evaluator-half-gate - the evaluator ``knows'' $r \oplus b$. 
-And the final XOR can be computed with free xor at the cost of no ciphertexts. 
+Consider the following where $r$ is a random bit generated by the garbler:
+\begin{align}
+    a \wedge b & = a \wedge (r \oplus r \oplus b) \\
+               & = (a \wedge r) \oplus (a \wedge (r \oplus b)).
+\end{align}
+The first AND gate, $a \wedge r$, can be computed with a garbler-half-gate - the garbler \textit{knows} $r$. 
+Furthermore, if we can let the evaluator know the value of $r \oplus b$, then the second AND gate, $(a \wedge (r \oplus b)$, can be computed with an evaluator-half-gate - the evaluator \textit{knows} $r \oplus b$. 
+And the XOR gate can be computed with free xor at the cost of no ciphertexts. 
 
-It is secure for the garbler to give $r \oplus b$ to the evaluator, since $r$ is random and blinds the value of $b$. 
-The value of $r \oplus b$, while only a single bit, can be communicated to the evaluator for free: use the select bit (from the point and permute technique) of the false wire label on wire $b$ (so $r$ is the select bit on the true wire label of wire $b$).
+It is secure for the garbler to give $r \oplus b$ to the evaluator, since $r$ is random so it blinds the value of $b$. 
+The value of $r \oplus b$ can be communicated to the evaluator for free: use the select bit (from the point and permute technique) of the false wire label on wire $b$ (so $r$ is the select bit on the true wire label of wire $b$).
 
-The overall cost of using Half Gates for AND gates is four calls to $H$ for the generator, two calls to $H$ for the evaluator, and the communication of $2$ ciphertexts. 
-Half Gates guarantees only two ciphertexts are needed per AND gate, but the tradeoff is the additional computation for both parties (i.e. computing $H$).
+The overall cost of using Half Gates for AND gates is four encryptions for the garbler, two decryptions for the evaluator, and the communication of $2$ ciphertexts. 
+Half Gates guarantees only two ciphertexts are needed per AND gate, but the tradeoff is the additional computation for both parties.
 With FleXOR, the number of ciphertexts that need to be communicated may vary, but there is less computation required.
-
-When secure computation becomes used in real operations, the circuit will likely not be optimized for XOR gates (reducing the number of AND gates). 
-In this case, where an arbitrary function is being computed, it is hypothesized that Half Gates will outperform FleXOR. 
-But in many of the cases being examined now - most notably computing AES - the circuit has been optimized heavily to have very few AND gates, hence the benefits of Half Gates are less noticeable.\footnote{At present, the AES circuit is 80\% XOR gates} 
 
 \section{Improving Oblivious Transfer}
 \al{Fix this up}
