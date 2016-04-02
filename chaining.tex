@@ -1,10 +1,56 @@
 \chapter{Chaining Garbled Circuits}
 
-the ``theory''
+At the end of the previous chapter, we discussed OT-preprocessing in which some work is in done in an offline phase that speeds up the computation of the online phase.
+We can also split the garbled circuits scheme into online/offline phase.
+During the offline phase, the garbler generates and garbles the circuit, and sends it to the evaluator.
+Then, when the garbler and evaluator acquire their inputs to the function that they want to compute, they exchange input labels - some via the online phase of OT-preprocessing - and the evaluator evaluates the garbled circuit.
+Splitting the work into offline/online phases dramatically reduces the real world overhead required in performing secure computation.
+Imagine that two banks integrate secure computation into their daily transactions.
+At night when activity is low, their servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly do secure comptuation.
+The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit.
+The size of the garbled tables and the size of the function are both irrelevant to the computation.
 
-talk about our idea about chaining here.
+With this more real world scenario, we have a new open question: how can we improve garbled circuits in the offline/online setting?
+Let us narrow the question a bit more.
+What are the problems with the garbled circuits in the offline/online setting?
+Two problems immediately come to mind. 
+First, the function that the parties want to perform is fixed by the computation done in the offline phase.
+If the two banks want to compute a particular function, but that function was not turned into a circuit and exchanged the night before, then the banks are out of luck - they cannot perform that function in the online/offline model.
+We refer to this problem as the flexibilty of functionality problem.
+Second, we have the flexibility of inputs problem.
+Garbled circuits have a fixed input size.
+For some functions, this is not a problem as the extra inputs can simply be padded into $0$s, which solves the problem of flexibilty but causes the evaluator to compute a needlessly large circuit.
+Imagine a setting of multiparty computation where multiple parties are voting.
+In the online/offline setting, the size of the circuit is fixed, so there is some maximum number of parties that can participate in the election.
+If more parties want to vote than predicted, then a party has to create a new function, perform with all parties again, and so on.
+It would be great if there some garbled circuit method that could handle arbitarily large or small number of inputs.
+
+This chapter discusses \textit{chaining} garbled circuits, a method which provides flexibility of functionality and flexibility of inputs.
+The idea is based on stringing together many smaller garbled circuits in order to compute a larger function.
+For example, many useful functions can be decomposed into multiplying matrices.
+The garbler can generate a bunch of circuits that multiple matrices and exchange them during the offline phase.
+At the beginning of the online phase, the garbler and evaluator agree on a function to compute, figure out how chain their matrix-multiplying-garbled-circuits in a way to compute their function, and do so.
+They have know computed a function, which was totally determined at online time.
+We might say that garbled circuits exchanged during the offline phase offer a \textit{class} of functions that the evaluator and garbler can compute.
+The evaluator and garbler then pick a function from the class of functions during the online phase.
 
 \section{The Random Oracle Model and Random Permutation Model}
+In order to discuss chaining, we need to introduce a little more theory.
+This section discusses two models in which we imagine cryptographic schemes.
+
+The scheme that we have been working in is called the \textit{real world model} \al{What's it called?}
+In the real world model, we assume that parties have access to a polynomial length string of random bits, preset at the beginning of their algorithm.
+This string can be used however the parties wish, but it is a static access of randomness.
+
+The \texit{random oracle model} is a relaxation of the real world model.
+In the random oracle model, parties have a access to $H$, an oracle that on input of any value, outputs a perfectly random string. 
+
+What is an oracle?
+clearly not real - but essentially real?
+
+The \textit{random permutation model} is a further relexation of the random oracle model.
+In the random oracle model, parties
+
 \section{Chaining}
 \section{Security of Chaining}
 \section{Single Communication Multiple Connections}
