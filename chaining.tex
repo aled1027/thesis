@@ -35,23 +35,24 @@ We might say that garbled circuits exchanged during the offline phase offer a \t
 The evaluator and garbler then pick a function from the class of functions during the online phase.
 
 \section{The Random Oracle Model and Random Permutation Model}
+\al{Why are we introducing the ROM and RPM?}
 In order to discuss chaining, we need to introduce a little more theory.
 This section discusses two models in which we imagine cryptographic schemes.
 
-The scheme that we have been working in is called the \textit{real world model} \al{What's it called?}
-In the real world model, we assume that parties have access to a polynomial length string of random bits, preset at the beginning of their algorithm.
+The scheme that we have been working in is called the \textit{standard model} \al{What's it called?}
+In the standard model, we assume that parties have access to a polynomial length string of random bits, preset at the beginning of their algorithm.
 This string can be used however the parties wish, but it is a static access of randomness.
 
-The \texit{random oracle model} is a relaxation of the real world model.
+The \texit{random oracle model} is a relaxation of the standard model.
 In the random oracle model, parties have a access to $H$, an oracle that on input of any value, outputs a perfectly random string. 
 
 What is an oracle?
-clearly not real - but essentially real?
 
 The \textit{random permutation model} is a further relexation of the random oracle model.
 In the random oracle model, parties
 
 \section{Chaining}
+
 \section{Security of Chaining}
 \section{Single Communication Multiple Connections}
 \section{Security of SCMC}
