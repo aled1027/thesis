@@ -1,9 +1,23 @@
 \chapter{Implementation}
 
-talk about my implementation here.
-be clear about what I did.
+This section discusses the bulk of my thesis work: implementing chaining and SCMC, and testing their performance.
+My implementation is called \CompGC is written in C.
 
-\section{JustGarble}
-\section{Our Implementation: CompGC}
+\section{\LibGarble}
+\al{fix} \CompGC is written on top of \LibGarble.
+\LibGarble is a C library that is a fork of \JustGarble.
+\JustGarble was produced by BHR in 2012.
+All it does is create circuits, garble them, and evaluate them in very fast speeds.
+\LibGarble is a rework of \JustGarble in which the memory layout and other things are changed to speed up computation.
+
+\section{Our Implementation: \CompGC}
+\CompGC implements the theoretical ideas of naive chaining and SCMC.
+
+
+
 \section{Adding SCMC}
-
+\section{Experimental Setup}
+talk about what computer was used, bandwidth, network simulation
+\section{Experiments}
+AES, CBC, Levenshtein
+\section{Results}

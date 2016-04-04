@@ -43,7 +43,7 @@ The scheme that we have been working in is called the \textit{standard model} \a
 In the standard model, we assume that parties have access to a polynomial length string of random bits, preset at the beginning of their algorithm.
 This string can be used however the parties wish, but it is a static access of randomness.
 
-The \texit{random oracle model} is a relaxation of the standard model.
+The \textit{random oracle model} is a relaxation of the standard model.
 In the random oracle model, parties have a access to $H$, an oracle that on input of any value, outputs a perfectly random string. 
 
 What is an oracle?
@@ -52,7 +52,41 @@ The \textit{random permutation model} is a further relexation of the random orac
 In the random oracle model, parties
 
 \section{Chaining}
+In this section we describe how to chain together garbled circuits.
+
+Suppose that during an offline phase, Alice garbles many circuits and sends them Bob.
+During the online phase, Alice sends Bob input labels, some via oblivious transfer, and then Alice sends Bob \textit{link} labels.
+A link label converts an output wire from one garbled circuit to an input wire of another garbled circuit.
+Say that Alice and Bob want to set output wire $A$ of a garbled circuit to the input wire $X$ of another garbled circuit.
+We suppose that Alice and Bob are using Free XOR, where each garbled circuit uses the same global $\Delta$.
+
+Alice sends Bob $L_{AX} = A \oplus X$.
+Bob, who has $A \oplus a\Delta$, sets the $X$ wire label to $A \oplus a\Delta \oplus L_{AX}$.
+The $X$ wire label will have value $X \oplus a\Delta$, the same semantic value as wire $A$.
+
+This method requires a single ciphertext be communicated per wire-pair link.
 
 \section{Security of Chaining}
+In this section we explain why chaining is secure.
+
 \section{Single Communication Multiple Connections}
+\textit{Single Communication Multiple Connections} (SCMC) is a method of reducing the number of linking values that Alice and Bob exchange.
+In the naive chaining scheme, online bandwidth sclaes linearly with the number of wires being chained, since a ciphertext is communicated per wire being chained.
+For some cases, this is a lot of communication.
+If Alice and Bob are chaining two garbled circuits that perform matrix multiplication on $100$ by $100$ matrices with entries that are 16 bits, then Alice sends $8,000$ ciphertexts to Bob - $8,000$ ciphertexts is 4 kBs.
+SCMC reduces the chaining operation to require a single ciphertext of communication: an $8,000$x improvement.
+
+SCMC works like most garbled circuits improvements: cleverly choosing wire labels.
+The key observation is that consecutive output wires are often chained to consecutive input wires.
+Suppose we are chaining garbled circuit $\C_0$ with output wires $\{W_i\}_{i \in \SFOutputs(\C_0})$ to garbled circuit $\C_1$ with input wires $\{Y_i\}_{i \in \SFOutputs(\C_1)}$.
+Moreover, for all wires $W_i$ being chained in $\C_0$, $W_i$ is being chained to $Y_j$ where $i = j$; intuitively, a wire in $\C_0$ is being chained to its corresponding wire in $\C_1$.
+\al{What does this mean? What is a corrresponding wire?}
+Alice, when garbling, sets all output wires $W_i$ to $W_0 \oplus H(T \oplus (i || b))$, and all output wires $Y_i$ to $Y_0 \oplus H(T \oplus (i || b))$ where $H$ is a hash function.
+
 \section{Security of SCMC}
+SCMC is known to be secure in the random oracle model.
+In the random oracle model, we assume that $H$ is a random function.
+That is, on any input $x \in \{0,1\}^*$, $H$ outputs a uniform random bit-string of length $\lambda$.
+
+...
+
