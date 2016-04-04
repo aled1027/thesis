@@ -1,18 +1,13 @@
 %!TEX root = thesis.tex
 \chapter{Classic 2PC}
 \al{this paragraph is a little weak}
-Secure Computation (SC) was first proposed in an oral presesntation by Andrew Yao \cite{yao-original}.
-Since Yao's presentation, multiple methods for performing SC were developed.
-One method was developed by Yao himself and is called garbled circuit.
-Another was developed by a group of researchers, Goldreich, Micali and Widgerson \al{cite}.
-The two methods are premised on a similar idea: encrypt a circuit by encrypting its gates, which has since been termed garbled circuit.
-At this point, it is unclear which method is better, so researchers continue to study both methods.
-\al{get source}
+Secure Computation was first proposed in an oral presesntation by Andrew Yao \cite{yao-original}.
+Since Yao's presentation, two main methods have emerged for secure computation.
+The first method is garbled circuits, and is the focus of this chapter.
+The second method is GMW, and is explained in brief at the end of the chapter.
 
-This chapter explains the two most prominent methods of SC for the two party case, referred to as Two-Party Protocol (2PC).
-The first part of the chapter will motivate and describe desirable properties of a 2PC protocol, culminating in a definition. 
-The second part of the chapter will describe in Yao's Garbled Circuits, a method for performing 2PC, and discuss security of 2PC.
-The third part will provide an overview of GMW's method.
+This chapter begins with motivating and describing desirable properties of a 2PC protocols, culminating in a defintion of security. 
+Next, the chapter describes garbled circuits, a method popular method for performing 2PC.
 
 \section{2PC Security Motivation}
 Think back to Alice and Bob from the introduction. 
@@ -54,9 +49,10 @@ A definition based on properties in this respect as it becomes the burden of the
 
 We must also think about the aims of each party involved in the protocol. 
 Can we trust that parties are going to obey the protocol? 
-It's relevant in the two party case, but if there are more than three parties, parties may either act independently or collude. 
+Are the parties going to try to cheat?
 These considerations are called the \textit{security setting}.
 There are two primary security settings: the semi-honest setting and the malicious setting. 
+
 The work presented in this thesis uses the semi-honest setting. 
 In the semi-honest setting, we assume that each party obeys the protocol but tries to learn as much as possible from the information they are given.
 This means that parties do not lie about their information, they do not abort, they do not send or withhold messages out of order, or deviate in any way from what is specified in the protocol. 
@@ -93,15 +89,14 @@ Carlo computes $f(x,y)$ himself, and sends the output to Alice and Bob.
 The only information that Alice and Bob have in the ideal world is their individual inputs and the output.
 
 Informally, we say that $\Pi$ is secure if Alice and Bob learn \textit{essentally the same} information executing $\Pi$ in the real world as they do computing $f$ in the ideal world with Carlo.
-Specifically, Alice and Bob should not learn any more information in the real world than they do in the ideal world.
-If they do learn more information in the ideal world, then the protocol $\Pi$ is leaking information that cannot be deduced from their individual inputs and the output of $f$.
-This is formaly achieved using the concept of computational indistinguishability presented in chapter 1. 
-Recall that computational indistinguishability is the idea that two probability distributions are essentially the same - no polynomial time algorithm can confidently distinguish them.
+If either Alice or Bob manage to learn more information in the real world, then the protocol $\Pi$ is leaking information that cannot be deduced from their individual inputs and the output of $f$.
+This idea of security is formally achieved using the concept of computational indistinguishability presented in Chapter 1. 
+Recall that computational indistinguishability is the idea that two probability distributions are essentially the same - no polynomial time algorithm can distinguish them.
 To use computational indistinguishability, we think of the information that Alice and Bob learn in the real and ideal world as probability distributions.
 The idea may seem fuzzy now, but the idea will become clearer as the probability distrubtions are explained
 
 To construct the probability distribution of the ideal world, we introduce \textit{simulators} $S_A$ and $S_B$.
-$S_A$ and $S_B$ are probabilistic polynomial-time algorithms who are essentially adversaries, like the adversary in the definition of encryption from chapter 1, that specifically attack the ideal world.
+$S_A$ and $S_B$ are probabilistic polynomial-time algorithms who are essentially adversaries, like the adversary in the definition of encryption from Chapter 1, that specifically attack the ideal world.
 Simulator $S_A$ takes as input $x$, Alice's input, and $f(x,y)$, the output of the function because that is the information that Alice has access to in the ideal world.
 Likewise, $S_B$ takes input $y$ and $f(x,y)$, since that the is information that Bob has access to in the ideal world.
 
@@ -137,11 +132,11 @@ Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose p
 We say that $\Pi$ securely computes $f$ in the presence of static\footnote{\al{TODO} Mention what static means} semi-honest adversaries if there exist probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following hold:
 \begin{equation} 
     \label{eqn:secdef1}
-    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
+    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \compindist \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
 \end{equation}
 \begin{equation} 
     \label{eqn:secdef2}
-    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \equiv^C \{(\viewrv^{\Pi}_2(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
+    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \compindist \{(\viewrv^{\Pi}_2(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
 \end{equation}
 \end{definition}
 
@@ -256,11 +251,11 @@ The only information that Bob has is the fourth column of the garbled tables, an
 
 Recall that Bob's input to the 2PC protocol is $y = y_0 y_1$ where $y_1, y_0 \in \{0,1\}$.
 Alice now wants to send Bob $W_2^{y_0}$ and $W_3^{y_1}$, but she does not know and cannot know (for the sake of security) $y_0$ and $y_1$.
-Alice and Bob can achieve this by using Oblivious Transfer, as described in chapter 1.
+Alice and Bob can achieve this by using Oblivious Transfer, as described in Chapter 1.
 As an example, we look at wire $W_2$.
 Alice has two possible values that she wants to send to Bob: $W_2^0$ and $W_2^1$.
 Alice only wants Bob to acquire one of the values, becuase otherwise he can decrypt multiple rows garbled table.
-\al{introduce htis OT notation in chapter 1}
+\al{introduce htis OT notation in Chapter 1}
 Bob wants to receive $W_2^{y_0}$, as that wire label corresponds to his input.
 So Alice and Bob do $\OT(\{W_2^0, W_2^1\}, y_0)$, so that Alice obvliously sends Bob the correct wire label.
 Alice and Bob also perform OT on wire $W_3$; in particular, they do $\OT(\{W_3^0, W_3^1\}, y_1)$.
@@ -347,12 +342,12 @@ Bob and Alice have now securely computed the function.
 \subsection{Security of Garbled Circuits}
 We now discuss the security of garbled circuits without proof.
 
-The definition of security of a 2PC protocol $\Pi$ given early in chapter 2 asked us to compare the execution of $\Pi$ in the real world to an ideal 2PC execution with a trusted third party Carlo.
+The definition of security of a 2PC protocol $\Pi$ given early in Chapter 2 asked us to compare the execution of $\Pi$ in the real world to an ideal 2PC execution with a trusted third party Carlo.
 This definition is extremely useful; however, it is difficult to adapt it to intuiting the security of a given protocol.
 To think about the security of garbled circuits, we think about the information that Alice and Bob.
 
 The only information that Alice receives from Bob during the execution of garbled circuits is in the OT stage.
-Thereby the security on Alice's side is dependent on the security of OT, whose security we describe in chapter 1.
+Thereby the security on Alice's side is dependent on the security of OT, whose security we describe in Chapter 1.
 Hence, we can confidently say that Alice does not learn anything during garbled circuits.
 
 The security of Bob is more complicated.
@@ -387,7 +382,7 @@ Alice performs 4 encryptions with a dual-key cipher for each gate.
 The third cost to consider is the amount of computation that Bob performs.
 Bob performs 4 decrypts with the dual-key cipher for each gate.
 
-These constraints are all important, but in practice the biggest bottlenecks are the communication per gate and Bob's computation, which are correlated as we see in chapter 3.
+These constraints are all important, but in practice the biggest bottlenecks are the communication per gate and Bob's computation, which are correlated as we see in Chapter 3.
 A circuit that computes AES requires approximately 35,000 gates.
 If 4 ciphertexts per gate need to communicated, and AES-128 is the encryption scheme, then $4 * 128 * 35,000$ bits = $2.24$ megabytes: a huge amount of communication for just encryption!
 
