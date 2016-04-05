@@ -68,6 +68,14 @@ This method requires a single ciphertext be communicated per wire-pair link.
 
 \section{Security of Chaining}
 In this section we explain why chaining is secure.
+Informally, chaining is secure since the chaining values do not represent any semantic information, and the evaluator cannot infer any further information from them.
+The evaluator cannot XOR a chaining value with any other value and gain meaningful information.
+Say the evaluator has chaining value $W_{ij}$, chaining $W_i$ to $W_j$. 
+The evaluator learns nothing by xoring $W_{ij}$ with $W_i$ or $W_j$, and $W_{ij}$ is not associated with $W_k$ for all $k \neq i,j$, so the evaluator stands to learn nothing.
+
+To think about the security of chaining formally, we modify the experiement of classical garbled circuits to include the chaining step\footnote{The experiment for classical garbled circuits is given in Chapter 2}.
+We modify the experiment to the following:
+
 
 \section{Single Communication Multiple Connections}
 \textit{Single Communication Multiple Connections} (SCMC) is a method of reducing the number of linking values that Alice and Bob exchange.
