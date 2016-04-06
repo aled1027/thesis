@@ -1,9 +1,87 @@
 \chapter{Implementation}
 
-This section discusses the bulk of my thesis work: implementing chaining and SCMC, and testing their performance.
-My implementation is called \CompGC is written in C.
+I created \CompGC, a system for chaining garbled circiuts.
+\CompGC is designed to run a two party garbled circuit protocol from start to finish.
 
-\section{\LibGarble}
+\CompGC has a garbler-side and an evaluator-side, which is specified with command line arguments.
+The \CompGC system operates in two phases.
+In the first phase, the offline phase, the garbler sends garbled circuits to the evaluator, and they perform the offline phase of OT-preprocessing.
+In the second phase, the online phase, the garbler sends input labels for the garbled circuits, some of which are exchanged via the online phase of OT-preprocessing, instructions for how the evaluator should chain the garbled circuits, and output garbled circuits which are garbled circuits composed of a single, unary gate that encode the real output of the function being processed.
+The following section goes into more detail into the particular of the \CompGC protocol.
+
+\section{\CompGC}
+I initially constructed \CompGC on top of \JustGarble.
+\JustGarble is a system for garbling and evaluating circuits, and it only garble circuits and evaluates.
+\JustGarble takes as input a circuit and can output a garbled circuit, and similarly, it can take as input a garbled circuit and input wires and return the output of the garbled circuit.
+While building \CompGC, \LibGarble was being developed by a researcher at University of Maryland.
+\LibGarble is a fork of \JustGarble - that is, the researcher took the code of \JustGarble as his starting point -  and offers the same functionality as \JustGarble, but it has a better API, is faster, and supports more feartures, namely half-gates.
+I eventually started using \LibGarble in \CompGC.
+
+Starting with \JustGarble and \LibGarble, which perform a very specific task, meant that I needed to add many steps and features to make a fully functional garbled circuit system.
+I started by adding oblivious Transfer, for which I found an implementation of the Naor-Pinkas algorithm.
+Naor-Pinkas is basic, semi-honest oblivious transfer.
+A colleague of mine later added to the oblivious transfer code to support OT-preprocessing.
+
+
+I will now walk through the 4 basic modes of \CompGC: garbler-offline, evaluator-offline, garbler-online and evaluator-online.
+Algorithm \ref{alg:garbler-offline} outlines the garbler's offline implementation.
+
+\begin{algorithm}
+    \caption{Garbler Offline}
+    \label{alg:garbler-offline}
+    \begin{algorithmic}
+        \State \textbf{Input:} List of circuits, and number of ciphertexts to be OT-preprocessed.
+        \State 1. Build circuits
+        \State 2. Garble circuits (using \LibGarble)
+        \State 3. Assign each garbled circuit an ID
+        \State 4. Send garbled circuits and their IDs to evaluator
+        \State 5. Save input labels and output labels of garbled circuit to disk
+        \State 6. Perform offline phase of OT-preprocessing
+        \State 7. Save data from OT-preprocessing to disk
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{Evaluator Offline}
+    \label{alg:evaluator-offline}
+    \begin{algorithmic}
+        \State 1. Receive garbled circuits from garbler
+        \State 2. Save garbled circuits to disk
+        \State 3. Perform offline phase of OT-preprocessing
+        \State 4. Save OT-preprocessing data to disk
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{Garbler Online}
+    \label{alg:evaluator-offline}
+    \begin{algorithmic}
+        \State 1. Load input labels and output labels of garbled circuits from disk
+        \State 2. Load OT-preprocessing data from disk
+        \State 3. Load function specification from disk
+        \State 4. Generate instructions from function specification
+        \State 5. Compute chaining values, and add values to instructions
+        \State 7. Perform online stage of OT-preprocessing
+        \State 8. Send input wires correspond to garbler's input
+        \State 9. Send instructions
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{Evaluator Online}
+    \label{alg:evaluator-offline}
+    \begin{algorithmic}
+        \State 1. Load garbled circuits from disk
+        \State 2. Load OT-preprocessing data from disk
+        \State 3. Perform online stage of oblivious transfer - acquire evaluator's input labels
+        \State 4. Receive garbler's input labels
+        \State 5. Receive instructions
+        \State 6. Following instructions, chaining and evaluating as instructed
+    \end{algorithmic}
+\end{algorithm}
+
+\section{\LibGarble and \JustGarble}
+
 \al{fix} \CompGC is written on top of \LibGarble.
 \LibGarble is a C library that is a fork of \JustGarble.
 \JustGarble was produced by BHR in 2012.
