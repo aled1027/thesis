@@ -1,10 +1,13 @@
+%!TEX root = thesis.tex
+
 \chapter{Implementation}
 
-I created \CompGC, a system for chaining garbled circiuts.
-\CompGC is designed to run a two party garbled circuit protocol from start to finish.
+I implemented the theoretical ideas of component-based garbled circuits and SCMC in a program called \CompGC. 
+This chapter describes the creation of \CompGC, and at the end presents experimental results. 
 
+The aim of \CompGC is to run a two party garbled circuit protocol from start to finish. 
 \CompGC has a garbler-side and an evaluator-side, which is specified with command line arguments.
-The \CompGC system operates in two phases.
+It operates in two phases.
 In the first phase, the offline phase, the garbler sends garbled circuits to the evaluator, and they perform the offline phase of OT-preprocessing.
 In the second phase, the online phase, the garbler sends input labels for the garbled circuits, some of which are exchanged via the online phase of OT-preprocessing, instructions for how the evaluator should chain the garbled circuits, and output garbled circuits which are garbled circuits composed of a single, unary gate that encode the real output of the function being processed.
 The following section goes into more detail into the particular of the \CompGC protocol.
@@ -14,7 +17,7 @@ I initially constructed \CompGC on top of \JustGarble.
 \JustGarble is a system for garbling and evaluating circuits, and it only garble circuits and evaluates.
 \JustGarble takes as input a circuit and can output a garbled circuit, and similarly, it can take as input a garbled circuit and input wires and return the output of the garbled circuit.
 While building \CompGC, \LibGarble was being developed by a researcher at University of Maryland.
-\LibGarble is a fork of \JustGarble - that is, the researcher took the code of \JustGarble as his starting point -  and offers the same functionality as \JustGarble, but it has a better API, is faster, and supports more feartures, namely half-gates.
+\LibGarble is a fork of \JustGarble - that is, the researcher took the code of \JustGarble as his starting point -  and offers the same functionality as \JustGarble, but it has a better API, is faster, and supports more features, namely half-gates.
 I eventually started using \LibGarble in \CompGC.
 
 Starting with \JustGarble and \LibGarble, which perform a very specific task, meant that I needed to add many steps and features to make a fully functional garbled circuit system.
@@ -94,8 +97,82 @@ All it does is create circuits, garble them, and evaluate them in very fast spee
 
 
 \section{Adding SCMC}
+
 \section{Experimental Setup}
+\CompGC experiments were run on an Intel Core i5-4210H CPU. 
+They were conducted over two network settings. 
+The first network setting ran both parties on the default localhost configuration, which was measured to have a latency of 0.012 ms and bandwidth of 25.2 Gb per second. 
+The second network setting used the built in Linux network emulator {\sf netted} to configure localhost to mimic the latency and bandwidth of the internet. 
+This included setting latency to 33 ms and bandwidth to 50 Mbits per second. 
+Finally, \CompGC requires reading from disk; our experimental machine was measured to have cache reads speed of 6.7 GB per second and buffered disk reads speed of 96 MB per second.
+
+We ran four experiments: AES, CBC mode, and Levenshtein distance with 30 symbols and with 60 symbols. 
+
+In the AES experiment, we treated each round of AES as a separate component. AES has 10 rounds, and hence required linking 10 components. Moreover, we used 128-bit AES, meaning that each component link required linking 128 wires. 
+
+CBC mode is an algorithm for encrypting messages of arbitrary length using a blockcipher, for which we used AES-128. 
+We again used a single round of AES as a component, and we also used XOR component, which took 256 bits of input, and outputted their xor. 
+For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, thus requiring 110 components - 100 for AES rounds and 10 for XOR. 
+
 talk about what computer was used, bandwidth, network simulation
+
 \section{Experiments}
 AES, CBC, Levenshtein
+
 \section{Results}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
