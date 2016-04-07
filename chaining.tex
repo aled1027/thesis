@@ -56,21 +56,32 @@ During the day, when the banks decide that they need to compute some function $f
 If they do, the garbler-bank runs $\Link$ on the components used in $f$, and sends the output link-labels to the evaluator. 
 The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
 Now that the garbler has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
+\al{change output to Z, instead of y --- y is bob's input}
 
 \section{Security of Chaining}
 
 In this section, we show how to adapt the standard definition of privacy, presented in chapter 2, to component-based garbled circuits.
-%We want that for a set of components $\{c_i\}_{i \in \Components}$, the pre-garbled components $\{GC_i\}
+Recall from Chapter 2 that we said a garbled circuit scheme is secure if for all probabilistic, polynomial-time simulators (i.e algorithms) $S_1$ and $S_2$ the following holds:
+\begin{equation}
+    \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \compindist \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y}
+\end{equation}
+\begin{equation}
+    \{(S_2(x, f_2(x,y), f(x,y)))\}_{x,y} \compindist \{(\viewrv^{\Pi}_2(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y}
+\end{equation}
 
-In this section we explain why chaining is secure.
-Informally, chaining is secure since the chaining values do not represent any semantic information, and the evaluator cannot infer any further information from them.
-The evaluator cannot XOR a chaining value with any other value and gain meaningful information.
-Say the evaluator has chaining value $W_{ij}$, chaining $W_i$ to $W_j$. 
-The evaluator learns nothing by xoring $W_{ij}$ with $W_i$ or $W_j$, and $W_{ij}$ is not associated with $W_k$ for all $k \neq i,j$, so the evaluator stands to learn nothing.
+To consider the security of component-based garbled circuits, we add in the extra information that each party receives into $\viewrv^{\Pi}(x,y)$. 
+First, consider the party 1, the garbler. 
+The garbler only receives additional information from OT-preprocessing, which we know to be secure. 
+So the garbler-side is secure in component-based garbled circuits.
 
-To think about the security of chaining formally, we modify the experiment of classical garbled circuits to include the chaining step\footnote{The experiment for classical garbled circuits is given in Chapter 2}.
-We modify the experiment to the following:
+Second, consider party 2, the evaluator. 
+The evaluator receives the following information: pre-garbled components $\{GC_i\}$, input labels $\{W_j^{x_j}\}_{j \in \Inputs(C)}$, output map $d_{C_out}$ and link labels $\{W_{ij}\}_{i,j \in \Components}$.
+The pre-garbled components, output map and input labels do not reveal any information for the same reasons that they are fine in the standard definition of security.
+The wire labels are the xor of two random values, hence they themselves do not reveal any semantic information about the value of a wire. 
+Moreover, the link labels cannot be used in conjunction with any wire labels to gain any further information.
 
+It should be noted that this not even close to a formal proof of security of component-based garbled circuits. 
+A formal proof is long, and beyond the scope of this project; rather, this section highlights the intuition behind why we believe a formal proof of security to be possible. 
 
 \section{Single Communication Multiple Connections}
 \textit{Single Communication Multiple Connections} (SCMC) is a method of reducing the number of linking values that Alice and Bob exchange.
