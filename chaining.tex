@@ -84,6 +84,41 @@ It should be noted that this not even close to a formal proof of security of com
 A formal proof is long, and beyond the scope of this project; rather, this section highlights the intuition behind why we believe a formal proof of security to be possible. 
 
 \section{Single Communication Multiple Connections}
+
+We now introduce \textit{Single Communication Multiple Connections} (SCMC), a technique which improves upon naive component-based garbled circuits for some functions. 
+SCMC makes the observation that often large sequences of consecutive wires represent a single element of data, like a string, number or matrix. 
+When large sequences of consecutive wires are mapped between garbled components, the sequence of consecutive wires is mapped together - the order of the wires is preserved. 
+SCMC takes advantage of this fact by requiring that only a single link label is communicated for each sequence of consecutive wires, as opposed to one link label per wire. 
+
+\al{CompGC paper notes that we could use permutation garbled components to deal with this problem, making things more efficient sometimes}
+
+As with most improvements to garbled circuits, SCMC operates by modifying the generation of wire labels. 
+Wire labels that are part of a block representing a single piece of data are generated in a fixed, patterned way such that the differences between linked labels will be the same for all wires in a block. 
+
+SCMC modifies the $\Garble$ algorithm by choosing input wires and output wires in a particular way. 
+For every component, we first choose three random labels $A,B$ and $T$: $A$ and $B$ are the base values for input wires and output wires respectively, and $T$ is a tweak value, ensuring security for the hash function.
+We next assume that all parties have access to a random oracle $H$. 
+A random oracle is a theoretically perfect random function, which on input of any value $x \in \{0,1\}^*$, returns a value from $\{0,1\}^{\lambda}$ selected uniformly at random.
+In practice, we use a hash function for $H$. 
+Then, for all input wire labels $W_i^b$, set wire label $W_i^b$ to $A \oplus H(T \oplus (i || b))$. 
+Likewise, for all output wires labels $W_i^b$, we do the same process, setting $W_i^b$ to $B \oplus H(T \oplus (i || b))$.
+
+Suppose that all output wires of component $c_0$ are being linked to the input wires component $c_1$, where the $i$th input wire is being mapped to the $i$th output wire. 
+Then, it is sufficient for the garbler to send $B_{c_0} \oplus A_{c_1}$ to the garbler. 
+This works since for any wire $i$ and bit $b$,
+\begin{equation}
+(B_{c_0} \oplus H(T \oplus (i || b)) \oplus (B_{c_0} \oplus A_{c_1}) = A_{c_1} \oplus H(T \oplus (i || b))
+\end{equation}
+
+Evaluation is the same as naive component-based garbled circuits, wherein the evaluator links using the correct wire label.
+
+\subsection{Analysis}
+SCMC substantially reduces the amount of communication required for chaining. 
+For example, if AES is being computed where the components are single AES rounds, then SCMC requires only $9$ link labels to be communicated between the garbler and evaluator; naive component-based garbled circuits requires $1152$ labels. 
+The milage of SCMC varies
+
+\al{-}
+
 \textit{Single Communication Multiple Connections} (SCMC) is a method of reducing the number of linking values that Alice and Bob exchange.
 In the naive chaining scheme, online bandwidth scales linearly with the number of wires being chained, since a ciphertext is communicated per wire being chained.
 For some cases, this is a lot of communication.
@@ -94,7 +129,7 @@ SCMC works like most garbled circuits improvements: cleverly choosing wire label
 The key observation is that consecutive output wires are often chained to consecutive input wires.
 Suppose we are chaining garbled circuit $\C_0$ with output wires $\{W_i\}_{i \in \SFOutputs(\C_0})$ to garbled circuit $\C_1$ with input wires $\{Y_i\}_{i \in \SFOutputs(\C_1)}$.
 Moreover, for all wires $W_i$ being chained in $\C_0$, $W_i$ is being chained to $Y_j$ where $i = j$; intuitively, a wire in $\C_0$ is being chained to its corresponding wire in $\C_1$.
-\al{What does this mean? What is a corrresponding wire?}
+\al{What does this mean? What is a corresponding wire?}
 Alice, when garbling, sets all output wires $W_i$ to $W_0 \oplus H(T \oplus (i || b))$, and all output wires $Y_i$ to $Y_0 \oplus H(T \oplus (i || b))$ where $H$ is a hash function.
 
 \section{Security of SCMC}
@@ -103,4 +138,26 @@ In the random oracle model, we assume that $H$ is a random function.
 That is, on any input $x \in \{0,1\}^*$, $H$ outputs a uniform random bit-string of length $\lambda$.
 
 ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
