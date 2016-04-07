@@ -1,69 +1,80 @@
+%!TEX root = thesis.tex
+
 \chapter{Chaining Garbled Circuits}
 
-At the end of the previous chapter, we discussed OT-preprocessing in which some work is in done in an offline phase that speeds up the computation of the online phase.
-We can also split the garbled circuits scheme into online/offline phase.
-During the offline phase, the garbler generates and garbles the circuit, and sends it to the evaluator.
-Then, when the garbler and evaluator acquire their inputs to the function that they want to compute, they exchange input labels - some via the online phase of OT-preprocessing - and the evaluator evaluates the garbled circuit.
-Splitting the work into offline/online phases dramatically reduces the real world overhead required in performing secure computation.
+In this chapter we introduce component-based garbled circuits.
+Component-based garbled circuits allow for most of the work involved in building and communicating a garbled circuit to occur in an offline phase before the inputs or function to compute are known. 
+This offers a significant improvement to the online performance of garbled circuits. 
+
+We begin with the observation that most functions are composed of many smaller components. 
+For example, many statistical functions are a composition of matrix and arithmetic operations.
+The gist of component-based garbled circuits is then to build and communicate many garbled components in the offline stage. 
+Then, in the online stage, the garbler and evaluator choose their inputs and a function a compute. 
+The garbler communicates input labels and auxiliary information, to be discusses, to the evaluator, who stitches together the garbled components into the larger function.
+
+The idea may make more sense with a real world example. 
 Imagine that two banks integrate secure computation into their daily transactions.
-At night when activity is low, their servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly do secure comptuation.
-The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit.
-The size of the garbled tables and the size of the function are both irrelevant to the computation.
-
-With this more real world scenario, we have a new open question: how can we improve garbled circuits in the offline/online setting?
-Let us narrow the question a bit more.
-What are the problems with the garbled circuits in the offline/online setting?
-Two problems immediately come to mind. 
-First, the function that the parties want to perform is fixed by the computation done in the offline phase.
-If the two banks want to compute a particular function, but that function was not turned into a circuit and exchanged the night before, then the banks are out of luck - they cannot perform that function in the online/offline model.
-We refer to this problem as the flexibilty of functionality problem.
-Second, we have the flexibility of inputs problem.
-Garbled circuits have a fixed input size.
-For some functions, this is not a problem as the extra inputs can simply be padded into $0$s, which solves the problem of flexibilty but causes the evaluator to compute a needlessly large circuit.
-Imagine a setting of multiparty computation where multiple parties are voting.
-In the online/offline setting, the size of the circuit is fixed, so there is some maximum number of parties that can participate in the election.
-If more parties want to vote than predicted, then a party has to create a new function, perform with all parties again, and so on.
-It would be great if there some garbled circuit method that could handle arbitarily large or small number of inputs.
-
-This chapter discusses \textit{chaining} garbled circuits, a method which provides flexibility of functionality and flexibility of inputs.
-The idea is based on stringing together many smaller garbled circuits in order to compute a larger function.
-For example, many useful functions can be decomposed into multiplying matrices.
-The garbler can generate a bunch of circuits that multiple matrices and exchange them during the offline phase.
-At the beginning of the online phase, the garbler and evaluator agree on a function to compute, figure out how chain their matrix-multiplying-garbled-circuits in a way to compute their function, and do so.
-They have know computed a function, which was totally determined at online time.
-We might say that garbled circuits exchanged during the offline phase offer a \textit{class} of functions that the evaluator and garbler can compute.
-The evaluator and garbler then pick a function from the class of functions during the online phase.
+At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
+The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
 
 \section{Chaining}
+
+
 In this section we describe how to chain together garbled circuits.
 
 Suppose that Alice and Bob are chaining two garbled circuits.
 During an offline phase, Alice garbles many circuits and sends them Bob.
 Later, during the online phase, Alice sends Bob input labels, some via oblivious transfer, and then Alice sends Bob \textit{link} labels.
 A link label converts an output wire from one garbled circuit to an input wire of another garbled circuit.
-Say that Alice and Bob want to set output wire $A$ of a garbled circuit to the input wire $X$ of another garbled circuit.
+Say that Alice and Bob want to set output wire $W_i$ of a garbled circuit to the input wire $W_j$ of another garbled circuit.
 We suppose that Alice and Bob are using Free XOR, where each garbled circuit uses the same global $\Delta$.
 
-Alice sends Bob $L_{AX} = A \oplus X$.
-Bob, who has $A \oplus a\Delta$, sets the $X$ wire label to $A \oplus a\Delta \oplus L_{AX}$.
-The $X$ wire label will have value $X \oplus a\Delta$, the same semantic value as wire $A$.
+We formally describe component-based garbled circuits as a tuple of three algorithms $(\Garble, \Link, \Eval)$.
+The $\Garble$ algorithm is the same algorithm as before; it takes as inputs a circuit $\C$ and outputs a garbled circuit $\GC$. 
+We extend the $\Garble$ algorithm to also take a component-circuit $c$ as input, instead of a complete circuit $\C$, which outputs a garbled component $\GC_c$, input wire set $e_c$ and output wire set $d_c$. 
 
-This method requires a single ciphertext be communicated per wire-pair link.
+The $\Link$ algorithm is new and designed for component-based garbled circuits. 
+$\Link$ takes as input two garbled components $c_0 = (\GC_0, e_0, d_0)$ and $c_1 = (\GC_1, e_1, d_1)$, and a mapping of output wires of $c_0$ to input wires of $c_1$. 
+$\Link$ outputs the \textit{link} labels needed to convert the output wires $c_0$ to input wires $e_1$. 
+Suppose that output wire $W_i \in d_0$ has labels $(W_i^0, W_i^1)$, and input wire $W_j \in e_1$ has wire labels $(W_j^0, W_j^1)$.
+To link $W_i$ to $W_j$, $\Link$ outputs $W_{ij} = W_i^0 \oplus W_j^1$. 
+Since Free-XOR is being used, we have that $W_i^0 \oplus W_i^1 = W_j^0 \oplus W_j^1 = \Delta$ for some random value $\Delta$.
+$W_{ij}$ is sufficient to transform a wire label of $W_i$ to a wire label of $W_j$ while preserving their semantic value. 
+\al{Do we need more explanation of how chaining works here? I'm guessing another paragraph explaining how the Delta moves over}
+
+The $\Eval$ algorithm is based on the original $\Eval$ algorithm used in normal garbled circuits, but with chaining added where needed.
+The $\Eval$ algorithm takes as input a list of a garbled components and $\{c_i\}$, linking labels $\{W_{ij}\}$, and it outputs output labels $\{Y_i\}$. 
+\al{Why does it not take input labels as input also}.
+$\Eval$ starts with the inputs, and then proceeds component by component, evaluating each component in order to get the component output wire label.
+Where necessary, $\Eval$ uses component output wire labels and link labels to compute the appropriate input label for later components. 
+Once all components are evaluated, $\Eval$ recovers the garbled outputs $\{Y_i\}$ from the output components, and uses $d$ for that component to recover the real output $y$. 
+
+Let us think about how the two banks who use secure computation in their daily operations employ the three algorithms.
+At night, during the offline stage, the garbler-bank generates many circuit components, garbles them with $\Garble$, and sends the garbled circuits to the other evaluator-bank. 
+The garbler-bank and evaluator-bank also perform the offline phase of OT-preprocessing.
+During the day, when the banks decide that they need to compute some function $f$, they check that they have sufficient components to compute $f$. 
+If they do, the garbler-bank runs $\Link$ on the components used in $f$, and sends the output link-labels to the evaluator. 
+The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
+Now that the garbler has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
 
 \section{Security of Chaining}
+
+In this section, we show how to adapt the standard definition of privacy, presented in chapter 2, to component-based garbled circuits.
+%We want that for a set of components $\{c_i\}_{i \in \Components}$, the pre-garbled components $\{GC_i\}
+
 In this section we explain why chaining is secure.
 Informally, chaining is secure since the chaining values do not represent any semantic information, and the evaluator cannot infer any further information from them.
 The evaluator cannot XOR a chaining value with any other value and gain meaningful information.
 Say the evaluator has chaining value $W_{ij}$, chaining $W_i$ to $W_j$. 
 The evaluator learns nothing by xoring $W_{ij}$ with $W_i$ or $W_j$, and $W_{ij}$ is not associated with $W_k$ for all $k \neq i,j$, so the evaluator stands to learn nothing.
 
-To think about the security of chaining formally, we modify the experiement of classical garbled circuits to include the chaining step\footnote{The experiment for classical garbled circuits is given in Chapter 2}.
+To think about the security of chaining formally, we modify the experiment of classical garbled circuits to include the chaining step\footnote{The experiment for classical garbled circuits is given in Chapter 2}.
 We modify the experiment to the following:
 
 
 \section{Single Communication Multiple Connections}
 \textit{Single Communication Multiple Connections} (SCMC) is a method of reducing the number of linking values that Alice and Bob exchange.
-In the naive chaining scheme, online bandwidth sclaes linearly with the number of wires being chained, since a ciphertext is communicated per wire being chained.
+In the naive chaining scheme, online bandwidth scales linearly with the number of wires being chained, since a ciphertext is communicated per wire being chained.
 For some cases, this is a lot of communication.
 If Alice and Bob are chaining two garbled circuits that perform matrix multiplication on $100$ by $100$ matrices with entries that are 16 bits, then Alice sends $8,000$ ciphertexts to Bob - $8,000$ ciphertexts is 4 kBs.
 SCMC reduces the chaining operation to require a single ciphertext of communication: an $8,000$x improvement.
