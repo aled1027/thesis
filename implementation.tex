@@ -83,22 +83,7 @@ Algorithm \ref{alg:garbler-offline} outlines the garbler's offline implementatio
     \end{algorithmic}
 \end{algorithm}
 
-\section{\LibGarble and \JustGarble}
-
-\al{fix} \CompGC is written on top of \LibGarble.
-\LibGarble is a C library that is a fork of \JustGarble.
-\JustGarble was produced by BHR in 2012.
-All it does is create circuits, garble them, and evaluate them in very fast speeds.
-\LibGarble is a rework of \JustGarble in which the memory layout and other things are changed to speed up computation.
-
-\section{Our Implementation: \CompGC}
-\CompGC implements the theoretical ideas of naive chaining and SCMC.
-
-
-
-\section{Adding SCMC}
-
-\section{Experimental Setup}
+\section{Experiments}
 \CompGC experiments were run on an Intel Core i5-4210H CPU. 
 They were conducted over two network settings. 
 The first network setting ran both parties on the default localhost configuration, which was measured to have a latency of 0.012 ms and bandwidth of 25.2 Gb per second. 
@@ -114,12 +99,16 @@ CBC mode is an algorithm for encrypting messages of arbitrary length using a blo
 We again used a single round of AES as a component, and we also used XOR component, which took 256 bits of input, and outputted their xor. 
 For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, thus requiring 110 components - 100 for AES rounds and 10 for XOR. 
 
-talk about what computer was used, bandwidth, network simulation
-
-\section{Experiments}
-AES, CBC, Levenshtein
+Levenshtein distance is a dynamic algorithm that computes the distance between strings. 
+We use the Levensthein core circuit, as described by Huang et al. \cite{asdf}, as the only component. 
+See figure \ref{ads} for an outline of the core circuit. \al{add circuit}
+For our experiments, we used an 8-bit alphabet and ran Levenshtein distance on strings of length 30 symbols and on strings of length 60 symbols, corresponding to 900 and 3600 components respectively. 
 
 \section{Results}
+\al{Get table!}
+Table \ref{asdf} shows the results of the experiments explained above. 
+The columns denoted \Naive show times of our system using the standard component-based garbled circuits; and the column denoted SCMC uses SCMC to reduce communication. 
+
 
 
 
