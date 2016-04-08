@@ -36,6 +36,25 @@ Finally, the garbler and evaluator perform the offline phase of preprocessed obl
 The garbler finishes by saving the input labels and oblivious transfer data to disk, and similarly, the garbler saves the oblivious transfer data to disk. 
 Algorithms \ref{alg:garbler-offline} and \ref{alg:evaluator-offline} show the steps taken by each party in the offline phase. 
 
+In the online phase, the evaluator begins by loading up the function to be computed from disk. 
+We specify the function in a JSON format, in which the following information is laid out: components needed in the function, how components input and output wires are linked, where inputs should go, and what wires are outputs. 
+We chose to use JSON because the file format is human readable, but a different format, like something in binary, would be faster. 
+As the functions become more complex, it becomes harder to write the function specification files. 
+To overcome this, I wrote a python script that automatically generates the function specification file for various functions on arbitrary inputs. 
+
+After the garbler loads the functions specification file from disk, it generates a set of instructions for the evaluator. 
+The instructions specify what components are used by naming with the unique ID assigned in the offline phase. 
+The instructions further specify in what order to evaluate components, and in what order and how to link components. 
+This step requires specifying the output wires of one garbled circuit, the input wires of another garbled circuit, and the linking value.
+Finally, the instructions specify how to map the final output wire labels to bits; this essentially works by sending two-row garbled gates for each output wire. 
+
+After the garbler sends the instructions to the evaluator, they perform the online phase of oblivious transfer, whereby the evaluator acquires their input labels. 
+The garbler next sends the input labels corresponding to their inputs. 
+At this point, the evaluator has all the data they need to finish the protocol. 
+They follow the instructions, and acquire the output bits. 
+
+Algorithms \ref{alg:garbler-online} and \ref{alg:evaluator-online} summarize the online phase. 
+
 \begin{algorithm}
     \caption{Garbler Offline}
     \label{alg:garbler-offline}
@@ -64,7 +83,7 @@ Algorithms \ref{alg:garbler-offline} and \ref{alg:evaluator-offline} show the st
 
 \begin{algorithm}
     \caption{Garbler Online}
-    \label{alg:evaluator-offline}
+    \label{alg:garbler-online}
     \begin{algorithmic}
         \State 1. Load input labels and output labels of garbled circuits from disk
         \State 2. Load OT-preprocessing data from disk
@@ -79,7 +98,7 @@ Algorithms \ref{alg:garbler-offline} and \ref{alg:evaluator-offline} show the st
 
 \begin{algorithm}
     \caption{Evaluator Online}
-    \label{alg:evaluator-offline}
+    \label{alg:evaluator-online}
     \begin{algorithmic}
         \State 1. Load garbled circuits from disk
         \State 2. Load OT-preprocessing data from disk
@@ -115,6 +134,9 @@ For our experiments, we used an 8-bit alphabet and ran Levenshtein distance on s
 \al{Get table!}
 Table \ref{asdf} shows the results of the experiments explained above. 
 The columns denoted \Naive show times of our system using the standard component-based garbled circuits; and the column denoted SCMC uses SCMC to reduce communication. 
+
+\input{table-results-no-load}
+
 
 
 
