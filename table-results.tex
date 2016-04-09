@@ -38,15 +38,11 @@
         & 524 Mb & 25 Mb \\
     \end{tabular}
     \caption{Experimental results.
-        \Naive denotes
-        our implementation of standard semi-honest 2PC using garbled circuits and
-        preprocessed OTs using \LibGarble,
-        whereas \CompGC denotes our component-based implementation.
-        Time is (online) computation time, not
-        including the time to preprocess OTs, but including the time to load data
-        from disk.  All timings are of the \emph{evaluator's} running time, and are
-        the average of 100 runs, with the value after the $\pm$ denoting the
-        95\% confidence interval.
-    The communication reported is the number of bits received by the evaluator.}
+        \Naive denotes standard semi-honest 2PC using garbled circuits and preprocessed OTs using \LibGarble,
+        whereas \CompGC denotes our component-based implementation using SCMC. 
+        Time is online computation time, not including the time to preprocess OTs, but including the time to load data from disk.
+        All timings are of the evaluator's running time, and are the average of 100 runs, with the value after the $\pm$ denoting the 95\% confidence interval.
+        The communication reported is the number of bits received by the evaluator.
+    }
     \label{tbl:results}
 \end{table}

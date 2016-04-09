@@ -110,6 +110,8 @@ Algorithms \ref{alg:garbler-online} and \ref{alg:evaluator-online} summarize the
 \end{algorithm}
 
 \section{Experiments}
+\al{talk about size and construction of circuit}
+
 \CompGC experiments were run on an Intel Core i5-4210H CPU. 
 They were conducted over two network settings. 
 The first network setting ran both parties on the default localhost configuration, which was measured to have a latency of 0.012 ms and bandwidth of 25.2 Gb per second. 
@@ -131,10 +133,34 @@ See figure \ref{ads} for an outline of the core circuit. \al{add circuit}
 For our experiments, we used an 8-bit alphabet and ran Levenshtein distance on strings of length 30 symbols and on strings of length 60 symbols, corresponding to 900 and 3600 components respectively. 
 
 \section{Results}
+
+\al{Should I say that I didn't run the experiments? That seems relevant.}
+
+We ran experiments on the \CompGC system to compare component-based garbled circuits to standard 2PC garbled circuits, and to compare standard component-based garbled circuits to SCMC.
+
+Table \ref{tbl:results} shows the results of running the naive, standard 2PC garbled circuits to running \CompGC.
+This table shows the online evaluator computation time, including time to load data from disk. 
+The timings shown are the average of 100 trials, and the value after $\pm$ gives the 95\% confidence interval.
+We see that larger circuits - Levenshtein 60 - offer more time savings than smaller circuits - AES; this is expected, since standard garbled circuits require that the entire circuit is communicated during online time, whereas the component-based garbled circuits sends the circuit during the offline phase. 
+
+Table \ref{tbl:results-no-load} shows the same timing as table \ref{table-results} except we remove the time spent loading from disk.
+Since \CompGC employs an offline phase, data is loaded from disk in the online phase. 
+I personally find this table to be somewhat misleading - in what application do we assume that data is preloaded into RAM?
+Especialy data that was processed in the offline phase probably hours before.
+However, this is the a common method of reporting times in the literature \ref{blazing-fast} \al{probably add another reference}.
+
+Table \ref{tbl:results-scmc} compares the speed of standard component based garbled circuits to SCMC.
+We see approximately a 2x improvement for all of the experiments. 
+However, these experiments do not highlight the benefit of SCMC. 
+SCMC offers the greatest benefits in a large circuit where a large number of wires are used to represent a section of data.
+Levenshtein distance, while a large circuit, has a small data-size: the number of for 60 symbols is 6.
+Consider circuits where an entire matrix is moved around between circuits, a 10 by 10 matrix, would use $800$ wires if entries in the matrix were between $0$ and $256$.
+
+
+\newpage
 \input{table-results}
 \input{table-results-no-load}
 \input{table-scmc}
+\newpage
 
-Table \ref{tbl:results} shows the results of the experiments. 
-The columns denoted \Naive show times of \CompGC using the standard component-based garbled circuits, and the columns denoted SCMC show times using the SCMC technique to reduce communication.
 
