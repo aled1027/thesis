@@ -1,0 +1,52 @@
+%!TEX root = thesis.tex
+\begin{table}[h]
+
+    \scriptsize
+    %\footnotesize
+    %\small
+
+    \centering
+    \begin{tabular}{ r c c c c c c }
+        &\multicolumn{2}{c}{\textbf{Time (localhost)}}
+        &\multicolumn{2}{c}{\textbf{Time (simulated network)}}
+        &\multicolumn{2}{c}{\textbf{Communication}} \\
+        & \Naive & \CompGC & \Naive & \CompGC & \Naive & \CompGC  \\
+        \midrule
+        AES
+        & 4.4 $\pm$ 0.0 ms
+        & 3.0 $\pm$ 0.2 ms
+        & 542.6 $\pm$ 0.7 ms
+        & 68.5 $\pm$ 0.2 ms
+        & 24 Mb & 254 Kb \\
+        CBC mode, 10 blocks 
+        & 45.8 $\pm$ 4.0 ms
+        & 22.7 $\pm$ 1.4 ms
+        & 4.8 $\pm$ 0.0 s
+        & 216.7 $\pm$ 0.2 ms
+        & 235 Mb & 2.6 Mb \\
+        Levenshtein, 30 symbols
+        & 28.9 $\pm$ 6.6 ms
+        & 24.3 $\pm$ 1.2 ms
+        & 2.2 $\pm$ 0.0 s
+        & 315.9 $\pm$ 0.5 ms
+        & 108 Mb & 6.3 Mb \\
+        Levenshtein, 60 symbols
+        & 109.8 $\pm$ 7.0 ms
+        & 62.2 $\pm$ 0.7 ms
+        & 10.6 $\pm$ 0.0 s
+        & 742.5 $\pm$ 2.0 ms
+        & 524 Mb & 25 Mb \\
+    \end{tabular}
+    \caption{Experimental results.
+        \Naive denotes
+        our implementation of standard semi-honest 2PC using garbled circuits and
+        preprocessed OTs using \LibGarble,
+        whereas \CompGC denotes our component-based implementation.
+        Time is (online) computation time, not
+        including the time to preprocess OTs, but including the time to load data
+        from disk.  All timings are of the \emph{evaluator's} running time, and are
+        the average of 100 runs, with the value after the $\pm$ denoting the
+        95\% confidence interval.
+    The communication reported is the number of bits received by the evaluator.}
+    \label{tbl:results}
+\end{table}

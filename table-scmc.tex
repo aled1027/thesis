@@ -1,0 +1,31 @@
+%!TEX root = thesis.tex
+
+\begin{table}[h]
+    \small
+    \centering
+    \begin{tabular}{ r c c c c }
+        &\multicolumn{2}{c}{\textbf{Time (simulated network)}}
+        &\multicolumn{2}{c}{\textbf{Communication}} \\
+        & Standard & \scmc & Standard & \scmc \\
+        \midrule
+        AES
+        & 134.4 $\pm$ 0.1 ms
+        & 68.5 $\pm$ 0.2 ms
+        & 656 Kb & 254 Kb \\
+        CBC mode, 10 blocks 
+        & 321.5 $\pm$ 0.9 ms
+        & 216.7 $\pm$ 0.2 ms
+        & 7.4 Mb & 2.6 Mb \\
+        Levenshtein, 30 symbols
+        & 371.0 $\pm$ 0.9 ms
+        & 315.9 $\pm$ 0.5 ms
+        & 10.0 Mb & 6.3 Mb \\
+        Levenshtein, 60 symbols
+        & 1119.6 $\pm$ 2.1 ms
+        & 742.5 $\pm$ 2.0 ms
+        & 44 Mb & 25 Mb \\
+    \end{tabular}
+    \caption{Comparison of our two approaches for communicating linked values: the standard approach and the \scmc approach.
+    The experiments are run on the simulated network.}
+    \label{tbl:results-scmc}
+\end{table}
