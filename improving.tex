@@ -2,36 +2,36 @@
 \al{cite Mike Rosulek's talk and website}
 \al{Mike's website has all the sources...}
 \al{figure out why GRR3 is secure}
-\al{Ask about notation: $A_0$ verse $W_i^0$}
+\al{switch notation to $W_i^j$}
 
 The aim of this chapter is to outline new techniques that improve the performance of garbled circuits and discuss their costs and benfits.
 
-We consider three metrics to understand the costs benefits of the new techniques: size of the garbled table, garbler-side computation and evaluator-side computation
-\footnote{In this chapter, the term garbled table is used interchangeably with the fourth column of the garbled table.}.
+We consider three metrics to understand the costs benefits of the new techniques: size of the garbled table, garbler-side computation and evaluator-side computation.\footnote{In this chapter, the term garbled table is used interchangeably with the fourth column of the garbled table.}
 In the classic scheme of garbled circuits, the garbler and evaluator communicate wire labels of input wires and the fourth coumn of the garbled table for each gate.
 Communicating the input labels is an unavoidable cost; this information needs to be exchanged. 
 However, many of the input labels are exchanged with oblivious transfer, discussed in chapter 1, which has been improved.
 We discuss the improvement to oblivious transfer at the end of this chapter.
 
-New techniques also reduce the size of the garbled table, the other infomration exchanged between the garbler and evaluator.
-\footnote{In chapter 2, Alice was the garbler and Bob was the evaluator. For clarity in chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}.
+New techniques also reduce the size of the garbled table, the other infomration exchanged between the garbler and evaluator.\footnote{In chapter 2, Alice was the garbler and Bob was the evaluator. For clarity in chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}
 In the classical garbled circuit scheme, the evaluator sends all four rows of the garble table to the evaluator.
-New techiniques, wherein the evaluator samples wire labels \textit{intelligently}, reduce the number of rows of the garbled table that are communicated.
+New techniques, wherein the evaluator samples wire labels \textit{intelligently}, reduce the number of rows of the garbled table that are communicated.
 Reducing the size of the garbled table is important, because it is a measure of the bandwidth requirement of the scheme.
 The garbled table amount to most of the communication, and the number of garbled tables scales with the size of the circuit - that is, a larger circuit means more gates means more garbled tables.
 Moreover, bandwidth is the most important factor in assessing the performance of a garbled circuit scheme.
 This is because communication of the internet is slower than local computation.
 
-We also consider garbler-side computatoin, which is the number of encryptions that the garbler performs in preparing a garbled table.
+We also consider garbler-side computation, which is the number of encryptions that the garbler performs in preparing a garbled table.
 In the classical garbled circuit scheme, the garbler performs four encryptions; however, this number is not often reduced.
 Typically, the new techniques increase or alter the computation that the garbler performs.
 
 Finally, we consider evaluator-side computation, which is the number of decryptions the evaluator performs in ungarbling a gate - that is, finding the output wire label.
-In the Classical garbled circuit scheme, the evaluator trial decrypts each row until one of the decryptions is successful.
+In the classical garbled circuit scheme, the evaluator trial decrypts each row until one of the decryptions is successful.
 Hence, on average, the evaluator performs 2.5 decryptions.
 New techniques reduce the evaluator-side computation to require a single decryption, a good performance improvement.
 
-Table \ref{tbl:gc-costs} shows an overview of the cost of all improvements made to garble circuits.
+\input{table-improvements}
+
+Table \ref{tbl:improvements} shows an overview of the cost of all improvements made to garble circuits.
 The table is split into three sections: size, eval cost and garble cost, corresponding to three metrics mentioned above.
 Size is the number of rows in the garbled table.
 Eval cost is number of encryptions that the evaluator performs per gate, and decryptions is the number of decryptions that the garbler performs per gate.
@@ -39,49 +39,23 @@ Because many of the techniques have different effects on XOR gates and AND gates
 
 The goal of this chapter is primarily to explain each row in this table.
 We will understand the technique, and its associated computational and bandwidth costs.
-We start with the earliest technique and move chronological to the most recent improvement.
+We start with the earliest technique and move forward chronologically.
 
-\begin{table}[t]
-    \label{tbl:gc-costs}
-    \centering
-    \renewcommand{\arraystretch}{1.2}
-    \begin{adjustbox}{width=1\textwidth}
-        \begin{tabular}{|p{5cm}|c|c|c|c|c|c|c|}
-            \hline
-            \multirow{2}{5cm}{\centering \textbf{Garbled Circuit Improvement}} & 
-            \multicolumn{2}{c|}{\textbf{Size (x$\lambda$)}} & 
-            \multicolumn{2}{c|}{\textbf{Eval Cost}} & 
-            \multicolumn{2}{c|}{\textbf{Garble Cost}} &
-            \multirow{2}{3cm}{\centering \textbf{Assumption}} \\
-            \cline{2-7}
-            & \textbf{XOR} & \textbf{AND} & \textbf{XOR} & \textbf{AND}  & \textbf{XOR} & \textbf{AND} & \\
-            \hline
-            Classical & 4 & 4 & 1024 & $\mu$ s & a & b & a\\ \hline
-            Point and Permute & TBD & TBD & TBD & $\mu$ s & a & b & a\\ \hline
-            GRR3 & TBD & TBD & TBD & $\mu$ s  & a & b& a\\ \hline
-            Free XOR & TBD & TBD & TBD & $\mu$ & a & bs& a  \\ \hline
-            GRR2 XOR & TBD & TBD & TBD & $\mu$ & a & bs  & a\\ \hline
-            FleXOR& TBD & TBD & TBD & $\mu$ & a & bs & a \\ \hline
-            Half Gates & 2 & 0 & 2 & 0 & 4 & 0 & a \\ \hline
-        \end{tabular}
-    \end{adjustbox}
-    \caption{Summary of Garbled Circuit Improvements. GRR3 stands for garbled row reduction 3 and GRR2 stands for garbled row reduction 2. \al{two halves make a whole paper}}
-\end{table}
 
 \section{Point and Permute}
 \al{add to chapter 2 that rows need to be permuted!}
 
-The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which row of the garbled table to decrypt.
-Recall that the garbled table is randomly permuted - that is, garbler randomly reorders the rows of the garbled table before sending the garbled table to the evaluator \footnote{This is required for security. See chapter 2 for more information}.
-Upon receiving the circuit, the evaluator trial decrypts each row of the garbled table until a decryption succeeds \footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see chapter 1.}.
+The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which row of the garbled table to decrypt, and the evaluator only decrypts that ciphertext.
+
+In the classic garbled cricuit scheme, the garbled table is randomly permuted - that is, the garbler randomly reorders the rows of the garbled table before sending the garbled table to the evaluator.\footnote{This is required for security. See chapter 2 for more information}
+Upon receiving the garbled table, the evaluator trial decrypts each row of the garbled table until a decryption succeeds.\footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see chapter 1.}
 
 Point and permute enables the evaluator to bypass the trial decryption step, so that they decrypt the correct wire label the first time.
-When garbling a gate, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire lables of the same wire have opposite bits.
-More formally, $b$ is randomly sampled from $\{0,1\}$.
-Then $A_0$ gets select bit $b$ and $A_1$ gets select bit $1-b$.
+In point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire lables of the same wire have opposite bits.
+More formally, the garble randomly samples $b$ from $\{0,1\}$, and then gives $A_0$ select bit $b$ and gives $A_1$ select bit $1-b$.
 The garbler permutes the garbled table based on the select bits, and appends the select bits each wire label.
 When the evaluator ungarbles the gate, they use the select bits appended to each of the two input wire labels to determine which row to decrypt.
-For example, if the select bits on the end of the input wire labels are 1 and 0, then the evaluator decryps the third row.
+For example, if the select bits on the end of the input wire labels are 1 and 0, then the evaluator decrypts the third row.
 
 Tables \ref{tbl:point-and-permute} show an example of point and permute.
 $A, B$ and $C$ are wires, where $A_0$ and $A_1$ are the zeroith and first wire label of wire $A$ respectively.

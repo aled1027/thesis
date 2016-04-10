@@ -1,0 +1,32 @@
+\begin{table}[t]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \normalsize
+    \begin{adjustbox}{width=1\textwidth}
+        \begin{tabular}{|p{5cm}|c|c|c|c|c|c|}
+            \hline
+            \multirow{2}{5cm}{\centering \textbf{Garbled Circuit Improvement}} & 
+            \multicolumn{2}{c|}{\textbf{Table Size (x$\lambda$)}} & 
+            \multicolumn{2}{c|}{\textbf{Garble Cost}} & 
+            \multicolumn{2}{c|}{\textbf{Eval Cost}} \\
+            \cline{2-7}
+            & \textbf{XOR} & \textbf{AND} & \textbf{XOR} & \textbf{AND}  & \textbf{XOR} & \textbf{AND} \\
+            \hline
+            Classical & 4 & 4 & 4 & 4 & 4 & 4 \\ \hline
+            Point and Permute & 4 & 4 & 4 & 4 & 1 & 1 \\ \hline
+            GRR3 & 3 & 3 & 4 & 4  & 1 & 1 \\ \hline
+            Free XOR & 0 & 3 & 0 & 4 & 0 & 1  \\ \hline
+            GRR2  & 2 & 2 & 4 & 4 & 1 & 1  \\ \hline
+            FleXOR & \{0,1,2\} & 2 & \{0,2,4\} & 4 & \{0,1,2\} & 1  \\ \hline
+            Half Gates & 2 & 0 & 2 & 0 & 0 & 2  \\ \hline
+        \end{tabular}
+    \end{adjustbox}
+    \caption{Summary of Garbled Circuit Improvements. 
+    GRR3 stands for garbled row reduction three and GRR2 stands for garbled row reduction two. 
+    The values shown for each improvement include benefits from point and permute and other compatible improvements: 
+    Free XOR uses GRR3; FleXOR uses GRR2 and Free XOR; and Half Gates use FreeXOR.
+    This table is adapted from \cite{twohalves}.}
+    \label{tbl:improvements}
+\end{table}
+
+

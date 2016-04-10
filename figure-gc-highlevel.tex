@@ -1,0 +1,28 @@
+%!TEX root = thesis.tex
+
+\begin{figure}
+\centering
+%\footnotesize
+\scriptsize
+\begin{center}
+\fbox{
+\begin{protocol}{2}
+%\protocolheader{High Level Garbled Circuit}
+\participants{Alice}{Bob}\\
+\text{Input $x$} & & \text{Input $y$}\\
+\C \gets {\sf CreateCircuit}(f) \\
+\GC, \InputLabels \gets {\sf GarbleCircuit(C)} \\
+\InputLabels_x, \InputLabels_y \gets \InputLabels \\
+& \sends{\GC} \\
+& \sends{\InputLabels_x} \\
+& \sends{\InputLabels_y \text{ via OT}} \\
+& & {\sf Evaluate(\GC, \InputLabels_x, \InputLabels_y)} \\
+%& \exchange{\OT(\AllInputLabels, $y$)} & \InputLabels \\
+%& \sends{\InputLabels} & \InputLabels \\
+% %& \receives{z} \\
+\end{protocol}}
+\end{center}
+\caption{A high level overview of the garbled circuit protocol}
+\label{fig:gc-highlevel}
+\end{figure}
+
