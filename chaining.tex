@@ -2,17 +2,16 @@
 
 \chapter{Chaining Garbled Circuits}
 
-In this chapter we introduce component-based garbled circuits.
-Component-based garbled circuits allow for most of the work involved in building and communicating a garbled circuit to occur in an offline phase before the inputs or function to compute are known. 
-This offers a significant improvement to the online performance of garbled circuits. 
+In this chapter we introduce component-based garbled circuits, a method that allows for most of the work involved in building and communicating a garbled circuit to occur in an offline phase before the inputs or function to compute are known. 
+This offers significant improvements to the online performance of garbled circuits. 
 
+\al{can clean up this paragraph 2nd and 3rd sentences don't link}
 We begin with the observation that most functions are composed of many smaller components. 
 For example, many statistical functions are a composition of matrix and arithmetic operations.
 The gist of component-based garbled circuits is then to build and communicate many garbled components in the offline stage. 
 Then, in the online stage, the garbler and evaluator choose their inputs and a function a compute. 
 The garbler communicates input labels and auxiliary information, to be discusses, to the evaluator, who stitches together the garbled components into the larger function.
 
-The idea may make more sense with a real world example. 
 Imagine that two banks integrate secure computation into their daily transactions.
 At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
 The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
@@ -22,6 +21,9 @@ The computational requirements for the banks, when they compute the function, is
 
 In this section we describe how to chain together garbled circuits.
 
+\al{explain higher level idea -- the method works by taking the output wires of one garbled circuit and converting them to a valid input wire of another garbled circuit}
+\al{it turns out that this process can happen quite efficiently}
+
 Suppose that Alice and Bob are chaining two garbled circuits.
 During an offline phase, Alice garbles many circuits and sends them Bob.
 Later, during the online phase, Alice sends Bob input labels, some via oblivious transfer, and then Alice sends Bob \textit{link} labels.
@@ -30,10 +32,11 @@ Say that Alice and Bob want to set output wire $W_i$ of a garbled circuit to the
 We suppose that Alice and Bob are using Free XOR, where each garbled circuit uses the same global $\Delta$.
 
 We formally describe component-based garbled circuits as a tuple of three algorithms $(\Garble, \Link, \Eval)$.
-The $\Garble$ algorithm is the same algorithm as before; it takes as inputs a circuit $\C$ and outputs a garbled circuit $\GC$. 
+The $\Garble$ algorithm is the same algorithm that we used before to garble circuits; it takes as inputs a circuit $\C$ and outputs a garbled circuit $\GC$. 
+\al{doesn't it also output the wires???}
 We extend the $\Garble$ algorithm to also take a component-circuit $c$ as input, instead of a complete circuit $\C$, which outputs a garbled component $\GC_c$, input wire set $e_c$ and output wire set $d_c$. 
 
-The $\Link$ algorithm is new and designed for component-based garbled circuits. 
+The $\Link$ algorithm is unique to component-based garbled circuits, and it produces the information neccessary for linking.
 $\Link$ takes as input two garbled components $c_0 = (\GC_0, e_0, d_0)$ and $c_1 = (\GC_1, e_1, d_1)$, and a mapping of output wires of $c_0$ to input wires of $c_1$. 
 $\Link$ outputs the \textit{link} labels needed to convert the output wires $c_0$ to input wires $e_1$. 
 Suppose that output wire $W_i \in d_0$ has labels $(W_i^0, W_i^1)$, and input wire $W_j \in e_1$ has wire labels $(W_j^0, W_j^1)$.
