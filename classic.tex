@@ -109,10 +109,10 @@ We think of $\{S_B(y, f(x,y)\}_{y \in \{0,1\}^*}$ for Bob's input similarly.
 
 In the real world, we need to consider what information Alice and Bob have at their disposal.
 Recall that Alice and Bob are semi-honest, which means that Alice and Bob follow all instructions of $\Pi$, but they use any information they receive along the way.
-More precisely, Alice and Bob obey the protocol, but also maintain a record of all intermediate computations.
-We call Alice's record of intermediate computations Alice's \textit{view}, $\viewrv_A(x, y)$, which depends on inputs $x$ and $y$
+More precisely, Alice and Bob obey the protocol, but also maintain a record of all messages sent and received.
+We call Alice's record of communications Alice's \textit{view}, $\viewrv_A(x, y)$, which depends on inputs $x$ and $y$
 And now we create the probability distribution for Alice: $\{\viewrv_A(x, y)\}_{x, y \in \{0,1\}^*}$.
-This distribution represents the Alice's information from the intermediate computation indexed over all possible inputs $x$ and $y$.
+This distribution represents the Alice's information from the exchanged messages indexed over all possible inputs $x$ and $y$.
 Likewise, we call Bob's record of intermediate computations Bob's view,  $\viewrv_B(x, y)$, and his probability distribution of intermediate computations is $\{\viewrv_B(x, y)\}_{x,y \in \{0,1\}^*}\}$
 
 To wrap it up, if $\Pi$ in the real world is the same as the Alice, Bob and Carlo in the ideal world, then the simulator $S_A$ and $S_B$ should only be able to learn what can be learned from the intermediate computations. 
@@ -153,6 +153,9 @@ Bob decrypts the circuit, acquring the output of $f(x,y)$ at the end.
 
 \begin{figure}
 \label{fig:gc-highlevel}
+\centering
+%\footnotesize
+\scriptsize
 \begin{center}
 \fbox{
 \begin{protocol}{2}
@@ -160,21 +163,28 @@ Bob decrypts the circuit, acquring the output of $f(x,y)$ at the end.
 \participants{Alice}{Bob}\\
 \text{Input $x$} & & \text{Input $y$}\\
 \C \gets {\sf CreateCircuit}(f) \\
-\GC, \AllInputLabels \gets {\sf GarbleCircuit(C)} & \sends{\GC} \\
-& \exchange{\OT(\AllInputLabels, $y$)} & \InputLabels \\
-& \sends{\InputLabels} & \InputLabels \\
-& & z \gets {\sf DegarbleCircuit}(\GC, \InputLabels) \\
-& \receives{z} \\
+\GC, \InputLabels \gets {\sf GarbleCircuit(C)} \\
+\InputLabels_x, \InputLabels_y \gets \InputLabels \\
+& \sends{\GC} \\
+& \sends{\InputLabels_x} \\
+& \sends{\InputLabels_y \text{ via OT}} \\
+& & {\sf Evaluate(\GC, \InputLabels_x, \InputLabels_y)} \\
+%& \exchange{\OT(\AllInputLabels, $y$)} & \InputLabels \\
+%& \sends{\InputLabels} & \InputLabels \\
+% %& \receives{z} \\
 \end{protocol}}
 \end{center}
-\caption{A high level overview of the garbled circuit protocol}
+\caption{A high level overview of the garbled circuit protocol \al{ask cat - text too small?}}
 \end{figure}
 
 
 
+
 \begin{figure}[h]
+    \center
     \label{fig:thefig}
 \centering
+
 \begin{circuitikz} \draw
 % http://tex.stackexchange.com/questions/55213/how-to-draw-a-boolean-circuit-diagram-in-circuitikz
 % http://texdoc.net/texmf-dist/doc/latex/circuitikz/circuitikzmanual.pdf
@@ -194,8 +204,22 @@ Bob decrypts the circuit, acquring the output of $f(x,y)$ at the end.
 (d) -| (myand2.in 2)
 (myand1.out) -| (myxor.in 1)
 (myand2.out) -| (myxor.in 2)
-(myxor.out) -| (f)
-;\end{circuitikz}
+(myxor.out) -| (f);
+\node at (-.7,2.0) {$G_0$};
+\node at (-.7,0.0) {$G_1$};
+\node at (2.4,1.0) {$G_2$};
+
+\node at (-1.7,2.5) {$W_0$};
+\node at (-1.7,2.0) {$W_1$};
+\node at (-1.7,0.5) {$W_2$};
+\node at (-1.7,0.0) {$W_3$};
+\node at (0.7,2.3) {$W_4$};
+\node at (0.7,0.3) {$W_5$};
+
+\node at (3.35,1.25) {$W_5$};
+
+
+\end{circuitikz}
 \caption{A simple boolean circuit. \al{Draw gate and wire number notation in here}}
 \end{figure}
 
