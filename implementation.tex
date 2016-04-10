@@ -125,14 +125,16 @@ We again used a single round of AES as a component, and we also used XOR compone
 For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, thus requiring 110 components - 100 AES round components and 10 XOR components. 
 
 Levenshtein distance is a dynamic algorithm that computes the distance between two strings. 
-We use the Levensthein core circuit, as described by Huang et al. \cite{asdf}, as the only component; see figure \ref{fig:leven-core}.
+We use the Levensthein core circuit, as described by \cite{faster2pc}, as the only component; see figure \ref{fig:leven-core}.
 See figure \ref{ads} for an outline of the core circuit. \al{add circuit}
 For our experiments, we used an 8-bit alphabet and ran Levenshtein distance on strings of length 30 symbols and on strings of length 60 symbols, corresponding to 900 and 3600 components respectively. 
 
 \begin{figure}
     \center
     \includegraphics[scale=0.3]{leven_core}
-    \caption{add caption}
+    \caption{The component used in the Levenshein distance algorirthm. 
+    Levenshtein distance is a dynamic algorithm, and this is the only component used. 
+    This particular version of the component was optimized by \cite{faster2pc}.}
     \label{fig:leven-core}
 \end{figure}
 
@@ -142,16 +144,15 @@ For our experiments, we used an 8-bit alphabet and ran Levenshtein distance on s
 
 We ran experiments on the \CompGC system to compare component-based garbled circuits to standard 2PC garbled circuits, and to compare standard component-based garbled circuits to SCMC.
 
-Table \ref{tbl:results} shows the results of running the naive, standard 2PC garbled circuits to running \CompGC.
-This table shows the online evaluator computation time, including time to load data from disk. 
-The timings shown are the average of 100 trials, and the value after $\pm$ gives the 95\% confidence interval.
+Table \ref{tbl:results} shows the online evaluator computation time, including time to load data from disk, of standard 2PC garbled circuits (implemented inside of the \CompGC system) and component-based garbled circuits with SCMC.
+We give the average time of 100 trials and the 95\% confidence interval, the value after the $\pm$.
 We see that larger circuits - Levenshtein 60 - offer more time savings than smaller circuits - AES; this is expected, since standard garbled circuits require that the entire circuit is communicated during online time, whereas the component-based garbled circuits sends the circuit during the offline phase. 
 
-Table \ref{tbl:results-no-load} shows the same timing as table \ref{table-results} except we remove the time spent loading from disk.
+Table \ref{tbl:results-no-load} shows the same timing as table \ref{tbl:results} except we remove the time spent loading from disk.
 Since \CompGC employs an offline phase, data is loaded from disk in the online phase. 
 I personally find this table to be somewhat misleading - in what application do we assume that data is preloaded into RAM?
-Especialy data that was processed in the offline phase probably hours before.
-However, this is the a common method of reporting times in the literature \ref{blazing-fast} \al{probably add another reference}.
+Especially data that is processed in the offline phase hours or days before.
+However, this is a common method of reporting times in the literature \cite{blazing-fast} \al{probably add another reference}.
 
 Table \ref{tbl:results-scmc} compares the speed of standard component based garbled circuits to SCMC.
 We see approximately a 2x improvement for all of the experiments. 
