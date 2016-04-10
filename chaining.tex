@@ -18,11 +18,12 @@ The computational requirements for the banks, when they compute the function, is
 
 \section{Chaining}
 
-
 In this section we describe how to chain together garbled circuits.
-
-\al{explain higher level idea -- the method works by taking the output wires of one garbled circuit and converting them to a valid input wire of another garbled circuit}
-\al{it turns out that this process can happen quite efficiently}
+Chaining, or stitching together two garbled circuits, essentially takes the output wires of one garbled circuits and converts them into valid input wires of another garbled circuit while retaining the semantic value of the input wires.
+For example, say a garbled circuit has two output wires that are chained to a garbled circuit with two input wires.
+Unbeknownst to the garbler or evaluator, the output wires both semantically represent 0, so the evaluator must acquire the input labels semantically representing zero.
+One naive method of chaining is to send a garbled table, where the table encrypts the input labels using the output labels.
+However, a better method exists.
 
 Suppose that Alice and Bob are chaining two garbled circuits.
 During an offline phase, Alice garbles many circuits and sends them Bob.
@@ -32,25 +33,23 @@ Say that Alice and Bob want to set output wire $W_i$ of a garbled circuit to the
 We suppose that Alice and Bob are using Free XOR, where each garbled circuit uses the same global $\Delta$.
 
 We formally describe component-based garbled circuits as a tuple of three algorithms $(\Garble, \Link, \Eval)$.
-The $\Garble$ algorithm is the same algorithm that we used before to garble circuits; it takes as inputs a circuit $\C$ and outputs a garbled circuit $\GC$. 
-\al{doesn't it also output the wires???}
+The $\Garble$ algorithm is the same algorithm that we used before to garble circuits; it takes as inputs a circuit $\C$ and outputs three pieces of information: a garbled circuit $\GC$, a set of input wires $e_{\C}$, and a set of output wires $d_{\C}$.
 We extend the $\Garble$ algorithm to also take a component-circuit $c$ as input, instead of a complete circuit $\C$, which outputs a garbled component $\GC_c$, input wire set $e_c$ and output wire set $d_c$. 
 
 The $\Link$ algorithm is unique to component-based garbled circuits, and it produces the information neccessary for linking.
 $\Link$ takes as input two garbled components $c_0 = (\GC_0, e_0, d_0)$ and $c_1 = (\GC_1, e_1, d_1)$, and a mapping of output wires of $c_0$ to input wires of $c_1$. 
-$\Link$ outputs the \textit{link} labels needed to convert the output wires $c_0$ to input wires $e_1$. 
+$\Link$ outputs the \textit{link} labels needed to convert the output wires $d_0$ to input wires $e_1$. 
 Suppose that output wire $W_i \in d_0$ has labels $(W_i^0, W_i^1)$, and input wire $W_j \in e_1$ has wire labels $(W_j^0, W_j^1)$.
 To link $W_i$ to $W_j$, $\Link$ outputs $W_{ij} = W_i^0 \oplus W_j^1$. 
 Since Free-XOR is being used, we have that $W_i^0 \oplus W_i^1 = W_j^0 \oplus W_j^1 = \Delta$ for some random value $\Delta$.
-$W_{ij}$ is sufficient to transform a wire label of $W_i$ to a wire label of $W_j$ while preserving their semantic value. 
-\al{Do we need more explanation of how chaining works here? I'm guessing another paragraph explaining how the Delta moves over}
+$W_{ij}$ is sufficient to transform a wire label of $W_i$ to a wire label of $W_j$ while preserving the semantic value. 
+The semantic value is preservered because the $\Delta$ is present in $W_j^*$ if and only if $\Delta$ is present in $W_i^*$; xoring by $\Delta$ simply transform $W_i^0$ to $W_j^0$ and leaves the $\Delta$ alone.
 
-The $\Eval$ algorithm is based on the original $\Eval$ algorithm used in normal garbled circuits, but with chaining added where needed.
-The $\Eval$ algorithm takes as input a list of a garbled components and $\{c_i\}$, linking labels $\{W_{ij}\}$, and it outputs output labels $\{Y_i\}$. 
-\al{Why does it not take input labels as input also}.
+The $\Eval$ algorithm evaluates the garbled components and links garbled circuits where necessary.
+It takes three inputs: a list of a garbled components $\{c_i\}$, linking labels $\{W_{ij}\}$ and input labels $\{W_i\}$, and it outputs output labels $\{Z_i\}$. 
 $\Eval$ starts with the inputs, and then proceeds component by component, evaluating each component in order to get the component output wire label.
 Where necessary, $\Eval$ uses component output wire labels and link labels to compute the appropriate input label for later components. 
-Once all components are evaluated, $\Eval$ recovers the garbled outputs $\{Y_i\}$ from the output components, and uses $d$ for that component to recover the real output $y$. 
+Once all components are evaluated, $\Eval$ recovers the garbled outputs $\{Z_i\}$ from the output components, and uses $d$ for that component to recover the real output $y$. 
 
 Let us think about how the two banks who use secure computation in their daily operations employ the three algorithms.
 At night, during the offline stage, the garbler-bank generates many circuit components, garbles them with $\Garble$, and sends the garbled circuits to the other evaluator-bank. 
@@ -59,7 +58,6 @@ During the day, when the banks decide that they need to compute some function $f
 If they do, the garbler-bank runs $\Link$ on the components used in $f$, and sends the output link-labels to the evaluator. 
 The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
 Now that the garbler has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
-\al{change output to Z, instead of y --- y is bob's input}
 
 \section{Security of Chaining}
 
@@ -83,7 +81,7 @@ The pre-garbled components, output map and input labels do not reveal any inform
 The wire labels are the xor of two random values, hence they themselves do not reveal any semantic information about the value of a wire. 
 Moreover, the link labels cannot be used in conjunction with any wire labels to gain any further information.
 
-It should be noted that this not even close to a formal proof of security of component-based garbled circuits. 
+It should be noted that this not even close to a formal proof of security.
 A formal proof is long, and beyond the scope of this project; rather, this section highlights the intuition behind why we believe a formal proof of security to be possible. 
 
 \section{Single Communication Multiple Connections}

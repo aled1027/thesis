@@ -3,3 +3,8 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 
 ## Various Resources
 http://tex.stackexchange.com/questions/55213/how-to-draw-a-boolean-circuit-diagram-in-circuitikz
+
+## Conventions
+- `W_i^j`
+- `W_i^*`
+- Inputs x and y and output z
