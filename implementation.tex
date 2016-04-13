@@ -3,18 +3,17 @@
 \chapter{Implementation}
 
 I implemented the theoretical ideas of component-based garbled circuits and SCMC in a program called \CompGC. 
+The aim of \CompGC is to run a two party garbled circuit protocol from start to finish. 
+The garbler and evaluator simply select a function to compute, plug their inputs into the system, and \CompGC securely computes the function.
 This chapter describes the creation of \CompGC and presents experimental results. 
 
-\al{bad flow}
-The aim of \CompGC is to run a two party garbled circuit protocol from start to finish. 
-\CompGC has a garbler-side and an evaluator-side, which is specified with command line arguments.
-It operates in two phases.
-In the first phase, the offline phase, the garbler sends garbled circuits to the evaluator, and they perform the offline phase of OT-preprocessing.
-In the second phase, the online phase, the garbler sends input labels for the garbled circuits, some of which are exchanged via the online phase of OT-preprocessing, instructions for chaining the garbled circuits, and output garbled circuits which are garbled circuits composed of a single, unary gate that encode the real output of the function being processed.
+\CompGC has four basic settings: garbler-offline, garbler-online, evaluator-offline and evaluator-online.
+In the offline phase, the garbler sends garbled circuits to the evaluator, and they perform the offline phase of OT-preprocessing.
+In the online phase, the garbler sends input labels for the garbled circuits, some of which are exchanged via the online phase of OT-preprocessing, instructions for chaining the garbled circuits, and output garbled circuits which are garbled circuits composed of a single, unary gate that encode the real output of the function being processed.
 The following section gives more details on \CompGC.
 
 \section{\CompGC}
-\CompGC originally started with \JustGarble as the basic building block.
+\CompGC started with \JustGarble as its basic building block.
 \JustGarble is a C-library written by Bellare et al. \cite{justgarble} that creates a garbled circuit given an inputted circuit, and evaluates the garbled circuit given input labels. 
 It is a tool, supporting only garbling and evaluating operations, but does not perform the many operations needed for a whole secure system, like networking, oblivious transfer, and secure recovery of final outputs. 
 
@@ -46,7 +45,7 @@ The instructions further specify in what order to evaluate components, and in wh
 This step requires specifying the output wires of one garbled circuit, the input wires of another garbled circuit, and the linking value.
 Finally, the instructions specify how to map the final output wire labels to bits; this works by sending unary gates, with a two-row garbled table, for each output wire. 
 
-After the garbler sends the instructions to the evaluator, they perform the online phase of oblivious transfer, whereby the evaluator acquires their input labels. 
+After the garbler sends the instructions to the evaluator, they both perform the online phase of oblivious transfer, whereby the evaluator acquires their input labels. 
 The garbler next sends the input labels corresponding to their inputs. 
 At this point, the evaluator has all the data they need to finish the protocol. 
 They follow the instructions, and acquire the output bits. 
@@ -125,8 +124,7 @@ We again used a single round of AES as a component, and we also used XOR compone
 For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, thus requiring 110 components - 100 AES round components and 10 XOR components. 
 
 Levenshtein distance is a dynamic algorithm that computes the distance between two strings. 
-We use the Levensthein core circuit, as described by \cite{faster2pc}, as the only component; see figure \ref{fig:leven-core}.
-See figure \ref{ads} for an outline of the core circuit. \al{add circuit}
+We use the Levensthein core circuit, as described by \cite{faster2pc}, as the only component; see figure \ref{fig:leven-core} for a description of the component.
 For our experiments, we used an 8-bit alphabet and ran Levenshtein distance on strings of length 30 symbols and on strings of length 60 symbols, corresponding to 900 and 3600 components respectively. 
 
 \begin{figure}
@@ -134,7 +132,7 @@ For our experiments, we used an 8-bit alphabet and ran Levenshtein distance on s
     \includegraphics[scale=0.3]{leven_core}
     \caption{The component used in the Levenshein distance algorirthm. 
     Levenshtein distance is a dynamic algorithm, and this is the only component used. 
-    This particular version of the component was optimized by \cite{faster2pc}.}
+    This particular version of the component was designed by \cite{faster2pc}.}
     \label{fig:leven-core}
 \end{figure}
 
@@ -159,8 +157,7 @@ We see approximately a 2x improvement for all of the experiments.
 However, these experiments do not highlight the benefit of SCMC. 
 SCMC offers the greatest benefits in a large circuit where a large number of wires are used to represent a section of data.
 Levenshtein distance, while a large circuit, has a small data-size: the number of for 60 symbols is 6.
-Consider circuits where an entire matrix is moved around between circuits, a 10 by 10 matrix, would use $800$ wires if entries in the matrix were between $0$ and $256$.
-
+Consider circuits where an entire matrix is moved around between circuits; for example, linking a 10 by 10 matrix uses $800$ link labels if entries in the matrix were between $0$ and $256$, but SCMC uses a single link label.
 
 \newpage
 \input{table-results}

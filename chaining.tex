@@ -5,12 +5,12 @@
 In this chapter we introduce component-based garbled circuits, a method that allows for most of the work involved in building and communicating a garbled circuit to occur in an offline phase before the inputs or function to compute are known. 
 This offers significant improvements to the online performance of garbled circuits. 
 
-\al{can clean up this paragraph 2nd and 3rd sentences don't link}
 We begin with the observation that most functions are composed of many smaller components. 
-For example, many statistical functions are a composition of matrix and arithmetic operations.
-The gist of component-based garbled circuits is then to build and communicate many garbled components in the offline stage. 
-Then, in the online stage, the garbler and evaluator choose their inputs and a function a compute. 
-The garbler communicates input labels and auxiliary information, to be discusses, to the evaluator, who stitches together the garbled components into the larger function.
+For example, many statistical operations are a composition of matrix operations; smith-waterman and levenshtein distance, two algorithms important to analyzing genomes, are dynamic algorithm that run a single procedure inside a for loop; and encrypting arbitrary length messages via modes of operation repeats the encryption algorithm a number of times.
+
+The gist of component-based garbled circuits is then to build and communicate many garbled components in the offline stage.
+Later, in the online stage, the garbler and evaluator choose their inputs, choose a function a compute, and compute the function using the pre-communicated garbled components.
+In the online phase, the garbler only communicates input labels and auxiliary information to the evaluator, who stitches together the garbled components into the larger function.
 
 Imagine that two banks integrate secure computation into their daily transactions.
 At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
@@ -130,45 +130,3 @@ First, SCMC alters the generation of some wire labels.
 The new method of generating wire labels is secure since $H$ is random function, hence $H(\cdot)$ blinds $A$ and $B$.
 In particular, the wire labels are only distinguishable if the evaluator can determine $T$, which is not possible since $H$ is a random function.
 Therefore, SCMC is intuitively secure. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
