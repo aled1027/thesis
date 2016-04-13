@@ -6,47 +6,53 @@ In this chapter we introduce component-based garbled circuits, a method that all
 This offers significant improvements to the online performance of garbled circuits. 
 
 We begin with the observation that most functions are composed of many smaller components. 
-For example, many statistical operations are a composition of matrix operations; smith-waterman and levenshtein distance, two algorithms important to analyzing genomes, are dynamic algorithm that run a single procedure inside a for loop; and encrypting arbitrary length messages via modes of operation repeats the encryption algorithm a number of times.
-
-The gist of component-based garbled circuits is then to build and communicate many garbled components in the offline stage.
-Later, in the online stage, the garbler and evaluator choose their inputs, choose a function a compute, and compute the function using the pre-communicated garbled components.
-In the online phase, the garbler only communicates input labels and auxiliary information to the evaluator, who stitches together the garbled components into the larger function.
+For example, many statistical operations are a composition of matrix operations; smith-waterman and Levenshtein distance, two algorithms important to analyzing genomes, are dynamic algorithm that run a single procedure inside a for loop; and encrypting arbitrary length messages via modes of operation repeats the encryption algorithm a number of times.
+The gist of component-based garbled circuits is then to build and communicate many small, garbled components in the offline stage.
+Later, in the online stage, the garbler and evaluator combine the pre-communicated components to form a larger function. 
+They compute each component individually, linking wire labels from one component to another as needed. 
 
 Imagine that two banks integrate secure computation into their daily transactions.
 At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
 The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
 
-\section{Chaining}
-
+\section{How to chain}
 In this section we describe how to chain together garbled circuits.
-Chaining, or stitching together two garbled circuits, essentially takes the output wires of one garbled circuits and converts them into valid input wires of another garbled circuit while retaining the semantic value of the input wires.
-For example, say a garbled circuit has two output wires that are chained to a garbled circuit with two input wires.
-Unbeknownst to the garbler or evaluator, the output wires both semantically represent 0, so the evaluator must acquire the input labels semantically representing zero.
-One naive method of chaining is to send a garbled table, where the table encrypts the input labels using the output labels.
-However, a better method exists.
+At a coarse level, chaining looks like figure \ref{fig:chaining-course} where the input to some some garbled components is the output of other garbler components. 
+To chain, or stitch together, two garbled components, the evaluator needs to transform an output wire label of one component into a valid input wire label of another component, while preserving the semantic value of the wires. 
+In figure \ref{fig:chaining-coarse} the zeroth output wire of $c_0$, $U_0$, needs to transform into the zeroth input wire of $c_1$, $W_0$. 
 
-Suppose that Alice and Bob are chaining two garbled circuits.
-During an offline phase, Alice garbles many circuits and sends them Bob.
-Later, during the online phase, Alice sends Bob input labels, some via oblivious transfer, and then Alice sends Bob \textit{link} labels.
-A link label converts an output wire from one garbled circuit to an input wire of another garbled circuit.
-Say that Alice and Bob want to set output wire $W_i$ of a garbled circuit to the input wire $W_j$ of another garbled circuit.
-We suppose that Alice and Bob are using Free XOR, where each garbled circuit uses the same global $\Delta$.
+Chaining, or stitching together two garbled circuits, essentially takes the output wires of one garbled circuits and converts them into valid input wires of another garbled circuit while retaining the semantic value of the input wires.
+Consider figure \ref{fig:chaining} where three output wires of component $c_0$ are chained to three input wires of component $c_1$. 
+We specifically desire that the evaluator transform $U_0^0$ into $W_0^0$ and $U_0^1$ into $W_0^1$. 
+
+To achieve this transformation, the garbler sends the evaluator a link label.
+A link label is a ciphertext that allows the evaluator to transform the output wire label into the appropriate wire label. 
+Suppose that the garbling uses Free XOR where each component uses the same $\Delta$, that is, $U_0^0 \oplus U_0^1 = W_0^0 \oplus W_0^1 = \Delta$, then it is sufficient for the link label $L_{UW}$ to be $U_0^0 \oplus W_0^0$.
+The evaluator xors the output wire label $U_0^*$ with $L_{UW}$ to acquire $W_0^*$, a valid input label for wire $W_0$. 
+
+\al{Have we introduced this notation?}
+We show this computation below; the value $u_0 \in \{0,1\}$ is the semantic value of wire $U_0$, so that $u_0\Delta$ equals $0$ if $u_0$ is $0$ and $\Delta$ otherwise. 
+This notation is a useful way to reason with wire labels when the Free XOR condition is present. 
+\begin{align}
+	U_0^0 \oplus u_0 \Delta \oplus L_{UW} & = U_0^0 \oplus u_0 \Delta \oplus U_0^0 \oplus W_0^0 \\
+	& = W_0^0 \oplus u_0 \Delta
+\end{align}
+We see from this equation that the evaluator acquires a valid wire label for wire $W_0$ which has the semantic value of as wire label $U_0^*$.
+
+\input{figure-chaining}
 
 We formally describe component-based garbled circuits as a tuple of three algorithms $(\Garble, \Link, \Eval)$.
 The $\Garble$ algorithm is the same algorithm that we used before to garble circuits; it takes as inputs a circuit $\C$ and outputs three pieces of information: a garbled circuit $\GC$, a set of input wires $e_{\C}$, and a set of output wires $d_{\C}$.
-We extend the $\Garble$ algorithm to also take a component-circuit $c$ as input, instead of a complete circuit $\C$, which outputs a garbled component $\GC_c$, input wire set $e_c$ and output wire set $d_c$. 
+In the component-based setting, the $\Garble$ algorithm can also take a component-circuit $c$ as input, to which the algorithm outputs a garbled component $\GC_c$, input wire set $e_c$ and output wire set $d_c$. 
 
-The $\Link$ algorithm is unique to component-based garbled circuits, and it produces the information neccessary for linking.
+The $\Link$ algorithm is unique to component-based garbled circuits, and it produces the link labels necessary for linking.
 $\Link$ takes as input two garbled components $c_0 = (\GC_0, e_0, d_0)$ and $c_1 = (\GC_1, e_1, d_1)$, and a mapping of output wires of $c_0$ to input wires of $c_1$. 
 $\Link$ outputs the \textit{link} labels needed to convert the output wires $d_0$ to input wires $e_1$. 
-Suppose that output wire $W_i \in d_0$ has labels $(W_i^0, W_i^1)$, and input wire $W_j \in e_1$ has wire labels $(W_j^0, W_j^1)$.
-To link $W_i$ to $W_j$, $\Link$ outputs $W_{ij} = W_i^0 \oplus W_j^1$. 
-Since Free-XOR is being used, we have that $W_i^0 \oplus W_i^1 = W_j^0 \oplus W_j^1 = \Delta$ for some random value $\Delta$.
-$W_{ij}$ is sufficient to transform a wire label of $W_i$ to a wire label of $W_j$ while preserving the semantic value. 
-The semantic value is preservered because the $\Delta$ is present in $W_j^*$ if and only if $\Delta$ is present in $W_i^*$; xoring by $\Delta$ simply transform $W_i^0$ to $W_j^0$ and leaves the $\Delta$ alone.
+Suppose that output wire $U_i \in d_0$ has labels $(U_i^0, U_i^1)$, and input wire $W_j \in e_1$ has wire labels $(W_j^0, W_j^1)$, then $\Link$ outputs $L_{u_i w_j} = U_i^0 \oplus W_j^0$. 
+This discussion above explains why link label $L_{u_i w_j}$ is sufficient for linking. 
 
 The $\Eval$ algorithm evaluates the garbled components and links garbled circuits where necessary.
-It takes three inputs: a list of a garbled components $\{c_i\}$, linking labels $\{W_{ij}\}$ and input labels $\{W_i\}$, and it outputs output labels $\{Z_i\}$. 
+It takes three inputs: a list of a garbled components $\{c_i\}$, linking labels $\{L_{ij}\}$ and input labels $\{W_i\}$, and it outputs output labels $\{Z_i\}$. 
 $\Eval$ starts with the inputs, and then proceeds component by component, evaluating each component in order to get the component output wire label.
 Where necessary, $\Eval$ uses component output wire labels and link labels to compute the appropriate input label for later components. 
 Once all components are evaluated, $\Eval$ recovers the garbled outputs $\{Z_i\}$ from the output components, and uses $d$ for that component to recover the real output $y$. 
@@ -54,10 +60,9 @@ Once all components are evaluated, $\Eval$ recovers the garbled outputs $\{Z_i\}
 Let us think about how the two banks who use secure computation in their daily operations employ the three algorithms.
 At night, during the offline stage, the garbler-bank generates many circuit components, garbles them with $\Garble$, and sends the garbled circuits to the other evaluator-bank. 
 The garbler-bank and evaluator-bank also perform the offline phase of OT-preprocessing.
-During the day, when the banks decide that they need to compute some function $f$, they check that they have sufficient components to compute $f$. 
-If they do, the garbler-bank runs $\Link$ on the components used in $f$, and sends the output link-labels to the evaluator. 
+During the day, when the banks decide that they want to securely compute some function $f$, the garbler-bank runs $\Link$ on the components used in $f$ to generate the link labels, which are subsequently send to the evaluator-bank.
 The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
-Now that the garbler has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
+Now that the evaluator-bank has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
 
 \section{Security of Chaining}
 
