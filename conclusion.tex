@@ -5,6 +5,26 @@
 	\setcounter{chapter}{4}
 	\setcounter{section}{0}
 	
-Here's a conclusion, demonstrating the use of all that manual incrementing and table of contents adding that has to happen if you use the starred form of the chapter command. The deal is, the chapter command in \LaTeX\ does a lot of things: it increments the chapter counter, it resets the section counter to zero, it puts the name of the chapter into the table of contents and the running headers, and probably some other stuff. 
+Component-based garbled circuits offer a number of benefits in terms of flexiblity and speed over other garbled circuits methods.
+This thesis contributes \CompGC, which demonstrates that component-based garbled circuit systems offer as much as as an order of magnitude improvements in terms of speed and bandwidth over other garbled circuit systems.
 
-So, if you remove all that stuff because you don't like it to say ``Chapter 4: Conclusion'', then you have to manually add all the things \LaTeX\ would normally do for you. Maybe someday we'll write a new chapter macro that doesn't add ``Chapter X'' to the beginning of every chapter title.
+Chapter 1 of this thesis starts by explaining the cryptographic pritives necessary for understanding garbled circuits.
+These primitives included encryption, oblivious transfer and the idea of computational indistinguishability.
+In Chapter 2 we use the fundamentals introduced in Chapter 1 to discuss security of secure computation and garbled circuits.
+We also introduce the basic garbled circuit protocol, and explain why it is secure under the earlier defition of security.
+In Chapter 3 we discusses various improvements to garbled circuits, most of which operate by cleverly setting wire labels.
+The most important improvement was Free XOR, which made XOR gates free, in the sense that they require no additional bandwidth.
+
+In Chapter 4, we introduce component-based garbled circuits, a method of stitching together small component-circuits into a larger function.
+We also discuss a contribution of this thesis to the literature: the idea of Single Commmunication Multiple Connections (SCMC).
+SCMC reduces the bandwidth requirements of component-based garbled circuits by choosing input and output wire labels to have a predictable pattern.
+
+Chapter 5 discusses \CompGC, our implementation of component-based garbled circuits.
+\CompGC is a full-fledged two party secure computation system; parties select a function, select their inputs, and \CompGC runs a networked protocol between the two parties to compute the answer to their function.
+We ran a number of experiments on \CompGC to test the improvements of SCMC over naive chaining, to compare component-based garbled circuits to traditional garbled circuits, and to examine the benefits of component-based garbled circuits in a real world networking setting by emulating the latency and bandwidth of the internet.
+We found that \CompGC with SCMC is faster than all other garbled circuit protocols, and the speed is further emphasized when the systems are run on the emulated internet.
+\CompGC reduced the online bandwidth of garbled circuits by approximatately, but this is for functions that are commonly tested in the literature.
+Functions with larger pieces of data, such as stastical operations in the real world or large genomic analysis, are optimal for the component-based system.
+
+Overall, we conclude that component-based garbled circuits improve garbled circuits by improving flexibility, speed and bandwidth of secure computation in the two party case.
+
