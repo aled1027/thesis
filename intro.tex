@@ -1,3 +1,6 @@
+%!TEX root = thesis.tex
+
+
 %The \introduction command is provided as a convenience.
 %if you want special chapter formatting, you'll probably want to avoid using it altogether
 \chapter*{Introduction}
@@ -5,57 +8,56 @@
 \chaptermark{Introduction}
 \markboth{Introduction}{Introduction}
 
-Secure computation is a cryptographic method of allowing two parties who do not trust each other to work together. 
+Secure computation is a cryptographic method that allows two parties who do not trust each other to work together. 
 Specifically, the two parties can compute a function $f(x,y)$, where each party keeps their input to the function, $x$ and $y$, private from the opposing party.
 
-The classic example of secure computation is millionaire problem.
-Suppose that Alice and Bob are millionaires who wish to determine who is wealthier, but they do not want to disclose their wealth to the opposing party.
-Alice and Bob could tell a trusted third party their wealth, and then that trusted third party turns around and tells Alice and Bob who is wealthier.
-However that method has many disadvantages, one being that they need to trust a third party - what if they can't find a trusted third party
-Secure computaiton gives Alice and Bob a method to solve their problem without the aid of a third party.
-Alice and Bob simply exchange messages between each other, and can acquire an answer to their question.
+The classic example of secure computation is the millionaire problem.
+In the millionaire problem, millionaires Alice and Bob wish to determine who is wealthier, but they do not want to disclose their wealth to the opposing party.
+Alice and Bob could tell a trusted third party their wealth, and then that trusted third party tells Alice and Bob who is wealthier.
+However that method has many disadvantages, one being that they need to trust a third party - what if they can't find a trusted third party?
+Secure computation gives Alice and Bob a method to solve their problem without the aid of a third party; they exchange messages between each other and acquire an answer to their question.
 
 Secure computation can be performed for arbitrarily many parties, but this thesis focuses on the special case where two parties are involved; this is called two-party computation (2PC).
 The most common method for performing 2PC is \textit{garbled circuits}.
-In a garbled circuits protocol, transform their function $f$ into a circuit. 
-They then encrypt, or garble their circuit, obscuring the values in the circuit, such that with a bit more information, Alice and Bob can recover the answer their function.
+In a garbled circuits protocol, the parties transform their function $f$ into a circuit. 
+They then encrypt, or garble their circuit, obscuring the values in the circuit, such that with a bit more information, they recover the answer to their function.
 
 Garbled circuits have been heavily researched and optimized since their creation in the late 1980s.
 For most of that period, garbled circuit protocols were too slow and cumbersome for usage in the real world, but as of late, the protocols have achieved speeds comparable to that of loading a webpage. 
 
-In order to further improve the speed of garbled circuits, researchers have split the garbled circuit protocol into two phases, an offline phase and an online phase.
-In the offline phase, before the two parties determine their inputs to the function, the parties exchane as much information as they can. 
-Then, upon determining their inputs to the function, the parties engage in the online phase, where they exchange more information and finish the garbled circuit protocol, recovering the output to their function.
+In order to further increase the speed of garbled circuits, researchers split the garbled circuit protocol into two phases, an offline phase and an online phase.
+In the offline phase, before the two parties determine their inputs to the function, the parties exchange as much information as feasible. 
+Then upon determining their inputs to the function, the parties engage in an online phase, where they exchange more information and finish the garbled circuit protocol, recovering the output to their function.
 Using an offline/online protocol greatly reduces the latency of the computation - the time that it takes to acquire an answer from the time that the parties determine their inputs.
 
 The offline/online system, while offering a number of benefits, is also limiting in that the function is determined ahead of time in the offline phase.
 Say that millionaires Alice and Bob originally agree to find out who is wealthier, so they exchange information for that function ahead of time in the offline phase, but what if at the beginning of the online phase, Alice and Bob change their minds. 
 They now wish to simply verify that they are indeed both millionaires, and that the other is not going bankrupt.
-Since they exchanged information specific to the ``who is wealtheir'' problem during the offline phase, they are stuck. 
-They cannot pivot and simply compute the new function without large computaitonal sacrifices.
+Since they exchanged information specific to the ``who is wealthier'' function during the offline phase, they are stuck. 
+They cannot pivot and compute the new function without large computational sacrifices.
 
-A new method called \textit{chaining} solves this problem.
+A new method called \textit{component-based} garbled circuits solves this problem.
 In the offline phase, instead of exchanging information corresponding to a single function, Alice and Bob exchange smaller pieces of information that can be stitched together to compute a class of functions.
-More specifically, instead of exchanging a garbled circuit that computes the ``who is wealthier'' function, Alice and Bob exchange a many garbled circuits which are \textit{components} or subparts of the less than function and other similar functions.
-Then, during the online phase, Alice and Bob select the function that they wish to compute from the class of available functions, and build their function out of the pre-exchanged components.
-The effect is that Alice and Bob have more flexibility. 
-They are no longer stuck using their original function - they can securely compute a host of function at their whim. 
+For example, instead of exchanging a garbled circuit that computes the ``who is wealthier'' function, Alice and Bob exchange a many garbled circuits which are \textit{components} or subparts of the less than function and other similar functions.
+Then, during the online phase, Alice and Bob select the function that they wish to compute from the class of available functions, and build their function by \textit{chaining} pre-exchanged components.
+With chaining, Alice and Bob have more flexibility. 
+They are no longer stuck using their original function - they can securely compute a host of functions at their whim. 
 
-This thesis extends on the theoretical idea of chaining by contributing an efficiency improvement.
-Naive chaining, as we refer to the original chaining idea, requires a ciphertext be communicated per wire chained - in other words, the communication scales linearly with the size of data.
-Our new method, called Single Communication Multiple Connections (SCMC), requires a single ciphertext be communicated per data object - the communication scales constant linearly with the number of data objects.
-In theory, the SCMC still scales linearly with the data, but with a small smaller constant; and, that constant is invariant to the size of the data object, enabling for extremely fast computation of large statistical operations.
+This thesis contributes a new method that improves the efficiency of component-based garbled circuits. 
+The original component-based garbled circuits requires that a ciphertext be communicated per wire chained - in other words, the communication scales linearly with the size of data.
+Our new method, called Single Communication Multiple Connections (SCMC), requires a single cipher text be communicated per block of data instead of per wire. 
+The communication requirement for chaining is now constant in the size of the data object: chaining a $10$ by $10$ matrix has the same bandwidth requirement as chaining a $1,000$ by $1,000$ matrix. 
+This allows for extremely fast computation of large statistical operations. 
 
-Finally, the major contribution of this thesis is to implement the idea of component-based garbled circuits and SCMC.
-We implement the ideas into a program called \CompGC.
+The major contribution of this thesis is the implementation of component-based garbled circuits and SCMC into a program called \CompGC. 
 \CompGC is a full-fledged secure computation system, where parties connect via TCP to agree on a function, exchange inputs, and securely compute the function.
-The program runs at considerable speeds, beating the best timings in the literature even for functions that do not benefit the most from SCMC.
+The program is fast, beating the best timings in the literature even for functions that do not benefit the most from SCMC.
 
 This thesis can be read from cover to cover, but it may be useful to skip around.
-The first chapter introduces cryptographic primitives, cryptographic knowlege that is needed to understand the more complex cryptographic constructions.
+The first chapter introduces cryptographic primitives, cryptographic knowledge that is needed to understand the more complex cryptographic constructions.
 The second chapter discusses what it means for a secure computation protocol to be secure, and introduces garbled circuits, the basic building block of secure computation used in this thesis.
-The third chapter presents a variety of improvements to garbled circuits; these improvements make garbled circuits viable in the real world.
-The fourth chapter explains component-based garbled circuits, how to chain garbled circuits, and my contribution SCMC.
+The third chapter presents a variety of improvements to garbled circuits.
+The fourth chapter explains component-based garbled circuits, how to chain garbled circuits, and my improvement to chaining, SCMC.
 The fifth chapter discusses our implementation of component-based garbled circuits and SCMC, \CompGC, and also gives performance metrics of \CompGC for various functions and settings.
 
 
