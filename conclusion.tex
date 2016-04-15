@@ -8,16 +8,16 @@
 	\setcounter{section}{0}
 	
 Component-based garbled circuits offer a number of benefits in terms of flexibility and speed over other garbled circuits methods.
-This thesis contributes \CompGC, which demonstrates that component-based garbled circuit systems offer as much as as an order of magnitude improvements in terms of speed and bandwidth over other garbled circuit systems.
+This thesis contributes Single Communication Multiple Connections (SCMC), a method for improving component-based garbled circuits, and \CompGC, an implementation of component-based garbled circuits which demonstrates that component-based garbled circuit systems offer substantial speed and bandwidth improvements over other garbled circuit systems.
 
 Chapter 1 of this thesis starts by explaining the cryptographic primitives necessary for understanding garbled circuits.
 These primitives included encryption, oblivious transfer and the idea of computational indistinguishability.
-In Chapter 2 we use the fundamentals introduced in Chapter 1 to discuss security of secure computation and garbled circuits.
-We also introduce the basic garbled circuit protocol, and explain why it is secure under the earlier definition of security.
-In Chapter 3 we discusses various improvements to garbled circuits, most of which operate by cleverly setting wire labels.
+In Chapter 2 we use the fundamentals introduced in Chapter 1 to discuss what it means for a protocol to be secure. 
+Chapter 2 also introduces garbled circuits, and explains the intuition behind their security.
+Chapter 3 discusses various improvements to garbled circuits, most of which operate by cleverly setting wire labels.
 The most important improvement was Free XOR, which made XOR gates free, in the sense that they require no additional bandwidth.
 
-In Chapter 4, we introduce component-based garbled circuits, a method of stitching together small component-circuits into a larger function.
+In Chapter 4 we introduce component-based garbled circuits, a method of stitching together small component-circuits into a larger function.
 We also discuss a contribution of this thesis to the literature: the idea of Single Communication Multiple Connections (SCMC).
 SCMC reduces the bandwidth requirements of component-based garbled circuits by choosing input and output wire labels to have a predictable pattern.
 
@@ -25,8 +25,7 @@ Chapter 5 discusses \CompGC, our implementation of component-based garbled circu
 \CompGC is a full-fledged two party secure computation system; parties select a function, select their inputs, and \CompGC runs a networked protocol between the two parties to compute the answer to their function.
 We ran a number of experiments on \CompGC to test the improvements of SCMC over naive chaining, to compare component-based garbled circuits to traditional garbled circuits, and to examine the benefits of component-based garbled circuits in a real world networking setting by emulating the latency and bandwidth of the internet.
 We found that \CompGC with SCMC is faster than all other garbled circuit protocols, and the speed is further emphasized when the systems are run on the emulated internet.
-\CompGC reduced the online bandwidth of garbled circuits by approximately, but this is for functions that are commonly tested in the literature.
-Functions with larger pieces of data, such as statistical operations in the real world or large genomic analysis, are optimal for the component-based system.
+\CompGC reduces the online bandwidth of garbled circuits by a substantial factor. \al{get a number here}
 
-Overall, we conclude that component-based garbled circuits improve garbled circuits by improving flexibility, speed and bandwidth of secure computation in the two party case.
+Overall, we conclude that component-based garbled circuits improve garbled circuits by adding flexibility, increasing speed and lowering bandwidth in the two party setting.
 
