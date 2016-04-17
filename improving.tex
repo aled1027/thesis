@@ -52,16 +52,16 @@ Upon receiving the garbled table, the evaluator trial decrypts each row of the g
 
 Point and permute enables the evaluator to bypass the trial decryption step, so that they decrypt the correct wire label the first time.
 In point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire lables of the same wire have opposite bits.
-More formally, the garble randomly samples $b$ from $\{0,1\}$, and then gives $A_0$ select bit $b$ and gives $A_1$ select bit $1-b$.
+More formally, the garble randomly samples $b$ from $\{0,1\}$, and then gives wire label $W_i^0$ select bit $b$ and gives $W_i^1$ select bit $1-b$.
 The garbler permutes the garbled table based on the select bits, and appends the select bits each wire label.
 When the evaluator ungarbles the gate, they use the select bits appended to each of the two input wire labels to determine which row to decrypt.
 For example, if the select bits on the end of the input wire labels are 1 and 0, then the evaluator decrypts the third row.
 
 Tables \ref{tbl:point-and-permute} show an example of point and permute.
-$A, B$ and $C$ are wires, where $A_0$ and $A_1$ are the zeroith and first wire label of wire $A$ respectively.
-The left table shows the select bits of the input wires $A$ and $B$.
-The garbler gives $A_0$ select bit 0, determining that $A_1$ has select bit 1.
-Likewise, the garbler gives $B_0$ select bit 1, determining that $B_1$ has select bit 0.
+$A, B$ and $W_k$ are wires, where $W_i^0$ and $W_i^1$ are the zeroith and first wire label of wire $W_i$ respectively.
+The left table shows the select bits of the input wires $W_i$ and $W_j$.
+The garbler gives $W_i^0$ select bit 0, determining that $W_i^1$ has select bit 1.
+Likewise, the garbler gives $W_j^0$ select bit 1, determining that $W_j^1$ has select bit 0.
 
 The garbler then permutes the garbled table based on the select bits. 
 The permuted table is shown on the left in table \ref{tbl:point-and-permute}.
@@ -85,10 +85,10 @@ The overall bandwidth is increased by $4$ bits per gate: a tiny constant increas
         \hline
         Select Bit & Wire Label \\
         \hline
-        0 & $A_0$ \\
-        1 & $A_1$ \\
-        1 & $B_0$ \\
-        0 & $B_1$ \\
+        0 & $W_i^0$ \\
+        1 & $W_i^1$ \\
+        1 & $W_j^0$ \\
+        0 & $W_j^1$ \\
         \hline
     \end{tabular}
     \qquad
@@ -96,17 +96,17 @@ The overall bandwidth is increased by $4$ bits per gate: a tiny constant increas
         \hline
         Select Bits & Encryption \\
         \hline
-        (0,0) & $\Enc_{A_0, B_1}(C_1)$ \\
-        (0,1) & $\Enc_{A_0, B_0}(C_0)$ \\
-        (1,0) & $\Enc_{A_1, B_1}(C_0)$ \\
-        (1,1) & $\Enc_{A_1, B_0}(C_0)$ \\
+        (0,0) & $\Enc_{W_i^0, W_j^1}(W_k^1)$ \\
+        (0,1) & $\Enc_{W_i^0, W_j^0}(W_k^0)$ \\
+        (1,0) & $\Enc_{W_i^1, W_j^1}(W_k^0)$ \\
+        (1,1) & $\Enc_{W_i^1, W_j^0}(W_k^0)$ \\
         \hline
     \end{tabular}
     %\qquad
     %\begin{tabular}{|c|}
     %    \hline
-    %    $C_0 \gets \{0,1\}^n$ \\
-    %    $C_1 \gets \{0,1\}^n$ \\
+    %    $W_k^0 \gets \{0,1\}^n$ \\
+    %    $W_k^1 \gets \{0,1\}^n$ \\
     %    \hline
     %\end{tabular}
     \caption{Garbled Gate for Point and Permute}
@@ -119,7 +119,7 @@ Garbled Row Reduction 3 (GRR3) reduces the size of the garbled table from 4 ciph
 In a classical garbled circuit scheme, the wire labels for each wire are chosen prior to garbling any gates.
 In GRR3, the garbler samples values for the input wire labels prior to garbling, and the garbler gives all other wire labels values as they generate each garbled table.
 
-Suppose the garbler is garbling an XOR gate with input wires $A$ and $B$ and output wire $C$.
+Suppose the garbler is garbling an XOR gate with input wires $W_i$ and $W_j$ and output wire $W_k$.
 The garbler begins by using the point and permute method, sampling select bits and permuting the garbled table.
 In GRR3, the garbler then set the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$, the string of $n$ zeros.
 Specifcally, $C_*$, the wire label on the top row, is set to $\EncInv_{A_*, B_*}(0^n)$.
@@ -129,10 +129,10 @@ In that case, the garbler set $C_*$ to $\EncInv_{A_*, B_*}(0^n)$.
 Otherwise if the select bits indicate to decrypt the second, third or fourth row, the garbler decrypts the row as per usual.
 
 Tables \ref{tbl:grr3} gives an example of garbling an XOR gate.
-The left table shows the select bits of wire labels $A_0, A_1, B_0$ and $B_1$.
+The left table shows the select bits of wire labels $W_i^0, W_i^1, W_j^0$ and $W_j^1$.
 The right table shows the garbled table, in which the top row, the row associated with select bits $(0,0)$, is missing, as the row is assumed to have value $0^n$.
-The bottom table shows the values of $C_0$ and $C_1$.
-The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
+The bottom table shows the values of $W_k^0$ and $W_k^1$.
+The value of $W_k^0$ is randomly sampled from $\{0,1\}^n$.
 
 \begin{table}
     \centering
@@ -140,10 +140,10 @@ The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
         \hline
         Select Bit & Wire Label \\
         \hline
-        0 & $A_0$ \\
-        1 & $A_1$ \\
-        1 & $B_0$ \\
-        0 & $B_1$ \\
+        0 & $W_i^0$ \\
+        1 & $W_i^1$ \\
+        1 & $W_j^0$ \\
+        0 & $W_j^1$ \\
         \hline
     \end{tabular}
     \qquad
@@ -151,16 +151,16 @@ The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
         \hline
         Select Bits & Encryption \\
         \hline
-        (0,1) & $\Enc_{A_0, B_0}(C_0)$ \\
-        (1,0) & $\Enc_{A_1, B_1}(C_0)$ \\
-        (1,1) & $\Enc_{A_1, B_0}(C_0)$ \\
+        (0,1) & $\Enc_{W_i^0, W_j^0}(W_k^0)$ \\
+        (1,0) & $\Enc_{W_i^1, W_j^1}(W_k^0)$ \\
+        (1,1) & $\Enc_{W_i^1, W_j^0}(W_k^0)$ \\
         \hline
     \end{tabular}
     \qquad
     \begin{tabular}{|c|}
         \hline
-        $C_0 \gets \{0,1\}^n$ \\
-        $C_1 \gets \Enc_{A_0, B_1}^{-1}(0^n)$ \\
+        $W_k^0 \gets \{0,1\}^n$ \\
+        $W_k^1 \gets \Enc_{W_i^0, W_j^1}^{-1}(0^n)$ \\
         \hline
     \end{tabular}
     \caption{Example garbled gate using point and permute and garbled row reduction 3. The gate being computed is given in figure \textbf{Make it 23:30 in mike's talk}}
@@ -168,7 +168,7 @@ The value of $C_0$ is randomly sampled from $\{0,1\}^n$.
 \end{table}
 
 In considering the security of GRR3, we consider the effect of always setting one of the wire labels, $C_*$, to $0^n$.
-Since the evaluator does not know whether $C_0$ or $C_1$ is set to $0^n$, the evaluator does not learn any information about the semantic representation of $C_*$..
+Since the evaluator does not know whether $W_k^0$ or $W_k^1$ is set to $0^n$, the evaluator does not learn any information about the semantic representation of $C_*$..
 
 GRR3 offers good performance benefits.
 Garbler-side computation is the same, except that a decryption is performed in place of an encryption in constructing the first row of the garbled table.
@@ -181,21 +181,21 @@ The evaluator can compute $C_*$ from only $A_*$ and $B_*$.
 
 Like GRR3, the free xor techniques takes advantage of carefully crafted wire labels, even input wires.
 To start, the garbler randomly samples a ciphertext $\Delta$ from $\{0,1\}^n$.
-For each input wire $A$, let $A_0$ be randomly sampled from $\{0,1\}^n$ as before, and set $A_1 = A_0 \oplus \Delta$.
+For each input wire $W_i$, let $W_i^0$ be randomly sampled from $\{0,1\}^n$ as before, and set $W_i^1 = W_i^0 \oplus \Delta$.
 
 If the garbler is garbling an XOR gate, then the garbler does not constructed a garbled table or use select bits.
-The garlber sets $C_0 = A_0 \oplus B_0$ and sets $C_1 = C_0 \oplus \Delta$.
+The garlber sets $W_k^0 = W_i^0 \oplus W_j^0$ and sets $W_k^1 = W_k^0 \oplus \Delta$.
 
 The evaluator, when evaluating an XOR gate, simply computes $C_* = A_* \oplus B_*$.
 As simple as it is, the evaluator will always acquire the correct value for $C_*$ based on the semantic value of $A_*$ and $B_*$.
 The math for each of the four cases is shown:
 \begin{align}
-    A_0 \oplus B_0 & = C_0 \\
-    A_0 \oplus B_1 & = A_0 \oplus (B_0 \oplus \Delta) = (A_0 \oplus B_0) \oplus \Delta = C_1 \\
-    A_1 \oplus B_0 & = (A_0 \oplus \Delta) \oplus B_0 = (A_0 \oplus B_0) \oplus \Delta = C_1 \\
-    A_1 \oplus B_1 & = (A_0 \oplus \Delta) \oplus (B_0 \oplus \Delta) = (A_0 \oplus B_0) = C_0
+    W_i^0 \oplus W_j^0 & = W_k^0 \\
+    W_i^0 \oplus W_j^1 & = W_i^0 \oplus (W_j^0 \oplus \Delta) = (W_i^0 \oplus W_j^0) \oplus \Delta = W_k^1 \\
+    W_i^1 \oplus W_j^0 & = (W_i^0 \oplus \Delta) \oplus W_j^0 = (W_i^0 \oplus W_j^0) \oplus \Delta = W_k^1 \\
+    W_i^1 \oplus W_j^1 & = (W_i^0 \oplus \Delta) \oplus (W_j^0 \oplus \Delta) = (W_i^0 \oplus W_j^0) = W_k^0
 \end{align}
-For any wire $A$, since $A_1$ is dependent on $A_0$, we often simplify notation such that the wire labels for $A$ are $A$ and $A \oplus \Delta$, omitting the subscript.
+For any wire $W_i$, since $W_i^1$ is dependent on $W_i^0$, we often simplify notation such that the wire labels for $W_i$ are $W_i$ and $A \oplus \Delta$, omitting the subscript.
 
 Free XOR is compatible with point and permute and GRR3; however, since XOR does not require a garbled table, GRR3 is only used on AND gates.
 
@@ -214,13 +214,13 @@ Evaluator-side computation is reduced likewise: xor gates do not requre any decr
 Garbled row reduction 2 (GRR2) reduces the size of the garbled table of AND gates to $2$ ciphertexts.
 Unfortunatley, GRR2 is not compatible with Free XOR, and GRR2 is less efficient than Free XOR combined with GRR3 for most circuits, so GRR2 is not often used by itself in practice.
 
-Suppose the garbler is garbling an AND gate with input wires $A$ and $B$ and output wire $C$.
+Suppose the garbler is garbling an AND gate with input wires $W_i$ and $W_j$ and output wire $W_k$.
 For all $a,b \in \{0,1\}$, let $V_{a,b} = H(A_a, B_b)$.
 Since the evaluator acquires $A_a$ and $B_b$ for specific $a$ and $b$, they are also able to acquire $V_{a,b}$ for the same specific $a$ and $b$.
 The garbler constructs a polynomial $P$ to be the unique 2-degree polynomial passing through the points $(1, V_{0,0}, (2, V_{0,1})$ and $(3, V_{0,1})$ - these $V$'s are selected because the garbler is garbling an AND gate.
-And they set $C_0$ to $P(0)$.
+And they set $W_k^0$ to $P(0)$.
 The garbler next constructs a second polynomial $Q$ to be the unique 2-degree polynomial passing through points $(4, V_{1,1}), (5, P(5))$ and  $(6, P(6))$.
-The garbler then sets $C_1$ to $Q(0)$.
+The garbler then sets $W_k^1$ to $Q(0)$.
 The garbler sends $(5, P(5))$ and $(6, P(6))$ to the evaluator.
 
 When de-garbling, the evaluator holds $a, b, A_a, B_b$ for some $a,b \in \{0,1\}$, $(5, P(5))$ and $(6, P(5))$.
@@ -228,8 +228,8 @@ With this information, the evaluator constructs polynomial $R$ to be unique the 
 Polynomial $R$ is either $P$ or $Q$, depending on the values of $a$ and $b$.
 The evaluator simply sets $C_*$ to be $R(0)$.
 
-GRR2 is incompatible with Free XOR since it sets $C_0$ and $C_1$ implicitly and unpredictably.
-Free XOR requires that $C_0$ = $C_1 \oplus \Delta$ for some global delta, which is not achievable with the randomly constructed polynomials.
+GRR2 is incompatible with Free XOR since it sets $W_k^0$ and $W_k^1$ implicitly and unpredictably.
+Free XOR requires that $W_k^0$ = $W_k^1 \oplus \Delta$ for some global delta, which is not achievable with the randomly constructed polynomials.
 
 \al{discuss security. Why is free xor secure?}
 GRR2 alters garbler-side computation by having the garbler construct two polynomials instead of encrypting ciphertexts.
@@ -243,26 +243,26 @@ After the creation of GRR2, secure computation was at an awkward point.
 Circuits with many XOR gates were comptuted most quickly with Free XOR and GRR3, but circuits with many AND gates were computed most quickly with GRR2.
 FleXOR reconciles GRR2 with Free XOR, resulting in a scheme that is universally faster.
 
-Recall that GRR2 is incompatible with Free XOR because the wire labels are uncontrollably created by random polynomials, where Free XOR requires that $C_1 = C_0 \oplus \Delta$ for some global delta.
+Recall that GRR2 is incompatible with Free XOR because the wire labels are uncontrollably created by random polynomials, where Free XOR requires that $W_k^1 = W_k^0 \oplus \Delta$ for some global delta.
 FleXOR solves this problem in a straightforward fashion: correct the delta value of output wires of AND gates such that the output wires use the global delta.
 To correct the value, FleXOR adds a unary gate after each AND gate that corrects the wire label. \footnote{A unary gate is a gate that takes a single input wire and outputs a single wire. The unary gate does not change the semantic meaning of a wire label - that is, whether it represents 0 or 1. The unary gate merely alters the actual value of the wire label or ciphertext.}
 
-Suppose an XOR gate has input wires $A$ and $B$ and output wire $C$.
-Input wires $A$ and $B$ each come from an AND gate, so their labels are the result of the polynomial interpolation of GRR2.
-$A$ has labels $A$ and $A \oplus \Delta_A$ and $B$ has labels $B$ and $B \oplus \Delta_B$.
-To perform Free XOR, $A,B$ and $C$ need to be using the same delta value. 
-The garbler adds an extra gate between $A$ and $B$ and the $XOR$ gate that adjusts their XOR value to the correct value.
-$A$ and $A \oplus \Delta_A$ change to $A'$ and $A' \oplus \Delta$.
-$B$ and $B \oplus \Delta_B$ change to $B'$ and $B' \oplus \Delta$.
-Since $A, B$ and $C$ have the same delta value, FreeXOR is used.
+Suppose an XOR gate has input wires $W_i$ and $W_j$ and output wire $W_k$.
+Input wires $W_i$ and $W_j$ each come from an AND gate, so their labels are the result of the polynomial interpolation of GRR2.
+$W_i$ has labels $W_i$ and $A \oplus \Delta_A$ and $W_j$ has labels $W_j$ and $B \oplus \Delta_B$.
+To perform Free XOR, $A,B$ and $W_k$ need to be using the same delta value. 
+The garbler adds an extra gate between $W_i$ and $W_j$ and the $XOR$ gate that adjusts their XOR value to the correct value.
+$W_i$ and $A \oplus \Delta_A$ change to $A'$ and $A' \oplus \Delta$.
+$W_j$ and $B \oplus \Delta_B$ change to $B'$ and $B' \oplus \Delta$.
+Since $A, B$ and $W_k$ have the same delta value, FreeXOR is used.
 
 The unary gate maps $A,A \oplus \Delta_1 \to A', A' \oplus \Delta$, where $\Delta$ is the correct delta value for the XOR gate.
 
 FleXOR is made more efficient by not correcting the outputwire of every AND gate.
 For example, if an output wire of an AND gate is immediately inputted into another AND gate, the wire label does not need to corrected.
 Moreover, the wire labels do not even need to be corrected to a global delta.
-Free XOR only requires that the three wires involved in the XOR gate, $A, B$ and $C$, use the same delta, so each XOR gate has its own $\Delta$.
-For example, $A$ and $C$ may share a delta but $B$ may have a different delta, so it is sufficient to only correct $B$'s delta value.
+Free XOR only requires that the three wires involved in the XOR gate, $A, B$ and $W_k$, use the same delta, so each XOR gate has its own $\Delta$.
+For example, $W_i$ and $W_k$ may share a delta but $W_j$ may have a different delta, so it is sufficient to only correct $W_j$'s delta value.
 
 FleXOR is fastest when AND gates are grouped together and XOR gates are grouped together, since fewer unary gates will be required.
 Thereby, FleXOR creates an optimization problem: place XOR gates, AND gates and unary gates to minimize bandwidth requirements.
@@ -292,16 +292,16 @@ We then combine the garbler-half-gate and the evaluator-half-gate to produce a g
 
 \al{where do the hashes come from?}
 We first examine the garbler-half-gate.
-Imagine an AND gate with input wires $A$ and $B$ and output wire $C$, where the garbler knows the semantic value of $A$.
-This means that the garbler knows whether $A_*$ is $A_0$ or $A_1$.
-Let $a,b$ and $c \in \{0,1\}$ represent the semantic value of $A$, $B$ and $C$ respectively.
-If $a = 0$, then $c = a \wedge b = 0$, so the garbler creates a unary gate that always outputs $C_0$.
+Imagine an AND gate with input wires $W_i$ and $W_j$ and output wire $W_k$, where the garbler knows the semantic value of $W_i$.
+This means that the garbler knows whether $A_*$ is $W_i^0$ or $W_i^1$.
+Let $a,b$ and $c \in \{0,1\}$ represent the semantic value of $W_i$, $W_j$ and $W_k$ respectively.
+If $a = 0$, then $c = a \wedge b = 0$, so the garbler creates a unary gate that always outputs $W_k^0$.
 If $a = 1$, then $c = a \wedge b = b$, so the garbler creates a unary identity gate that outputs $C_b$.
 We combine the unary gates into a single garbled table, shown in table \ref{tbl:halfgate-gg-garb}.
-Since the evaluator has $B_*$, the evaluator can compute the label of the output wire of the AND gate by xoring the rows in the garbled table by $H(B)$ or $H(B \oplus \Delta)$ to get $C$ or $C \oplus \Delta$ respectively. 
+Since the evaluator has $B_*$, the evaluator can compute the label of the output wire of the AND gate by xoring the rows in the garbled table by $H(B)$ or $H(B \oplus \Delta)$ to get $W_k$ or $C \oplus \Delta$ respectively. 
 
 Using point and permute and the GRR3 trick reduces the size of the garbler-half-gate garbled table to $1$ ciphertext.
-The garbler chooses $C_0$ such that the first of the top row of the garbled table is the all zeros ciphertext, and therefore is not sent to the evaluator.
+The garbler chooses $W_k^0$ such that the first of the top row of the garbled table is the all zeros ciphertext, and therefore is not sent to the evaluator.
 If the evaluator should decrypt the ciphertext on the top row (as directed by point and permute), then the evaluator assumes the ciphertext to be all 0s.
 
 \begin{table}[]
@@ -311,23 +311,23 @@ If the evaluator should decrypt the ciphertext on the top row (as directed by po
         \hline
         Garbled Table for $a = 0$ \\
         \hline
-        $\Enc_{B_0}(C_0)$ \\
+        $\Enc_{W_j^0}(W_k^0)$ \\
         \hline
     \end{tabular}
     \begin{tabular}{|c|}
         \hline
         Garbled Table for $a = 1$ \\
         \hline
-        $\Enc_{B_0}(C_0)$ \\
-        $\Enc_{B_1}(C_1)$ \\
+        $\Enc_{W_j^0}(W_k^0)$ \\
+        $\Enc_{W_j^1}(W_k^1)$ \\
         \hline
     \end{tabular} $\;\rightarrow$
     \begin{tabular}{|c|}
         \hline
         Garbled Table for any $a$ \\
         \hline
-        $\Enc_{B_0}(C_0)$ \\
-        $\Enc_{B_1}(C_0 \oplus a\Delta)$ \\
+        $\Enc_{W_j^0}(W_k^0)$ \\
+        $\Enc_{W_j^1}(W_k^0 \oplus a\Delta)$ \\
         \hline
     \end{tabular}
     \caption{Left: garbler-half-gate garbled table for $a = 0$. Middle: garbler-half-gate garbled table for $a = 1$. Right: garbler-half-gate garbled table for arbitrary $a$.}
@@ -335,13 +335,13 @@ If the evaluator should decrypt the ciphertext on the top row (as directed by po
 
 The evaluator-half-gate is somewhat different from the garbler-half-gate.
 Consider an AND gate where the evaluator \textit{knows} the semanitc value of $a$.
-If $a = 0$, then the evaluator should acquire $C_0$. 
-Otherwise if $a = 1$, then the evaluator should acquire $C_0 \oplus b\Delta$.
-In this case, it suffices for the evaluator to obtain $\Omega = C_0 \oplus B_0$, as the evaluator simply sets $C_*$ to $B_* \oplus \Omega$ which sets $C_*$ equal to $C_0 \oplus b\Delta$.
+If $a = 0$, then the evaluator should acquire $W_k^0$. 
+Otherwise if $a = 1$, then the evaluator should acquire $W_k^0 \oplus b\Delta$.
+In this case, it suffices for the evaluator to obtain $\Omega = W_k^0 \oplus W_j^0$, as the evaluator simply sets $C_*$ to $B_* \oplus \Omega$ which sets $C_*$ equal to $W_k^0 \oplus b\Delta$.
 
 Table \ref{tbl:halfgate-gg-eval} the garbled table for the evaluator-half-gate.
 This table does not need to be permuted, since the evaluator knows $a$.
-Again, we use the GRR3 trick, and set $C_0$ to $\EncInv_{A_0}(0^n)$, eliminating the need to send the top row of the garbled table.
+Again, we use the GRR3 trick, and set $W_k^0$ to $\EncInv_{W_i^0}(0^n)$, eliminating the need to send the top row of the garbled table.
 
 \begin{table}[h]
     \label{tbl:halfgate-gg-eval}
@@ -350,8 +350,8 @@ Again, we use the GRR3 trick, and set $C_0$ to $\EncInv_{A_0}(0^n)$, eliminating
         \hline
         Garbled Table for any $a$ \\
         \hline
-        $\Enc_{A_0}(C)$ \\
-        $\Enc_{A_1}(C \oplus B)$ \\
+        $\Enc_{W_i^0}(C)$ \\
+        $\Enc_{W_i^1}(C \oplus B)$ \\
         \hline
     \end{tabular}
     \caption{Evaluator-half-gate garbled table.}
