@@ -13,4 +13,8 @@ http://tex.stackexchange.com/questions/55213/how-to-draw-a-boolean-circuit-diagr
 ## Conventions
 - `W_i^j`
 - `W_i^*`
+- `\sigma_i` = semantic value of wire `W_i`
+- `\gets`
+- whatever I end up using for randomly samples
+
 - Inputs x and y and output z
