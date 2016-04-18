@@ -8,16 +8,19 @@
 \chaptermark{Introduction}
 \markboth{Introduction}{Introduction}
 
-Secure computation is a cryptographic method that allows two parties who do not trust each other to work together. 
-Specifically, the two parties can compute a function $f(x,y)$, where each party keeps their input to the function, $x$ and $y$, private from the opposing party.
+Suppose that millionaires Alice and Bob wish to determine who is wealthier, but they do not want to disclose their wealth to the opposing party.
+Alice and Bob could tell a trusted third party their wealth, and then that trusted third party could tell Alice and Bob who is wealthier.
+However that method has many disadvantages, one being that they need to trust a third party.
+What if there were a method that allows Alice and Bob to determine who is wealtier by only sending messages between each other?
 
-The classic example of secure computation is the millionaire problem.
-In the millionaire problem, millionaires Alice and Bob wish to determine who is wealthier, but they do not want to disclose their wealth to the opposing party.
-Alice and Bob could tell a trusted third party their wealth, and then that trusted third party tells Alice and Bob who is wealthier.
-However that method has many disadvantages, one being that they need to trust a third party - what if they can't find a trusted third party?
-Secure computation gives Alice and Bob a method to solve their problem without the aid of a third party; they exchange messages between each other and acquire an answer to their question.
+This classic problem is known as the millionaire problem, and is a special case of secure computation.
+Secure computation gives multiple parties the ability to jointly to compute an arbitrary function, while keeping each party's input private from all other parties.
+In the millionaire problem, there are two parties, Alice and Bob, and they wish to compute the less that an function.
 
-Secure computation can be performed for arbitrarily many parties, but this thesis focuses on the special case where two parties are involved; this is called two-party computation (2PC).
+By generalizing secure computation to work with arbitary functions, we open many possible uses of secure computation.
+For example, we can run an election without an centralized body; we can perform an auction without using an auctionioneer; and we can allow two hospitals with sensitive data to work together.
+While secure computation works with arbitrarily many parties, this thesis focuses on the special case where there are two parties, called two-party computation (2PC).
+
 The most common method for performing 2PC is \textit{garbled circuits}.
 In a garbled circuits protocol, the parties transform their function $f$ into a circuit. 
 They then encrypt, or garble their circuit, obscuring the values in the circuit, such that with a bit more information, they recover the answer to their function.
@@ -36,29 +39,31 @@ They now wish to simply verify that they are indeed both millionaires, and that 
 Since they exchanged information specific to the ``who is wealthier'' function during the offline phase, they are stuck. 
 They cannot pivot and compute the new function without large computational sacrifices.
 
-A new method called \textit{component-based} garbled circuits solves this problem.
+This presents a new method called \textit{component-based} garlblec circuit so solve this problem.
 In the offline phase, instead of exchanging information corresponding to a single function, Alice and Bob exchange smaller pieces of information that can be stitched together to compute a class of functions.
 For example, instead of exchanging a garbled circuit that computes the ``who is wealthier'' function, Alice and Bob exchange a many garbled circuits which are \textit{components} or subparts of the less than function and other similar functions.
 Then, during the online phase, Alice and Bob select the function that they wish to compute from the class of available functions, and build their function by \textit{chaining} pre-exchanged components.
 With chaining, Alice and Bob have more flexibility. 
 They are no longer stuck using their original function - they can securely compute a host of functions at their whim. 
 
-This thesis contributes a new method that improves the efficiency of component-based garbled circuits. 
+This thesis is part of a larger project which created component-based garbled circuits.
+This thesis specifically contributed two items to the project.
+The first is a new method that improves the efficiency of component-based garbled circuits. 
 The original component-based garbled circuits requires that a ciphertext be communicated per wire chained - in other words, the communication scales linearly with the size of data.
 Our new method, called Single Communication Multiple Connections (SCMC), requires a single cipher text be communicated per block of data instead of per wire. 
 The communication requirement for chaining is now constant in the size of the data object: chaining a $10$ by $10$ matrix has the same bandwidth requirement as chaining a $1,000$ by $1,000$ matrix. 
 This allows for extremely fast computation of large statistical operations. 
 
-The major contribution of this thesis is the implementation of component-based garbled circuits and SCMC into a program called \CompGC. 
+The second, and larger, contribution of this thesis is the implementation of component-based garbled circuits and SCMC into a program called \CompGC. 
 \CompGC is a full-fledged secure computation system, where parties connect via TCP to agree on a function, exchange inputs, and securely compute the function.
 The program is fast, beating the best timings in the literature even for functions that do not benefit the most from SCMC.
 
-This thesis can be read from cover to cover, but it may be useful to skip around.
-The first chapter introduces cryptographic primitives, cryptographic knowledge that is needed to understand the more complex cryptographic constructions.
-The second chapter discusses what it means for a secure computation protocol to be secure, and introduces garbled circuits, the basic building block of secure computation used in this thesis.
-The third chapter presents a variety of improvements to garbled circuits.
-The fourth chapter explains component-based garbled circuits, how to chain garbled circuits, and my improvement to chaining, SCMC.
-The fifth chapter discusses our implementation of component-based garbled circuits and SCMC, \CompGC, and also gives performance metrics of \CompGC for various functions and settings.
+For those that are not familiar with cryptography, it is best to read Chapters 1, 2 and 3 as they provide the neccessary background.
+Chapter 1 introduces cryptographic primitives, and chapter 2 discusses what it means for a secure computation protocol to be secure and introduces garbled circuits.
+Chapter 3 build off of chapter 2, explaining a variety of improvements to garbled circuits.
+Chapter 4 and 5 focus on component-based garbled circuits.
+Chapter 5 explains the basic idea of component-based garbled circuits, and gives our improvement, SCMC.
+Chapter 5 discusses our implementation of component-based garbled circuits and SCMC, \CompGC, and also gives performance metrics of \CompGC for various functions and settings.
 
 
 

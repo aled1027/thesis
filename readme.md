@@ -37,6 +37,7 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 - \samples from notation
     - figure out fix
     - use macro
+- spellcheck
 
 ## Various Resources
 http://tex.stackexchange.com/questions/55213/how-to-draw-a-boolean-circuit-diagram-in-circuitikz
