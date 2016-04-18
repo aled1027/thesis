@@ -1,6 +1,6 @@
 %!TEX root = thesis.tex
 
-\chapter{Component-based Garbled Circuits}
+\chapter{Component-Based Garbled Circuits}
 
 In this chapter we introduce component-based garbled circuits, a method that allows for most of the work involved in building and communicating a garbled circuit to occur in an offline phase before the inputs or function to compute are known. 
 This offers significant improvements to the online performance of garbled circuits. 
@@ -64,7 +64,7 @@ During the day, when the banks decide that they want to securely compute some fu
 The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
 Now that the evaluator-bank has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
 
-\section{Security of Component-based Garbled Circuits}
+\section{Security of Component-Based Garbled Circuits}
 
 In this section, we show how to adapt the standard definition of privacy, presented in chapter 2, to component-based garbled circuits.
 Recall from Chapter 2 that we said a garbled circuit scheme is secure if for all probabilistic, polynomial-time simulators (i.e algorithms) $S_1$ and $S_2$ the following holds:
