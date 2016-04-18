@@ -6,26 +6,36 @@
 	\markboth{Conclusion}{Conclusion}
 	\setcounter{chapter}{4}
 	\setcounter{section}{0}
-	
+
 Component-based garbled circuits offer a number of benefits in terms of flexibility and speed over other garbled circuits methods.
-This thesis contributes Single Communication Multiple Connections (SCMC), a method for improving component-based garbled circuits, and \CompGC, an implementation of component-based garbled circuits which demonstrates that component-based garbled circuit systems offer substantial speed and bandwidth improvements over other garbled circuit systems.
+Other garbled circuit methods require that a function either be selected ahead of time in an offline phase, or that the function's garbled circuit be communicated during the online phase.
+In the former case, the parties performing secure computation lack flexiblity, as they must choose their function must be determined ahead of time, and as a result, the function selected must be indepdent of their inputs.
+In the latter case, communicating a garbled circuit during the online phase is slow, as garbled circuits are quite large.
 
-Chapter 1 of this thesis starts by explaining the cryptographic primitives necessary for understanding garbled circuits.
-These primitives included encryption, oblivious transfer and the idea of computational indistinguishability.
-In Chapter 2 we use the fundamentals introduced in Chapter 1 to discuss what it means for a protocol to be secure. 
-Chapter 2 also introduces garbled circuits, and explains the intuition behind their security.
-Chapter 3 discusses various improvements to garbled circuits, most of which operate by cleverly setting wire labels.
-The most important improvement was Free XOR, which made XOR gates free, in the sense that they require no additional bandwidth.
+To solve this problem, I, along with my collaborators, propose component-based garbled circuits.
+Component-based garbled circuits break a large function up into its smaller components.
+In the offline phaes, the parties exchange the smaller components, and then in the online phase, the parties stitch, or chain, together the pre-exchagned components into a function of their choosing.
+With component-baed garbled circuits, the function to be comptuted may be selected in the online phase without the cost of cost of sending a garbled circuit.
 
-In Chapter 4 we introduce component-based garbled circuits, a method of stitching together small component-circuits into a larger function.
-We also discuss a contribution of this thesis to the literature: the idea of Single Communication Multiple Connections (SCMC).
-SCMC reduces the bandwidth requirements of component-based garbled circuits by choosing input and output wire labels to have a predictable pattern.
+Component-based garbled circuits is a larger project, in which this thesis specifically contributes two items.
+The first contribution is Single Communication Multiple Connections (SCMC), a method for improving component-based garbled circuits.
+SCMC cleverly chooses input wire labels and output wire labels to have a predictable pattern, such that fewer link labels are sent during the online phase to stitch together the garbled components.
+SCMC offers the best improvements when large pieces of data are being chained between garbled components.
+Since a single label is required per piece of data, a 10 by 10 matrix requires the same bandwidth as a 100 by 100 matrix.
+In other words, SCMC makes the online bandwidth of component-based garbled invariant to size of data but scales linearly with the number of pieces of data (linearly with a small constant).
 
-Chapter 5 discusses \CompGC, our implementation of component-based garbled circuits.
-\CompGC is a full-fledged two party secure computation system; parties select a function, select their inputs, and \CompGC runs a networked protocol between the two parties to compute the answer to their function.
-We ran a number of experiments on \CompGC to test the improvements of SCMC over naive chaining, to compare component-based garbled circuits to traditional garbled circuits, and to examine the benefits of component-based garbled circuits in a real world networking setting by emulating the latency and bandwidth of the internet.
-We found that \CompGC with SCMC is faster than all other garbled circuit protocols, and the speed is further emphasized when the systems are run on the emulated internet.
-\CompGC reduces the online bandwidth of garbled circuits by a substantial factor. \al{get a number here}
+The second contribution of this thesis is \CompGC, an implementation of component-based garbled circuits and SCMC into a fully crytographic system.
+\CompGC allows two parties to securely compute an arbitrary function using component-baed garbled circuits, supporting all of the intermediate steps.
+We timed \CompGC and found that it is the fastest implementation of garbled circuts in the literature.
 
-Overall, we conclude that component-based garbled circuits improve garbled circuits by adding flexibility, increasing speed and lowering bandwidth in the two party setting.
+Future work in the area of component-baed garbled circuits should focus on adapting component-baesed methods to the malicious setting.
+In the malicious setting, we assume that the parties may lie, in which case the manner in which the parties exchange links needs to be made more secure.
+Another area is to expand component-based methods to work with more than two parties.
+The two party setting is a special case, so some theoretical work needs to be done to make component-based methods work with three or more parties.
+Adapting component-based methods to malicious and to greater than two parties is likely to be possible, but remains an open problem.
 
+The goal of secure computation research is make methods that are sufficiently fast, flexible and secure for the world.
+Overall, component-based garbled circuits are a step in this direction.
+They are fast and generate a lot more flexibility than any past protocol.
+By continuing research in this direction, and extending component-based methods to work in stronger security settings, secure computation will soon be a standard part of the internet operations in the real world.
+As data becomes more prevalent and secure becomes more important, the demand for secure computation will increase; fortunately, good, flexible, fast and secure protocols are near.
