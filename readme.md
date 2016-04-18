@@ -1,7 +1,24 @@
 # Thesis
 My senior thesis on multiparty computation (a problem in cryptography). For more info, read the thesis or see my description of the project on my website: [aled1027.github.io](aled1027.github.io).
 
+
+## TODO
+- citations on history
+- new section in comp based garbled circuits talking about previous work
+    - include citations from compgc paper
+- list of tables/figures is funky
+- expand OT improvements section
+- list of abbreviations
+- add figures from talk
+- bank lower latency
+- \samples from notation
+    - figure out fix
+    - use macro
+- spellcheck
+
 ## Done
+* fix original OT section - use figure from talk
+    * finish chapter better
 * intro revisions
     * project vs my work
     * describe component-basd garbled circuits as a project that I worked on collabors, not a preexisting idea.
@@ -25,20 +42,6 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
     * goals:
         * "what we did from less tech minded people"
         * what I want people to take away
-## TODO
-- citations on history
-- new section in comp based garbled circuits talking about previous work
-    - include citations from compgc paper
-- list of tables/figures is funky
-- fix original OT section - use figure from talk
-    - finish chapter better
-- expand OT improvements section
-- add figures from talk
-- bank lower latency
-- \samples from notation
-    - figure out fix
-    - use macro
-- spellcheck
 
 ## Various Resources
 http://tex.stackexchange.com/questions/55213/how-to-draw-a-boolean-circuit-diagram-in-circuitikz

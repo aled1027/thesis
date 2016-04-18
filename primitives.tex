@@ -229,14 +229,14 @@ Figure \ref{fig:less_than_circuit} shows the circuit representation of the less 
 \caption{A NOT gate.}
 \end{figure}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale=0.75]{images/drawing.png}
-    \label{fig:less_than_circuit}
-    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.\al{make with tikz}}
-\end{figure}
+%\begin{figure}[h]
+%    \centering
+%    \includegraphics[scale=0.75]{images/drawing.png}
+%    \label{fig:less_than_circuit}
+%    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.\al{make with tikz}}
+%\end{figure}
 
-\begin{table}[h]
+\begin{table}[h!]
 \label{tab:less_than}
 \centering
 \begin{tabular}{ | l | c || r |}
@@ -251,23 +251,28 @@ x & y & $x < y$ \\ \hline
 \end{table}
 
 \section{Oblivious Transfer}
-Oblivious Transfer (OT) is a communicating protocol that underlies many more complicated cryptosystems.
-At the highest level, Alice potentially sends two messages to Bob, and Bob only recieves one of the messages.
 
-Consider the following thought experiment: Alice and Bob want to exchange a message.
-Alice has two messages $m_0$ and $m_1$, and she Alice wants to send one of them Bob but does not care which one.
-Bob knows that he wants message $m_b$ where $b \in \{0,1\}$.
-Alice gives both messages to the trusted post-office. 
-Bob also goes to the trusted post office, and says that he wants $m_b$. 
-The post office gives $m_b$ to Bob, throws the other message ($m_{1-b}$) in the trash, and does not tell Alice which message they gave to Bob.
-Now, Alice has sent a message to Bob, but is oblivious as to which message was sent.
+\begin{figure}[h]
+    \center
+    \includegraphics[scale=.8]{images/ot}
+    \caption{The high level idea of oblivious transfer. Image from \cite{alexpieran}}
+    \label{fig:basic-ot}
+\end{figure}
+Oblivious Transfer (OT) is a simple, useful protocol that underlies many more complicated cryptosystems.
 
-Oblivious Transfer is a useful protocol and is a fundamental component of 2PC protocols.
-Oblivious Transfer protocols guarantee the following security properties:
-\begin{enumerate}
-    \item Alice does not know whether Bob recieved $m_0$ or $m_1$.
-    \item Bob does not know anything about $m_{1-b}$, the message that he did not receive.
-\end{enumerate}
+Figure \ref{fig:basic-ot} outlines the high level idea of oblivious transfer.
+The box in figure \ref{fig:basic-ot} may be thought of as a trusted post office.
+Alice potentially sends two messages $m_0$ and $m_1$ to Bob.
+Instead of sending the messages to Bob, she sends the messages to the post office.
+Bob, without seeing either $m_0$ or $m_1$, knows that he wants $m_b$ where $b \in \{0,1\}$, so he notifies the post office that he wants message $b$.
+With this information, the post office gives Bob $m_b$, but two secure properties hold: (1) Alice does not know whether Bob received $m_0$ or $m_1$ and (2) Bob does not learn any information about $m_{1-b}$, the message that he did not receive.
+
+We will not focus on the internal operations of oblivious transfer; for our purposes, it is a secure black box.
+When we use oblivious transfer in the next chapter, the two messages that Alice potentially sends will be encryption keys, and Bob will select a key that corresponds to his input - a value that he doesn't want Alice to know.
+In Chapter 3 we discuss improvements to oblivious transfer, since oblivious transfer, despite its simple appearance, requires a good amount of math and is consequently slow.
+
+
+
 
 
 
