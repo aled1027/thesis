@@ -8,7 +8,6 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
     - include citations from compgc paper
 - list of tables/figures is funky
 - expand OT improvements section
-- list of abbreviations
 - add figures from talk
 - bank lower latency
 - \samples from notation
@@ -17,6 +16,7 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 - spellcheck
 
 ## Done
+* list of abbreviations
 * fix original OT section - use figure from talk
     * finish chapter better
 * intro revisions

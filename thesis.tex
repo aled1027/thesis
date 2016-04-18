@@ -57,21 +57,30 @@ I want to thank a few people.
 \chapter*{Preface}
 This is an example of a thesis setup to use the reed thesis document class.
 
-\chapter*{List of Abbreviations}
+\chapter*{List of Notation}
+This is a list of notation that is used through this thesis.
 You can always change the way your abbreviations are formatted. Play around with it yourself, use tables, or come to CUS if you'd like to change the way it looks. You can also completely remove this chapter if you have no need for a list of abbreviations. Here is an example of what this could look like:
 
 \begin{table}[h]
 \centering % You could remove this to move table to the left
-\al{Do I need this?}
 \begin{tabular}{ll}
-	\textbf{ABC}  	&  American Broadcasting Company \\
-	\textbf{CBS}  	&  Columbia Broadcasting System\\
-	\textbf{CDC}  	&  Center for Disease Control \\
-	\textbf{CIA}  	&  Central Intelligence Agency\\
-	\textbf{CLBR} 	&  Center for Life Beyond Reed\\
-	\textbf{CUS}  	&  Computer User Services\\
-	\textbf{FBI}  	&  Federal Bureau of Investigation\\
-	\textbf{NBC}  	&  National Broadcasting Corporation\\
+    $\C$ & A circuit \\
+    $\GC$ & A garbled circuit \\
+    $W_i$ & Wire i, or if using Free XOR then $W_i$ represents the single wire label for wire $i$ \\
+    $W_i^j$ & Wire $i$'s $j$th wire label. $j \in \{0,1\}$ \\
+    $\sigma_i$ & The semantic value of wire $W_i$ \\
+    $c$ & A component-circuit \\
+    $e_{\C}$ & set of $\C$'s input wires \\
+    $d_{\C}$ & set of $\C$'s output wires \\
+    $\gamma \samples \{0,1\}^n$ & $\gamma$ is sampled uniformly at random from the set $\{0,1\}^n$. \\
+    $\Delta$ & The delta value for the Free XOR technique \\
+    $x$ & Alice's input string \\
+    $y$ & Bob's input string \\
+    $z$ & he output string \\
+    $x_i$ & The $i$th bit of string $x$. \\
+    $g$ & Gate g \\
+    $T_g$  & Garbled table for gate $g$ \\
+    $L_{ij}$ & Link label for mapping output wire $W_i$ to input wire $W_j$. \\
 \end{tabular}
 \end{table}
 	

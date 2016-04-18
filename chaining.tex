@@ -1,6 +1,6 @@
 %!TEX root = thesis.tex
 
-\chapter{Chaining Garbled Circuits}
+\chapter{Component-based Garbled Circuits}
 
 In this chapter we introduce component-based garbled circuits, a method that allows for most of the work involved in building and communicating a garbled circuit to occur in an offline phase before the inputs or function to compute are known. 
 This offers significant improvements to the online performance of garbled circuits. 
@@ -15,7 +15,7 @@ Imagine that two banks integrate secure computation into their daily transaction
 At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
 The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
 
-\section{How to chain}
+\section{How to Chain}
 In this section we describe how to chain together garbled circuits.
 At a coarse level, chaining looks like figure \ref{fig:chaining-course} where the input to some some garbled components is the output of other garbler components. 
 To chain, or stitch together, two garbled components, the evaluator needs to transform an output wire label of one component into a valid input wire label of another component, while preserving the semantic value of the wires. 
@@ -37,7 +37,7 @@ This notation is a useful way to reason with wire labels when the Free XOR condi
 	U_0^0 \oplus u_0 \Delta \oplus L_{UW} & = U_0^0 \oplus u_0 \Delta \oplus U_0^0 \oplus W_0^0 \\
 	& = W_0^0 \oplus u_0 \Delta
 \end{align}
-We see from this equation that the evaluator acquires a valid wire label for wire $W_0$ which has the semantic value of as wire label $U_0^*$.
+We see from this equation that the evaluator acquires a valid wire label for wire $W_0$ which has the same semantic value as wire label $U_0^*$.
 
 \input{figure-chaining}
 
@@ -64,7 +64,7 @@ During the day, when the banks decide that they want to securely compute some fu
 The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
 Now that the evaluator-bank has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
 
-\section{Security of Chaining}
+\section{Security of Component-based Garbled Circuits}
 
 In this section, we show how to adapt the standard definition of privacy, presented in chapter 2, to component-based garbled circuits.
 Recall from Chapter 2 that we said a garbled circuit scheme is secure if for all probabilistic, polynomial-time simulators (i.e algorithms) $S_1$ and $S_2$ the following holds:
