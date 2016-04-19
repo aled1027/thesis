@@ -40,7 +40,6 @@ A link label is a ciphertext that allows the evaluator to transform the output w
 Suppose that the garbling uses Free XOR where each component uses the same $\Delta$, that is, $U_0^0 \oplus U_0^1 = W_0^0 \oplus W_0^1 = \Delta$, then it is sufficient for the link label $L_{UW}$ to be $U_0^0 \oplus W_0^0$.
 The evaluator xors the output wire label $U_0^*$ with $L_{UW}$ to acquire $W_0^*$, a valid input label for wire $W_0$. 
 
-\al{Have we introduced this notation?}
 We show this computation below; the value $u_0 \in \{0,1\}$ is the semantic value of wire $U_0$, so that $u_0\Delta$ equals $0$ if $u_0$ is $0$ and $\Delta$ otherwise. 
 This notation is a useful way to reason with wire labels when the Free XOR condition is present. 
 \begin{align}

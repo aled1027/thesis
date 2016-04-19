@@ -3,17 +3,19 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 
 
 ## TODO
-- expand OT improvements section
 - add figures from talk
 - list of tables/figures is funky
-- \samples from notation
-    - figure out fix
-    - use macro
-    - what about \leftharpoonup
 - spellcheck
 - go through \al notes
 
+## Not doing
+- expand OT improvements section
+
 ## Done
+* \samples from notation
+    * figure out fix
+    * use macro
+    * what about \leftharpoonup
 * citations on history
 * new section in comp based garbled circuits talking about previous work
     * include citations from compgc paper

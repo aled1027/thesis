@@ -114,7 +114,6 @@ The overall bandwidth is increased by $4$ bits per gate: a tiny constant increas
 \end{table}
 
 \section{Garbled Row Reduction 3}
-\al{check notation for get/sample in figure. $\gets$ is used for both}
 Garbled Row Reduction 3 (GRR3) reduces the size of the garbled table from 4 ciphertexts to three 3 ciphertexts \cite{grr}.
 In a classical garbled circuit scheme, the wire labels for each wire are chosen prior to garbling any gates.
 In GRR3, the garbler samples values for the input wire labels prior to garbling, and the garbler gives all other wire labels values as they generate each garbled table.
@@ -173,7 +172,7 @@ Since the evaluator does not know whether $W_k^0$ or $W_k^1$ is set to $0^n$, th
 GRR3 offers good performance benefits.
 Garbler-side computation is the same, except that a decryption is performed in place of an encryption in constructing the first row of the garbled table.
 Evaluator-side computation is the same as point and permute: the evaluator performs a single decryption.
-Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, contributing a $25\%$ reduction in bandwidth.
+Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, a $25\%$ reduction in bandwidth.
 
 \section{Free XOR}
 The Free XOR technique makes the computation of XOR gates free, in the sense that no garbled table need to be communicated \cite{freexor}.
@@ -278,7 +277,7 @@ However, FreeXOR requires the circularity assumption,
 The circularity assumption is discussed in the section on FreeXOR.
 
 \section{Half Gates}
-Half Gates is the most recent improvement to garbled circuits \cite{two halves}.
+Half Gates is the most recent improvement to garbled circuits \cite{twohalves}.
 The goal of Half Gates is to make AND gates cost two ciphertexts, while preserving properties necessary for Free XOR without adding unary gates. 
 Half gates work by splitting an AND gate into two half gates.
 Each half gate is an AND gate, where one of the inputs is \textit{known} to a party.

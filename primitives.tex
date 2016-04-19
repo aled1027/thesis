@@ -1,4 +1,5 @@
 %!TEX root = thesis.tex
+
 \chapter{Cryptographic Primitives}
 Secure Compuation is the study of computing functions in a secure fashion. 
 SC is split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
@@ -108,26 +109,26 @@ We define security using a thought experiment.
 In the thought experiment, the adversary has access to the encryption algorithm with key hardcoded in. 
 This means that the adversary can encrypt any message they want, and see how the message would encrypt. 
 The goal of the adversary at this point in the thought experiment is to find a pattern or weakness in the encryption algorithm that they can exploit.
-The adversary eventually picks any two messages $m_0$ and $m_1$ which they did not give to their ecnryption algorithm and see how they encrypt.
-The adversay shows us $m_0$ and $m_1$.
+The adversary eventually picks any two messages $m_0$ and $m_1$ which they did not give to their encryption algorithm and see how they encrypt.
+The adversary shows us $m_0$ and $m_1$.
 We choose one of the messages\footnote{We select the message uniformly at random.}, encrypt the message, and send the resulting ciphertext to the adversary.
 The adversary's goal now is to determine which message we encrypted.
 They still may use their encryption algorithm with the key hardcoded in.
-Evenutally the adversary must output either $0$ or $1$ indicating that they think we selected $m_0$ or $m_1$ respectively.
+Eventually the adversary must output either $0$ or $1$ indicating that they think we selected $m_0$ or $m_1$ respectively.
 If the adversary picks correctly, then we say that the adversary wins; otherwise, we say that the adversary loses.
 
-Finall and informally, the encryption scheme is considered secure if the probability that the adversary wins is $\frac{1}{2} + \mu(\lambda)$, i.e. the best the adversary can do is guess.
+Finally and informally, the encryption scheme is considered secure if the probability that the adversary wins is $\frac{1}{2} + \mu(\lambda)$, i.e. the best the adversary can do is guess.
 
 \begin{definition}
-An encryption scheme is secure under a chosen-plaintext attack if for all probabilistic polynomial-time adversaries $A$, there exist a neglible function $\mu$ such that
+An encryption scheme is secure under a chosen-plaintext attack if for all probabilistic polynomial-time adversaries $A$, there exist a negligible function $\mu$ such that
 \begin{equation}
 Pr[E_{\A, \Pi}(n) = 1] \leq \frac{1}{2} + \mu(n)
 \end{equation}
 where $E$ is the following experiment:
 \begin{enumerate}
 \item Generate key $k$ by running $\Gen(1^n)$. 
-\item The adversary $\A$ is given $1^n$ and oracle access to $\Enc_k$., and outputs a pair of messages $m_0$ and $m_1$ of the same length.
-\item A uniform bit $b \in \{0,1\}$ is selected, and then a ciphertext $c \gets \Enc_k(m_b)$ is computed and given to $\A$.  
+\item The adversary $\A$ is given $1^n$ and oracle access to $\Enc_k$, and outputs a pair of messages $m_0$ and $m_1$ of the same length.
+\item A uniform bit $b \samples \{0,1\}$ is sampled uniformly at random\footnote{Throughout this thesis, we use the notation $x \samples X$ to mean that x is sampled uniformly at random from set $X$.}, and then ciphertext $c \gets \Enc_k(m_b)$ is computed and given to $\A$.
 \item $\A$ continues to have oracle access to $\Enc_k$, and outputs a bit $b'$. 
 \item The output of the experiment is defined to be $1$ if $b' = b$ and $0$ otherwise. In the former case, we say that $\A$ succeeds.
 \end{enumerate}
@@ -151,7 +152,7 @@ If the DKC is insecure, then an adversary can find two messages, $m_0$ and $m_1$
 
 \section{Computational Indistinguishability}
 This section introduces the idea of computational indistinguishability. 
-We do not use computational indistinguishability immedidiately, but it will important later for defining security of a 2PC protocol.
+We do not use computational indistinguishability immediately, but it will important later for defining security of a 2PC protocol.
 
 Informally, two probability distribution are indistinguishable if no polynomial-time algorithm can tell them apart.
 The thought experiment is like this: an algorithm is  that there are two distributions, it is given one of the distributions.
