@@ -15,6 +15,16 @@ Imagine that two banks integrate secure computation into their daily transaction
 At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
 The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
 
+\section{History}
+The goal to reduce online computation by using an offline phase is not a new goal.
+In Chapter 3, we discuss oblivious transfer preprocessing, a method that moves most of the work involved in oblivious transfer to an offline stage \cite{Bea95}. 
+In the research of Malicious garbled circuits, researchers improve the online efficiency of cut-and-choose by using an offline phase \cite{HKK14, LR14, LR15}.
+Moreover, research in non-garbled circuit two party computation uses similar ideas in \cite{DPSZ12, NNOB12}. 
+
+Most similar to component-based garbled circuits is a technique called \textit{partial garbled circuits} proposed by Mood et al. \cite{MGBF14}. 
+The goal of partial garbled circuits was to retain state after a garbled circuit computation. 
+To achieve this, they used two link labels per connection, whereas we, as you will see in the presentation of SCMC, use fewer than a single label per connection on average.   
+
 \section{How to Chain}
 In this section we describe how to chain together garbled circuits.
 At a coarse level, chaining looks like figure \ref{fig:chaining-course} where the input to some some garbled components is the output of other garbler components. 
@@ -117,6 +127,7 @@ In this section I discuss my theoretical contribution to component-based garbled
 Single Communication Multiple Connections (SCMC) is a technique that improves upon naive component-based garbled circuits for some functions by observing that large sequences of consecutive wires often represent a single element of data, like a string, number or matrix. 
 When large sequences of consecutive wires are mapped between garbled components, the sequence of consecutive wires is mapped together - the order of the wires is preserved. 
 SCMC takes advantage of this fact by requiring that only a single link label is communicated for each sequence of consecutive wires, as opposed to one link label per wire. 
+This technique is analogous to SIMD-style (single instruction multiple data) computation that is used in homomorphic encryption \cite{SV11} and GMW-based two party computation \cite{DSZ15, SZ15} in that a single piece of communication, or instruction, is used for multiple links, or data. 
 
 As with most improvements to garbled circuits, SCMC operates by modifying the generation of wire labels. 
 Wire labels that are part of a block representing a single piece of data are generated in a fixed, patterned way such that the differences between linked labels will be the same for all wires in a block. 

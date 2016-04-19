@@ -1,20 +1,21 @@
+%!TEX root = thesis.tex
+
 \chapter{Improving MPC}
 \al{cite Mike Rosulek's talk and website}
 \al{Mike's website has all the sources...}
 \al{figure out why GRR3 is secure}
-\al{switch notation to $W_i^j$}
 
-The aim of this chapter is to outline new techniques that improve the performance of garbled circuits and discuss their costs and benfits.
+The aim of this chapter is to outline new techniques that improve the performance of garbled circuits and discuss their costs and benefits.
 
 We consider three metrics to understand the costs benefits of the new techniques: size of the garbled table, garbler-side computation and evaluator-side computation.\footnote{In this chapter, the term garbled table is used interchangeably with the fourth column of the garbled table.}
-In the classic scheme of garbled circuits, the garbler and evaluator communicate wire labels of input wires and the fourth coumn of the garbled table for each gate.
+In the classic scheme of garbled circuits, the garbler and evaluator communicate wire labels of input wires and the fourth column of the garbled table for each gate.
 Communicating the input labels is an unavoidable cost; this information needs to be exchanged. 
-However, many of the input labels are exchanged with oblivious transfer, discussed in chapter 1, which has been improved.
+However, many of the input labels are exchanged with oblivious transfer, discussed in Chapter 1, which has been improved.
 We discuss the improvement to oblivious transfer at the end of this chapter.
 
-New techniques also reduce the size of the garbled table, the other infomration exchanged between the garbler and evaluator.\footnote{In chapter 2, Alice was the garbler and Bob was the evaluator. For clarity in chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}
+New techniques also reduce the size of the garbled table, the other information exchanged between the garbler and evaluator.\footnote{In Chapter 2, Alice was the garbler and Bob was the evaluator. For clarity in Chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}
 In the classical garbled circuit scheme, the evaluator sends all four rows of the garble table to the evaluator.
-New techniques, wherein the evaluator samples wire labels \textit{intelligently}, reduce the number of rows of the garbled table that are communicated.
+New techniques, wherein the garbler cleverly samples wire labels, reduce the number of rows of the garbled table that are communicated.
 Reducing the size of the garbled table is important, because it is a measure of the bandwidth requirement of the scheme.
 The garbled table amount to most of the communication, and the number of garbled tables scales with the size of the circuit - that is, a larger circuit means more gates means more garbled tables.
 Moreover, bandwidth is the most important factor in assessing the performance of a garbled circuit scheme.
@@ -24,7 +25,7 @@ We also consider garbler-side computation, which is the number of encryptions th
 In the classical garbled circuit scheme, the garbler performs four encryptions; however, this number is not often reduced.
 Typically, the new techniques increase or alter the computation that the garbler performs.
 
-Finally, we consider evaluator-side computation, which is the number of decryptions the evaluator performs in ungarbling a gate - that is, finding the output wire label.
+Finally, we consider evaluator-side computation, which is the number of decryptions the evaluator performs in un-garbling a gate - that is, finding the output wire label.
 In the classical garbled circuit scheme, the evaluator trial decrypts each row until one of the decryptions is successful.
 Hence, on average, the evaluator performs 2.5 decryptions.
 New techniques reduce the evaluator-side computation to require a single decryption, a good performance improvement.
@@ -39,22 +40,21 @@ Because many of the techniques have different effects on XOR gates and AND gates
 
 The goal of this chapter is primarily to explain each row in this table.
 We will understand the technique, and its associated computational and bandwidth costs.
-We start with the earliest technique and move forward chronologically.
-
+We start with the earliest technique and move forward chronologically\footnote{For further information and exposition, we encourage the reader to investigate \cite{mikes-video}.}.
 
 \section{Point and Permute}
 \al{add to chapter 2 that rows need to be permuted!}
 
-The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which row of the garbled table to decrypt, and the evaluator only decrypts that ciphertext.
+The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which row of the garbled table to decrypt, and the evaluator only decrypts that ciphertext \cite{fairplay}.
 
-In the classic garbled cricuit scheme, the garbled table is randomly permuted - that is, the garbler randomly reorders the rows of the garbled table before sending the garbled table to the evaluator.\footnote{This is required for security. See chapter 2 for more information}
-Upon receiving the garbled table, the evaluator trial decrypts each row of the garbled table until a decryption succeeds.\footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see chapter 1.}
+In the classic garbled circuit scheme, the garbled table is randomly permuted - that is, the garbler randomly reorders the rows of the garbled table before sending the garbled table to the evaluator.\footnote{This is required for security. See Chapter 2 for more information}
+Upon receiving the garbled table, the evaluator trial decrypts each row of the garbled table until a decryption succeeds.\footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see Chapter 1.}
 
 Point and permute enables the evaluator to bypass the trial decryption step, so that they decrypt the correct wire label the first time.
-In point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire lables of the same wire have opposite bits.
+In point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire labels of the same wire have opposite bits.
 More formally, the garble randomly samples $b_i$ from $\{0,1\}$, and then gives wire label $W_i^0$ select bit $b_i$ and gives $W_i^1$ select bit $1-b_i$.
 The garbler permutes the garbled table based on the select bits, and appends the select bits each wire label.
-When the evaluator ungarbles the gate, they use the select bits appended to each of the two input wire labels to determine which row to decrypt.
+When the evaluator un-garbles the gate, they use the select bits appended to each of the two input wire labels to determine which row to decrypt.
 For example, if the select bits on the end of the input wire labels are 1 and 0, then the evaluator decrypts the third row.
 
 Tables \ref{tbl:point-and-permute} show an example of point and permute.
@@ -115,14 +115,14 @@ The overall bandwidth is increased by $4$ bits per gate: a tiny constant increas
 
 \section{Garbled Row Reduction 3}
 \al{check notation for get/sample in figure. $\gets$ is used for both}
-Garbled Row Reduction 3 (GRR3) reduces the size of the garbled table from 4 ciphertexts to three 3 ciphertexts.
+Garbled Row Reduction 3 (GRR3) reduces the size of the garbled table from 4 ciphertexts to three 3 ciphertexts \cite{grr}.
 In a classical garbled circuit scheme, the wire labels for each wire are chosen prior to garbling any gates.
 In GRR3, the garbler samples values for the input wire labels prior to garbling, and the garbler gives all other wire labels values as they generate each garbled table.
 
 Suppose the garbler is garbling an XOR gate with input wires $W_i$ and $W_j$ and output wire $W_k$.
 The garbler begins by using the point and permute method, sampling select bits and permuting the garbled table.
 In GRR3, the garbler then set the ciphertext in the top row of the garbled table equal to a value that decrypts to $0^n$, the string of $n$ zeros.
-Specifcally, $W_k^*$, the wire label on the top row, is set to $\EncInv_{W_i^*, W_j^*}(0^n)$.
+Specifically, $W_k^*$, the wire label on the top row, is set to $\EncInv_{W_i^*, W_j^*}(0^n)$.
 The garbler sends the bottom three rows of the garbled table to the evaluator.
 When evaluating the garbled gate, if the evaluator sees that the select bits of the input wires indicate to decrypt the first row, then the evaluator simply assumes the row to have value $0^n$ and decrypts it as usual.
 In that case, the garbler sets $W_k^*$ to $\EncInv_{W_i^*, W_j^*}(0^n)$.
@@ -173,10 +173,10 @@ Since the evaluator does not know whether $W_k^0$ or $W_k^1$ is set to $0^n$, th
 GRR3 offers good performance benefits.
 Garbler-side computation is the same, except that a decryption is performed in place of an encryption in constructing the first row of the garbled table.
 Evaluator-side computation is the same as point and permute: the evaluator performs a single decryption.
-Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, contributin a $25\%$ reduction in bandwidth.
+Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, contributing a $25\%$ reduction in bandwidth.
 
 \section{Free XOR}
-The Free XOR technique makes the computation of XOR gates free, in the sense that no garbled table need to be communicated.
+The Free XOR technique makes the computation of XOR gates free, in the sense that no garbled table need to be communicated \cite{freexor}.
 The evaluator can compute $W_k^*$ from only $W_i^*$ and $W_j^*$.
 Like GRR3, the Free XOR techniques takes advantage of carefully crafted wire labels, even input wires.
 
@@ -205,12 +205,11 @@ Fortunately, the popular encryption scheme AES-128 is presumed to be secure unde
 Free XOR dramatically reduces bandwidth, and because XOR gates are relatively cheaper than AND gates, circuits with more XOR gates perform faster.
 Many programs have been made to optimize the number of XOR gates and minimize the number of AND gates (while minimizing the size of the entire circuit of course).
 The garbler-side computation is reduced: constructing the xor garbled table does not require 3 encryptions and 1 decryption.
-Evaluator-side computation is reduced likewise: xor gates do not requre any decryption.
+Evaluator-side computation is reduced likewise: xor gates do not require any decryption.
 
 \section{Garbled Row Reduction 2}
-\al{https://web.engr.oregonstate.edu/~rosulekm/scbib/index.php?n=Paper.PSSW09}
-Garbled row reduction 2 (GRR2) reduces the size of the garbled table of AND gates to $2$ ciphertexts.
-Unfortunatley, GRR2 is not compatible with Free XOR, and GRR2 is less efficient than Free XOR combined with GRR3 for most circuits, so GRR2 is not often used by itself in practice.
+Garbled row reduction 2 (GRR2) reduces the size of the garbled table of AND gates to $2$ ciphertexts \cite{grr}.
+Unfortunately, GRR2 is not compatible with Free XOR, and GRR2 is less efficient than Free XOR combined with GRR3 for most circuits, so GRR2 is not often used by itself in practice.
 
 Suppose the garbler is garbling an AND gate with input wires $W_i$ and $W_j$ and output wire $W_k$.
 For all $a,b \in \{0,1\}$, let $V_{a,b} = H(W_i^a, W_j^b)$.
@@ -239,7 +238,7 @@ Evaluator side computation increases slightly, as the evaluator constructs a pol
 \al{passive tone}
 After the creation of GRR2, secure computation was at an awkward point.
 Circuits with many XOR gates were computed most quickly with Free XOR and GRR3, but circuits with many AND gates were computed most quickly with GRR2.
-FleXOR reconciles GRR2 with Free XOR, resulting in a scheme that is universally faster.
+FleXOR reconciles GRR2 with Free XOR, resulting in a scheme that is universally faster \cite{flexor}.
 
 Recall that GRR2 is incompatible with Free XOR because the wire labels are uncontrollably created by random polynomials, where Free XOR requires that $W_k^1 = W_k^0 \oplus \Delta$ for some global delta.
 FleXOR solves this problem in a straightforward fashion: correct the delta value of output wires of AND gates such that the output wires use the global delta.
@@ -264,7 +263,7 @@ For example, $W_i$ and $W_k$ may share a delta but $W_j$ may have a different de
 
 FleXOR is fastest when AND gates are grouped together and XOR gates are grouped together, since fewer unary gates will be required.
 Thereby, FleXOR creates an optimization problem: place XOR gates, AND gates and unary gates to minimize bandwidth requirements.
-However, FleXOR's optimzation problem is too computationally expensive, but on the up side, analysis reveals that FleXOR requires on average an extra $0$ or $1$ ciphertext per gate, a relatively small amount.
+However, FleXOR's optimization problem is too computationally expensive, but on the up side, analysis reveals that FleXOR requires on average an extra $0$ or $1$ ciphertext per gate, a relatively small amount.
 That cost comes at the benefit of a Free XOR circuit, and 1 fewer ciphertext for each AND gate.
 
 FleXOR requires slightly more garbler-side computation than FreeXOR and GRR2, since the garbler must create the unary gates.
@@ -279,8 +278,7 @@ However, FreeXOR requires the circularity assumption,
 The circularity assumption is discussed in the section on FreeXOR.
 
 \section{Half Gates}
-\al{for some reason it uses hashes instead of encryption in the paper. not sure why. and in the talk, mike uses enc. in our code, alex m used hash}
-Half Gates is the most recent improvement to garbled circuits.
+Half Gates is the most recent improvement to garbled circuits \cite{two halves}.
 The goal of Half Gates is to make AND gates cost two ciphertexts, while preserving properties necessary for Free XOR without adding unary gates. 
 Half gates work by splitting an AND gate into two half gates.
 Each half gate is an AND gate, where one of the inputs is \textit{known} to a party.
@@ -332,7 +330,7 @@ If the evaluator should decrypt the ciphertext on the top row (as directed by po
 \end{table}
 
 The evaluator-half-gate is somewhat different from the garbler-half-gate.
-Consider an AND gate where the evaluator \textit{knows} the semanitc value of $a$.
+Consider an AND gate where the evaluator \textit{knows} the semantic value of $a$.
 If $a = 0$, then the evaluator should acquire $W_k^0$. 
 Otherwise if $a = 1$, then the evaluator should acquire $W_k^0 \oplus \sigma_j\Delta$.
 In this case, it suffices for the evaluator to obtain $\Omega = W_k^0 \oplus W_j^0$, as the evaluator simply sets $W_k^*$ to $W_j^* \oplus \Omega$ which sets $W_k^*$ equal to $W_k^0 \oplus b\Delta$.
@@ -374,26 +372,27 @@ With FleXOR, the number of ciphertexts that need to be communicated may vary, bu
 
 \section{Improving Oblivious Transfer}
 \al{Fix this up}
-This section discusses improvements to oblivious transfer, the method by which the garbler communciates the wire labels corresponding to the evaluator's inputs to the evaluator.
+\al{add citations}
+This section discusses improvements to oblivious transfer, the method by which the garbler communicates the wire labels corresponding to the evaluator's inputs to the evaluator.
 At its most basic, oblivious transfer enables Alice to potentially send one of two messages to Bob.
-Bob selects which message he wants to recieve.
-The desirable securitiy properties are (1) Alice does not konw which message she sent to Bob and (2) Bob cannot infer any informatoin about the message that he did not recieve.
+Bob selects which message he wants to receive.
+The desirable security properties are (1) Alice does not know which message she sent to Bob and (2) Bob cannot infer any information about the message that he did not receive.
 
 Oblivious transfer is a key component in secure computation, and often consumes a substantial portion of the secure computation protocol's time.
 There are two major improvements to oblivious transfer.
 The first is called \textit{OT-extension}.
-When using OT with a garbled circuit scheme, Alice and Bob are not exchaning just one message: they exchange a wire label for each of Bob's inputs.
+When using OT with a garbled circuit scheme, Alice and Bob do not exchange a single message; rather, they exchange a wire label for each of Bob's inputs.
 This means that Alice and Bob are performing a linear number of OTs based on the number of inputs.
-OT-extension reduces the entire OT phase to a constant number of OT operations.
+OT-extension reduces the entire OT phase to a constant number of OT operations \cite{otextension}.
 In particular, Alice and Bob run a constant number of OT in order to generate a polynomial number of exchanged messages.
 
-The second improvement to OT is called \textit{OT-preprocessing}.
+The second improvement to OT is called \textit{OT-preprocessing} \cite{Bea95}.
 In OT-preprocessing, Alice and Bob performs the expensive OT operation ahead of time, in what is called the offline phase, on random values.
 Then, during the online phase, Alice and Bob quickly exchange values to correct the pre-shared messages.
 Alice and Bob only exchange a single message during the online phase, and there is no computationally expensive math required like there is during the real OT operation.
 
 In our work with secure computation, OT-preprocessing substantially improved the performance of garbled circuits, and OT-extension was less useful.
-If a garbled circuit scheme uses an offline phase and thereby uses OT-preprocessing, then OT-extension is largely unneccessary.
+If a garbled circuit scheme uses an offline phase and thereby uses OT-preprocessing, then OT-extension is largely unnecessary.
 The parties take the extra needed to send all of the wire labels in the offline phase, since the time does not matter.
 What we the parties are truly concerned about is online time.
 During online time, OT-preprocessing offers huge advantages.
