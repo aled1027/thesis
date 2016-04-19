@@ -3,19 +3,18 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 
 
 ## TODO
-- citations on history
-- new section in comp based garbled circuits talking about previous work
-    - include citations from compgc paper
-- list of tables/figures is funky
 - expand OT improvements section
 - add figures from talk
-- bank lower latency
+- list of tables/figures is funky
 - \samples from notation
     - figure out fix
     - use macro
 - spellcheck
 
 ## Done
+* citations on history
+* new section in comp based garbled circuits talking about previous work
+    * include citations from compgc paper
 * list of abbreviations
 * fix original OT section - use figure from talk
     * finish chapter better
