@@ -9,7 +9,9 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 - \samples from notation
     - figure out fix
     - use macro
+    - what about \leftharpoonup
 - spellcheck
+- go through \al notes
 
 ## Done
 * citations on history
