@@ -2,8 +2,8 @@
 
 \chapter{Cryptographic Primitives}
 Secure Compuation is the study of computing functions in a secure fashion. 
-SC is split into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
-This thesis will focus primarily on 2PC protocols, but many of the methods are applicable to MPC as well.
+We split secure computation into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
+This thesis focuses on 2PC protocols, but many of the methods are applicable to MPC as well.
 
 2PC protocols are complex cryptographic protocols that rely on a number of cryptographic primitives.
 In order to understand 2PC, it is not crucial to understand how the cryptographic primitives work, but it is important to understand their inputs, outputs and security guarantees. 
@@ -24,21 +24,20 @@ A good starting place is to consider perfect security.
 A scheme is perfectly secure if no matter what the adversary does, they cannot break the scheme.
 Even if the adversary has unlimited computational power, in terms of time and space, an adversary cannot break a perfectly secure scheme. 
 
-However, perfect security is not the most useful way to think of security, because it makes forces schemes to be slow and communication intensive.
+However, perfect security is not the most useful way to think of security, because it forces schemes to be slow and communication intensive.
 We relax the definition of security by requiring that the adversary run in polynomial time. 
 This substantially reduces the power of the adversary, and it matches our intuition. 
-We are really only concerned with what adversaries can reasonably achieve, as opposed to theoretically possible. 
+We are really only concerned with what adversaries can reasonably achieve, as opposed to what is theoretically possible. 
 
 Because computers have improved drastically over the years, what was previously considered a reasonable adversary is not what is considered a reasonable adversary today. 
 Modern computing advances have created easy access to faster computation, meaning that modern adversaries can solve harder problems than they could in previous years. 
-As a concrete example, consider an giving an adversary the following problem: find the factors of $N$. 
-The average computer today can solve the problem for a larger $N$ than the average computer a decade ago.
+As a concrete example, consider giving an adversary the following problem: find the factors of $N$. 
+The average computer today can solve the problem for a larger $N$ than the average computer could a decade ago.
 
-Changing computational power makes it important to scale how hard a cryptographic scheme is to break.
+The changing computational power highlights the importance of being able to scale how hard a cryptographic scheme is to break.
 To this end, we introduce a \textit{security parameter}, denoted as $\lambda$.
-A security parameter is a positive integer that represents how hard a scheme is to break. 
-A larger security parameter should mean that the scheme is more difficult to break. 
-More specifically, the security parameter is correlates to the input-size of the problem underlying the cryptographic scheme. 
+A security parameter is a positive integer that represents how hard a scheme is to break; A larger security parameter should mean that the scheme is more difficult to break. 
+More specifically, the security parameter is correlated to the input size of the problem underlying the cryptographic scheme. 
 For example, if the underlying problem is factoring large number $N$, then $N = \lambda$. 
 As $N$ and $\lambda$ scale up, the factoring problem becomes more difficult and the scheme becomes hard to break. 
 
@@ -49,8 +48,7 @@ In order to reason about the security of cryptographic schemes, it is useful to 
 For example, we want to be able to say that the best adversary, that is best probabilistic polynomial-time algorithm, has some probability $p$ of breaking the scheme. 
 We note that $p$ is nonzero, since the adversary can always guess and be right with some nonzero probability. 
 To achieve a probability based formalism, we introduce a negligible function.
-Informally, a negligible function is smaller than the reciprocal of all polynomial functions. 
-Formally, a negligible function is:
+Informally, a negligible function is smaller than the reciprocal of all polynomial functions.
 
 \begin{definition}
 \label{defn:negible}
@@ -60,13 +58,12 @@ A function $\mu : \NN \to \RR$ is negligible if for all positive polynomial $p(\
 \end{equation}
 \cite{goldreich}
 \end{definition}
-
 Examples of negligible functions include $2^{-n}$, $2^{- \sqrt{2}}$ and $n^{- \log n}$. 
 
-To put a negligible function to use, say an adversary is attacking a cryptographic scheme that is equivalent to solving a problem $P$ with input-size $\lambda$ and $2^{\lambda}$ possible answers. 
+To put a negligible function to use, say an adversary is attacking a cryptographic scheme that is equivalent to solving a problem $P$ with input size $\lambda$ and $2^{\lambda}$ possible answers. 
 Moreover, say that $P$ is known to be NP-hard such that there is no polynomial time algorithm to solve $P$. 
 Then, the best that the adversary can do is to guess the answer to $P$.
-Hence the probability that the adversary that finds the answer the $P$, or breaks the scheme, is 
+Hence the probability that the adversary successfully answers $P$, or breaks the scheme, is 
 \begin{align*}
 Pr[\text{A correctly answers $P$}] & = {2^{- \lambda}}
 \end{align*}
@@ -86,8 +83,8 @@ An encryption scheme enables Alice to send her message to Bob with confidence th
 An encryption scheme is composed of three algorithms: $\Enc$, $\EncInv$ and $\Gen$; formally, we say an encryption scheme is a tuple $\Pi = (\Gen, \Enc, \EncInv)$\footnote{We use $\Pi$ here to denote the encryption scheme, because it is a protocol. Protocol starts with a p.}.
 $\Enc$ the obfuscating algorithm, $\EncInv$ is the un-obfuscating algorithm and $\Gen$ generates a key. 
 The key is extra information that $\Enc$ and $\EncInv$ use to obfuscate and un-obfuscate the message respectively. 
-The key, denoted $k$, is a random\footnote{The notion of randomness in cryptography is precisely defined, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseudorandom. Pseudorandomness is also precisely defined.} string of $\lambda$ bits, that is $k$ is randomly sampled from $\{0,1\}^{\lambda}$  where $\lambda$ is the security parameter of the encryption scheme. 
-As per the discussion on security parameters, as $\lambda$ increases and $k$ grows in length, an encryption scheme should become harder to break.
+The key, denoted $k$, is a random\footnote{The notion of randomness in cryptography is precisely defined, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseudorandom. Pseudorandomness is also precisely defined.} string of $\lambda$ bits, that is $k$ is randomly sampled from the set $\{0,1\}^{\lambda}$  where $\lambda$ is the security parameter of the encryption scheme. 
+As per the discussion on security parameters, as $\lambda$ increases and $k$ grows in length, the encryption scheme should become harder to break.
 
 $\Enc$, the encryption algorithm, takes a message and the key as input and outputs an obfuscated message. 
 $\EncInv$, the decryption algorithm, takes the encrypted message and the key as input and outputs the original message. 
@@ -104,20 +101,18 @@ We refer to the original message as the plaintext or $pt$ and the encrypted mess
 
 We are not concerned with how encryption schemes are implemented or on what problems they rely; rather, we use encryption schemes as subroutines, so we are concerned with the security guarantees that they offer.
 
-We say that an encryption scheme is secure if an adversary cannot tell the difference between two messages.
 We define security using a thought experiment. 
-In the thought experiment, the adversary has access to the encryption algorithm with key hardcoded in. 
+In the thought experiment, the adversary has access to the encryption algorithm with the key hardcoded in. 
 This means that the adversary can encrypt any message they want, and see how the message would encrypt. 
 The goal of the adversary at this point in the thought experiment is to find a pattern or weakness in the encryption algorithm that they can exploit.
-The adversary eventually picks any two messages $m_0$ and $m_1$ which they did not give to their encryption algorithm and see how they encrypt.
+The adversary eventually picks any two messages $m_0$ and $m_1$ which they did not give to their encryption algorithm to see how they encrypt.
 The adversary shows us $m_0$ and $m_1$.
 We choose one of the messages\footnote{We select the message uniformly at random.}, encrypt the message, and send the resulting ciphertext to the adversary.
 The adversary's goal now is to determine which message we encrypted.
-They still may use their encryption algorithm with the key hardcoded in.
-Eventually the adversary must output either $0$ or $1$ indicating that they think we selected $m_0$ or $m_1$ respectively.
+They still may use their encryption algorithm with the key hardcoded in, but they cannot encrypt $m_0$ or $m_1$.
+Eventually the adversary must output either $0$ or $1$ indicating that they think we selected $m_0$ or $m_1$ to encrypt, respectively.
 If the adversary picks correctly, then we say that the adversary wins; otherwise, we say that the adversary loses.
-
-Finally and informally, the encryption scheme is considered secure if the probability that the adversary wins is $\frac{1}{2} + \mu(\lambda)$, i.e. the best the adversary can do is guess.
+We consider the encryption scheme to be secure if the probability that the adversary wins is $\frac{1}{2} + \mu(\lambda)$ where $\mu$ is a negligible function, i.e. the best the adversary can do is guess.
 
 \begin{definition}
 An encryption scheme is secure under a chosen-plaintext attack if for all probabilistic polynomial-time adversaries $A$, there exist a negligible function $\mu$ such that
@@ -128,9 +123,9 @@ where $E$ is the following experiment:
 \begin{enumerate}
 \item Generate key $k$ by running $\Gen(1^n)$. 
 \item The adversary $\A$ is given $1^n$ and oracle access to $\Enc_k$, and outputs a pair of messages $m_0$ and $m_1$ of the same length.
-\item A uniform bit $b \samples \{0,1\}$ is sampled uniformly at random\footnote{Throughout this thesis, we use the notation $x \samples X$ to mean that x is sampled uniformly at random from set $X$.}, and then ciphertext $c \gets \Enc_k(m_b)$ is computed and given to $\A$.
+\item A uniform bit $b \samples \{0,1\}$ is sampled uniformly at random\footnote{Throughout this thesis, we use the notation $x \samples X$ to mean that x is sampled uniformly at random from set $X$.}, and then ciphertext $c \gets \Enc_k(m_b)$ is computed and given to $\A$\footnote{We use the arrow $\gets$ to indicate that a value to being assigned to variable. Other common notation would write $c := \Enc_k(m_b)$}.
 \item $\A$ continues to have oracle access to $\Enc_k$, and outputs a bit $b'$. 
-\item The output of the experiment is defined to be $1$ if $b' = b$ and $0$ otherwise. In the former case, we say that $\A$ succeeds.
+\item The output of the experiment is defined to be $1$ if $b' = b$ and $0$ otherwise. If at any point $\A$ encrypts $m_0$ or $m_1$ with their encryption oracle, the output is $0$. $1$ indicates that the adversary wins, and $0$ indicates that the adversary loses.
 \end{enumerate}
 \end{definition}
 
@@ -144,18 +139,21 @@ It is easy to instantiate a DKC if one has a secure single-key encryption scheme
     \end{split}
 \end{equation}
 
-If the encrytion scheme used to create the DKC is secure, then it is easy to see to that the DKC is also secure.
+If the encryption scheme used to create the DKC is secure, then it is easy to see to that the DKC is also secure.
 We are formally considering the statement: $\Enc$ secure $\implies$ DKC secure. 
 Consider the contrapositive: DKC insecure $\implies$ $\Enc$ insecure. 
 If the DKC is insecure, then an adversary can find two messages, $m_0$ and $m_1$ such that their ciphertexts are distinguishable. 
-\al{Figure this out, need to break the old intro crypto work}
+For example, in the $\Enc$ experiment, the adversary could set $m_0 \gets \Enc_k(0)$ and $m_1 \gets \Enc_k(1)$ using their oracle. 
+The ciphertext that the adversary receives back will be $\Enc_k(\Enc_k(b))$, for which the adversary can determine if $b$ is $0$ or $1$ since they can break the DKC experiment. 
+Therefore the adversary can break the $\Enc$ experiment if they can break the DKC experiment.
 
 \section{Computational Indistinguishability}
 This section introduces the idea of computational indistinguishability. 
 We do not use computational indistinguishability immediately, but it will important later for defining security of a 2PC protocol.
 
-Informally, two probability distribution are indistinguishable if no polynomial-time algorithm can tell them apart.
-The thought experiment is like this: an algorithm is  that there are two distributions, it is given one of the distributions.
+Informally, two probability distribution are indistinguishable if no probabilistic polynomial-time algorithm can tell them apart.
+The thought experiment is like this: an algorithm knows that there are two distributions.
+It is given one of the distributions.
 If the algorithm correctly determines which distribution it was given, then it wins, otherwise the algorithm loses.
 The algorithm, since it must run in polynomial time, can only sample a polynomial number of values from the distributions.
 
@@ -180,11 +178,11 @@ The phrases $x \gets X_n$ and $y \gets Y_n$ mean that the probability is taken o
 A function in a 2PC protocol is represented as a boolean circuit.
 A boolean circuit takes as input $x \in \{0,1\}^n$, performs a series of small operations on the inputs, and outputs $y \in \{0,1\}^m$.  
 You may have encountered circuits and logical operators in another context, where the inputs and outputs were True and False.
-For our usage, True will correspond to the value $1$, and False will corresond to the value $0$. 
+For our usage, True corresponds to the value $1$, and False corresponds to the value $0$. 
 
 The small operations done inside of a circuit are performed by a \emph{gate}.
 A gate is composed of three wires: two input wires and one output wire, where a \emph{wire} can have a value either $0$ or $1$.
-A gate performs a simpler operation on the two inputs, resulting in a single output bit.
+A gate performs a simple operation on the two inputs, resulting in a single output bit.
 Table \ref{tab:xor} gives the mapping of an XOR gate.
 
 \begin{table}[h]
@@ -203,8 +201,7 @@ x & y & xor(x,y) \\ \hline
 
 A circuit is a combination of gates that are stringed together.
 It turns out that circuits are quite powerful: in fact, a circuit composed only of AND gates, XOR gates and NOT gates can compute any function or algorithm \cite{goldreich}.
-In other words, if there's some algorithm that can do it, then there is some circuit that can do it as well.
-Figure \ref{fig:less_than_circuit} shows the circuit representation of the less than function.
+In other words, if there is some algorithm that can do it, then there is some circuit that can do it as well.
 
 \begin{figure}[h]
     \centering
@@ -230,13 +227,6 @@ Figure \ref{fig:less_than_circuit} shows the circuit representation of the less 
 \caption{A NOT gate.}
 \end{figure}
 
-%\begin{figure}[h]
-%    \centering
-%    \includegraphics[scale=0.75]{images/drawing.png}
-%    \label{fig:less_than_circuit}
-%    \caption{A circuit that computes the less or equal to function, equivalent to the less than function for input of two one-bit values.\al{make with tikz}}
-%\end{figure}
-
 \begin{table}[h!]
 \label{tab:less_than}
 \centering
@@ -259,18 +249,41 @@ x & y & $x < y$ \\ \hline
     \caption{The high level idea of oblivious transfer. Image from \cite{alexirpan}}
     \label{fig:basic-ot}
 \end{figure}
-Oblivious Transfer (OT) is a simple, useful protocol that underlies many more complicated cryptosystems.
+Oblivious Transfer (OT) is a simple, useful protocol that underlies many more complicated crypto-systems.
 
 Figure \ref{fig:basic-ot} outlines the high level idea of oblivious transfer.
 The box in figure \ref{fig:basic-ot} may be thought of as a trusted post office.
 Alice potentially sends two messages $m_0$ and $m_1$ to Bob.
 Instead of sending the messages to Bob, she sends the messages to the post office.
 Bob, without seeing either $m_0$ or $m_1$, knows that he wants $m_b$ where $b \in \{0,1\}$, so he notifies the post office that he wants message $b$.
-With this information, the post office gives Bob $m_b$, but two secure properties hold: (1) Alice does not know whether Bob received $m_0$ or $m_1$ and (2) Bob does not learn any information about $m_{1-b}$, the message that he did not receive.
+With this information, the post office gives Bob $m_b$.
+We want two secure properties to hold: (1) Alice does not know whether Bob received $m_0$ or $m_1$ and (2) Bob does not learn any information about $m_{1-b}$, the message that he did not receive.
 
 We will not focus on the internal operations of oblivious transfer; for our purposes, it is a secure black box.
 When we use oblivious transfer in the next chapter, the two messages that Alice potentially sends will be encryption keys, and Bob will select a key that corresponds to his input - a value that he doesn't want Alice to know.
-In Chapter 3 we discuss improvements to oblivious transfer, since oblivious transfer, despite its simple appearance, requires a good amount of math and is consequently slow.
+In Chapter 3 we discuss improvements to oblivious transfer, since oblivious transfer, despite its simple appearance, is computationally expensive.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
