@@ -42,17 +42,17 @@ There are many applications of 2PC, and in some cases, an important security pro
 Ideally, a good definition of 2PC works for all applications, hence capturing all desirable properties.
 A second reason that the property based definition is unsatisfactory is that the definition should be simple.
 If the definition is simple, then it should be clear that \textit{all} possible attacks against the protocol are prevented by the definition.
-A definition based on properties in this respect as it becomes the burden of the prover of security to show that all relevant properties are covered \cite{lindell2009}.
+With a definition based on properties, it becomes the burden of the prover of security to show that all relevant properties are covered \cite{lindell2009}.
 
 We must also think about the aims of each party involved in the protocol. 
-Can we trust that parties are going to obey the protocol? 
+Can we trust that the parties are going to obey the protocol? 
 Are the parties going to try to cheat?
 These considerations are called the \textit{security setting}.
 There are two primary security settings: the semi-honest setting and the malicious setting. 
 
 The work presented in this thesis uses the semi-honest setting. 
 In the semi-honest setting, we assume that each party obeys the protocol but tries to learn as much as possible from the information they are given.
-This means that parties do not lie about their information, they do not abort, they do not send or withhold messages out of order, or deviate in any way from what is specified in the protocol. 
+This means that parties do not lie about their information, they do not abort, do not send out of order, do not withhold messages or deviate in any way from what is specified in the protocol. 
 In contrast, the malicious setting considers that each party is liable to lie and cheat; parties can take any action to learn more information.
 
 The malicious setting is much more realistic. 
@@ -60,10 +60,10 @@ Parties that are involved in cryptographic protocols are liable to lie and cheat
 There are two main reasons why the semi-honest setting is useful.
 The first is that many protocols can be constructed for the semi-honest setting, and then improved to function in the malicious setting.
 There is a strong history of this occurring with protocols.
-It's simply easier to think through and create protocols for the semi-honest setting; at the very least, it's a valuable starting point for building complex crypto-systems.
+It is simply easier to think through and create protocols for the semi-honest setting; at the very least, it is a valuable starting point for building complex crypto-systems.
 In the case of 2PC, there exist malicious protocols, and in fact, the primary 2PC protocol that this thesis uses, garbled circuits, can be improved to be malicious secure without too much difficulty. 
 
-The second reason that the semi-honest setting is that it does have use cases in the real world.
+The second reason that the semi-honest setting is useful is because it does have real world use cases.
 There are some scenarios where parties want to compute a function amongst themselves, and trust each other to act semi-honestly.
 One example is hospitals sharing medical data.
 Hospitals are legally, and arguably ethically, restricted from sharing medical data, but this data can have great value especially when aggregated with datasets from other hospitals.
@@ -71,18 +71,17 @@ Hospitals are legally, and arguably ethically, restricted from sharing medical d
 Other examples where semi-honesty is sufficient include mutually trusting companies and government agencies.
 
 \section{2PC Security Definition}
-% http://crypto.stackexchange.com/questions/3814/simulation-based-security
 % page 620 of Goldreich volume 2
-In this section we discuss at a high level the definition of 2PC security, and then give the formal definition. 
+In this section we discuss the definition of 2PC security at a high level, and then give the formal definition. 
 The definition of security for 2PC protocols is the most complicated cryptographic theory that we have encountered thus far. 
 
 Recall our setup: Alice and Bob are semi-honest parties with inputs $x$ and $y$ respectively who wish to compute the function $f: \{0,1\}^n \times \{0,1\}^n \to \{0,1\}^m \times \{0,1\}^m$.
-The protocol $\Pi$ is a 2-party computation protocol, that is instructions that Alice and Bob follow, that enables them to compute $f$.
+The protocol $\Pi$ is a 2PC protocol, that is, $\Pi$ is a series of instructions that Alice and Bob follow which enables them to compute $f$.
 To think about the security of $\Pi$, we imagine an ideal world where the protocol is computed securely, and compare the ideal world to the real world where $\Pi$ is executed.
 
 In the ideal world, we imagine that there is a third, trusted and honest party Carlo.
 Instead of Alice and Bob communicating amongst each other, Alice and Bob send their inputs to Carlo.
-Carlo computes $f(x,y)$ himself, and sends the output to Alice and Bob.
+Carlo computes $f(x,y)$ himself and sends the output to Alice and Bob.
 The only information that Alice and Bob have in the ideal world is their individual inputs and the output.
 
 Informally, we say that $\Pi$ is secure if Alice and Bob learn \textit{essentially the same} information executing $\Pi$ in the real world as they do computing $f$ in the ideal world with Carlo.
@@ -92,27 +91,26 @@ Recall that computational indistinguishability is the idea that two probability 
 To use computational indistinguishability, we think of the information that Alice and Bob learn in the real and ideal world as probability distributions.
 The idea may seem fuzzy now, but the idea will become clearer as the probability distributions are explained
 
-To construct the probability distribution of the ideal world, we introduce \textit{simulators} $S_A$ and $S_B$.
-$S_A$ and $S_B$ are probabilistic polynomial-time algorithms who are essentially adversaries, like the adversary in the definition of encryption from Chapter 1, that specifically attack the ideal world.
+To construct the probability distribution of Alice and Bob's information in the ideal world, we introduce \textit{simulators} $S_A$ and $S_B$.
+Simulators $S_A$ and $S_B$ are probabilistic polynomial-time algorithms who are essentially adversaries, like the adversary in the definition of encryption from Chapter 1, that specifically attack the ideal world.
 Simulator $S_A$ takes as input $x$, Alice's input, and $f(x,y)$, the output of the function because that is the information that Alice has access to in the ideal world.
 Likewise, $S_B$ takes input $y$ and $f(x,y)$, since that the is information that Bob has access to in the ideal world.
 
-To create a probability distribution, we consider what $S_A$ does over all possible input: the distribution of the possible outputs is given by $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$.
-Let us break this distribution down: $S_A$ is a fixed single algorithm.
-$x$ is Alice's input, and $f(x,y)$ is the output of the function.
+To create a probability distribution, we consider what $S_A$ does over all possible inputs: the distribution of the possible outputs is given by $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$.
+Let us break this distribution down: $S_A$ is a fixed single algorithm, $x$ is Alice's input and $f(x,y)$ is the output of the function.
 The set is indexed by all possible $x$, so all possible inputs that Alice could have.
 In summary, $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$ represents the possible information that an algorithm could deduced from all possible $x$ and $f(x,y)$.
 We think of $\{S_B(y, f(x,y)\}_{y \in \{0,1\}^*}$ for Bob's input similarly.
 
 In the real world, we need to consider what information Alice and Bob have at their disposal.
 Recall that Alice and Bob are semi-honest, which means that Alice and Bob follow all instructions of $\Pi$, but they use any information they receive along the way.
-More precisely, Alice and Bob obey the protocol, but also maintain a record of all messages sent and received.
-We call Alice's record of communications Alice's \textit{view}, $\viewrv_A(x, y)$, which depends on inputs $x$ and $y$
-And now we create the probability distribution for Alice: $\{\viewrv_A(x, y)\}_{x, y \in \{0,1\}^*}$.
-This distribution represents the Alice's information from the exchanged messages indexed over all possible inputs $x$ and $y$.
-Likewise, we call Bob's record of intermediate computations Bob's view,  $\viewrv_B(x, y)$, and his probability distribution of intermediate computations is $\{\viewrv_B(x, y)\}_{x,y \in \{0,1\}^*}\}$
+More precisely, Alice and Bob obey the protocol, but they also maintain a record of all messages sent and received.
+We call Alice's record of communications Alice's \textit{view}, denoted $\viewrv_A(x, y)$, which depends on inputs $x$ and $y$.
+We can now create the probability distribution for Alice: $\{\viewrv_A(x, y)\}_{x, y \in \{0,1\}^*}$.
+This distribution represents Alice's information from the exchanged messages indexed over all possible inputs $x$ and $y$.
+Likewise, we call Bob's record of intermediate computations Bob's view, $\viewrv_B(x, y)$, and his probability distribution of intermediate computations is $\{\viewrv_B(x, y)\}_{x,y \in \{0,1\}^*}$
 
-To wrap it up, if $\Pi$ in the real world is the same as the Alice, Bob and Carlo in the ideal world, then the simulator $S_A$ and $S_B$ should only be able to learn what can be learned from the intermediate computations. 
+In summary, if $\Pi$ in the real world is the same as the protocol Alice, Bob and Carlo run in the ideal world, then the simulator $S_A$ and $S_B$ should only be able to learn what can be learned from the intermediate computations. 
 That is, the probability distributions $\{S_A(x, f(x,y)\}_{x \in \{0,1\}^*}$ and $\{\viewrv_A(x, y)\}_{x, y \in \{0,1\}^*}\}$ should be essentially the same, i.e., computationally indistinguishable.
 
 With this intuition in mind, we give Goldreich's definition of 2PC security from his textbook \textit{Foundations of Cryptography Volume II}\cite{goldreich}.
@@ -124,7 +122,7 @@ Define $\viewrv_i^{\Pi}(n,x,y)$ (for $i \in \{1,2\}$) as the view of the $i$th p
 $\viewrv_i^{\Pi}(n,x,y)$ equals the tuple $(1^n, x, r^i, m_1^i, \ldots, m_t^i)$, where $r^i$ is the contents of the $i$th party's internal random tape, and $m_j^i$ is the $j$th message that the $i$th party received.
 Define $output^{\Pi}_i(n,x,y)$ as the output of the $i$th party on input $(x,y)$ and security parameter $n$.
 Also denote $ \outputrv^{\Pi}(n,x,y) = (\outputrv^{\Pi}_1(n,x,y), \outputrv^{\Pi}_2(n,x,y)).$
-Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. Also note that for two party computation.
+Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. 
 
 We say that $\Pi$ securely computes $f$ in the presence of static\footnote{\al{TODO} Mention what static means} semi-honest adversaries if there exist probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following hold:
 \begin{equation} 
@@ -161,7 +159,7 @@ For a given wire $W_i$, the zeroith wire label $W_i^0$ represents $0$, and the f
 A wire labels is a ciphertext, the output of the encryption algorithm\footnote{A common encryption algorithm used now is AES-128, so the wire labels are 128 bit strings.}.
 Alice assigns the wire labels by randomly sampling from $\{0,1\}^{\lambda}$, where $\lambda$ is the size of the output of the encryption algorithm.
 
-In general, we use $W_i$ to represent the $i$th wire, $W_i^j$ to represent the $i$ wire's $j$ label, and later we use $W_i^*$ to represent one of wire $i$'s wire labels without specifying whether it is wire label 0 or wire label 1.
+In general, we use $W_i$ to represent the $i$th wire, $W_i^j$ to represent the $i$th wire's $j$th label, and later we use $W_i^*$ to represent one of wire $i$'s wire labels without specifying whether it is wire label 0 or wire label 1.
 
 After assigning wire labels, Alice garbles gate $G_0$, the gate nearest to the inputs\footnote{Multiple gates at some point could equidistant from the input. In these cases, the ordering of gates does not matter.}.
 Alice garbles gate $G_0$ by creating a garbled table $T_{G_0}$.
@@ -172,12 +170,11 @@ The third column is the wire labels for the output wire $W_4$
 
 The wire label placed in the third column is based on logical operation of the AND gate.
 For example, the first three rows of the third column have the wire label associated with $0$, since AND outputs 0 if any inputs are 0.
-The fourth column is the dual-key cipher encryption\footnote{See section \al{what section?} for information on dual-key ciphers} of the value in the third column, using the values of the first two columns as keys.
-The garbled table for $G_0$ is shown in table \ref{tbl:g0-table}
+The fourth column is the dual-key cipher encryption\footnote{See section Chapter 1 for information on dual-key ciphers} of the value in the third column, using the values of the first two columns as keys.
+The garbled table for $G_0$ is shown in table \ref{tbl:g0-table}.
 
 \begin{table}[h]
 \centering
-\label{tbl:g0-table}
 \begin{tabular}{|c|c|c|c|}
 \hline
 $W_0$ & $W_1$ & $W_4$ & Encryption \\
@@ -189,125 +186,123 @@ $W_0^1$ & $W_1^1$ & $W_4^1$ & $\Enc_{W_0^1, W_1^1}(W_4^1)$ \\
 \hline
 \end{tabular}
 \caption{A garbled table for an AND gate with input wires $W_0$ and $W_1$ and output wire $W_4$.}
+\label{tbl:g0-table}
 \end{table}
 
-Alice creates garbled tables all remaining gates; in this case, $G_1$ and $G_2$ remain.
+Alice creates garbled tables for each remaining gate; in this case, $G_1$ and $G_2$.
 She then sends the fourth column all of garbled tables, the encryption of the respective out-wires, to Bob.
 Now if Bob has a label for each input wire, then Bob can acquire one of the labels of the output wire.
-More formally, say a gate was input wires $W_i$ and $W_j$ and output wire $W_k$.
-Bob can acquire a wire label of $W_k$ (i.e. $W_k^0$ or $W_k^1$) if he has one wire label of $W_i$ (i.e. $W_i^0$ or $W_i^1$) and one wire label of $W_j$ (i.e. $W_j^0$ or $W_j^1$).
+Say a gate has input wires $W_i$ and $W_j$ and output wire $W_k$.
+Bob can acquire a wire label of $W_k$ (i.e., $W_k^0$ or $W_k^1$) if he has one wire label of $W_i$ (i.e. $W_i^0$ or $W_i^1$) and one wire label of $W_j$ (i.e. $W_j^0$ or $W_j^1$).
+
+Alice cannot send the fourth column of the garbled table to Bob as it is. 
+Since the table is ordered, Bob can interpret the semantic value of wire $W_k$ based on which row successfully decrypts. 
+The fix is simple: Alice randomly permutes the rows of the table prior to sending.
 
 In order to decrypt each gate, Bob needs to first acquire the wire labels of the input wires, $W_0$, $W_1$, $W_2$ and $W_3$.
 Recall that Alice's input to the 2PC protocol are $x = x_0x_1$ where $x_1, x_0 \in \{0,1\}$.
 Alice communicates her input to Bob, without revealing values of $x_i$, by sending wire labels $W_0^{x_0}$ and $W_1^{x_1}$.
 Bob does not know the values of $x_0$ or $x_1$, because he is simply receiving two ciphertexts, and does not know which value the ciphertexts represent.
-The only information that Bob has is the fourth column of the garbled tables, and that does not provide any information about the sematic value of the wire labels.
+The only information that Bob has is the fourth column of the garbled tables, and that does not provide any information about the semantic value of the wire labels.
 
 Recall that Bob's input to the 2PC protocol is $y = y_0 y_1$ where $y_1, y_0 \in \{0,1\}$.
 Alice now wants to send Bob $W_2^{y_0}$ and $W_3^{y_1}$, but she does not know and cannot know (for the sake of security) $y_0$ and $y_1$.
 Alice and Bob can achieve this by using Oblivious Transfer, as described in Chapter 1.
 As an example, we look at wire $W_2$.
-Alice has two possible values that she wants to send to Bob: $W_2^0$ and $W_2^1$.
+Alice potentially sends $W_2^0$ and $W_2^1$ to Bob.
 Alice only wants Bob to acquire one of the values, because otherwise he can decrypt multiple rows garbled table.
-\al{introduce this OT notation in Chapter 1}
 Bob wants to receive $W_2^{y_0}$, as that wire label corresponds to his input.
-So Alice and Bob do $\OT(\{W_2^0, W_2^1\}, y_0)$, so that Alice obviously sends Bob the correct wire label.
-Alice and Bob also perform OT on wire $W_3$; in particular, they do $\OT(\{W_3^0, W_3^1\}, y_1)$.
+In terms of the post office metaphor from Chapter 1, Alice gives $W_2^0$ and $W_2^1$ to the post office, and Bob notifies the post office that he wants message $y_0$.
+The post office gives $W_2^{y_0}$ to Bob, but does not tell Bob anything about $W_2^{1 - y_0}$ and does not tell Alice which message Bob requested. 
+Alice and Bob also perform OT on wire $W_3$, such that Bob acquires wire label $W_3^{y_1}$.
 
-Alice is finished garbling the circuit, and communicating information to Bob. 
-Bob has everything he needs to un-garble, or decrypt, the circuit.
-Bob starts with gate $G_0$, for which he has the fourth column of $T_{G_0}$, a wire label for wire $0$, which I denote $W_0^*$ since Bob does not which wire label it is, and $W_1^*$ accordingly.
+Alice is finished garbling the circuit, and finished communicating information to Bob. 
+Bob has everything he needs to evaluate, or decrypt, the circuit.
+Bob starts with gate $G_0$, for which he has the fourth column of $T_{G_0}$, a wire label for wire $W_0$, which I denote $W_0^*$ since Bob does not know which wire label it is, and $W_1^*$ accordingly.
 Bob starts with the first row of $T_{G_0}$ and tries decrypting the value using $W_0^*$ and $W_1^*$.
 Formally, Bob tries $\EncInv_{W_0^*, W_1^*}(T_{G_0}\big[0\big])$ where $T_{G_0}\big[0\big]$ represents the value in the zeroith row of $T_{G_0}$.
 Bob tries decrypting the values in all four rows of the garbled table $T_{G_0}$, but only one should work, since the other decryptions using the incorrect keys.
-For Bob to recognize that encryption is failing, we add an additional property to the encryption scheme: the output of the decryption function should indicate whether the decryption was valid.
+
+For Bob to recognize that encryption is failing, we add an additional property to the encryption scheme: the output of the decryption algorithm should indicate whether the decryption was valid.
 The decryption algorithm outputs a single additional bit, where 1 indicates that decryption was successful and 0 indicates that decryption failed, i.e., that keys or ciphertext were invalid.
-A single additional bit, where $0$ represents that decryption failed and $1$ represents that decryption was successful. 
 It is noteworthy that such a property is common to encryption schemes, and can be added to any existing encryption if necessary.
 With this property, as Bob tries decrypting all four rows of the garbled table, only one should decrypt correctly.
-\al{check these subscripts to make sure they align}
-Because of the way Alice constructed the garbled table, Bob knows that this correctly decrypted value is one of the wire labels of $W_4$, the output wire of gate $G_0$.
+Because of the way that Alice constructed the garbled table, Bob knows that this correctly decrypted value is one of the wire labels of $W_4$, the output wire of gate $G_0$.
 Bob then assigns this decrypted value to $W_4^*$, and uses the value as the input wire when decrypting gate $G_2$.
 
 Bob repeats this same process for gate $G_1$ and for gate $G_2$.
-For gate $G_2$, Bob uses wire labels $W_5^*$ and $W_6^*$ which he acquired by un-garbling gates $G_0$ and $G_1$.
-Bob notifies Alice after acquiring $W_7^*$.
-Alice sends him values $W_7^0$ and $W_7^1$.
-If $W_7^* = W_7^0$, then the function output $0$ and Bob notifies Alice that the output was $0$.
-Otherwise if $W_7^* = W_7^0$, then the function output $1$ and Bob notifies Alice that the output was $1$.
+For gate $G_2$, Bob uses wire labels $W_5^*$ and $W_6^*$ which he acquires by evaluating gates $G_0$ and $G_1$.
+Bob notifies Alice after acquiring $W_6^*$.
+Alice sends him values $W_6^0$ and $W_6^1$.
+If $W_6^* = W_6^0$, then the function output $0$ and Bob notifies Alice that the output was $0$.
+Otherwise if $W_6^* = W_6^1$, then the function outputs $1$ and Bob notifies Alice that the output was $1$.
+Alice and Bob have now securely computed the function.
 
-Bob and Alice have now securely computed the function.
-
-\al{Match notation in this description with the algorithms}
-
-\begin{algorithm}
-\caption{Garble Circuit}
-\label{alg:garble}
-\begin{algorithmic}
-    \Require Circuit $f(x,\cdot)$ 
-    \Ensure Populate garbled tables $f(x,\cdot).tables$.
-\For{wire $w_i$ in $f(x,\cdot).wires$} 
-    \State Generate two encryption keys, called garbled values, $W_i^0$ and $W_i^1$.
-    \State Assign $(W_i^0, W_i^1)$ to $w_i$.
-\EndFor \\
-
-\For{gate $g$ in $f(x,\cdot).gates$}
-    \State Let $w_i$ be $g$'s first input wire.
-    \State Let $w_j$ be $g$'s second input wire.
-    \State Let $w_k$ be $g$'s output wire.
-    \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
-    \State $T_g[u,v] = \Enc_{W_i^u}( \Enc_{W_j^v} ( W_k^{g(u,v)}))$
-    \al{use DKC}
-    \EndFor
-    \State $f(x,\cdot).tables[g] = T_g$.
-\EndFor
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{Evaluate Circuit}
-\label{alg:evaluate}
-\begin{algorithmic}
-
-\Require $(input\_wires, tables, gates)$
-\For{Input wire $w_i$ in $input\_wires$}
-	\Comment retrieve garbled values of input wires
-	\State Perform OT$(w_i, x_i)$ 
-	\Comment retrieve $W^{x_i}_i$ from Alice
-	\State Save the value to $w_i$.
-\EndFor
-
-\For{Gate $g$ in $gates$}
-	\Comment compute the output of each gate.
-	\State Let $w_i$ be $g$'s first input wire.
-	\State Let $w_j$ be $g$'s second input wire.
-	\State Let $w_k$ be $g$'s output wire.
-	\State \textbf{Require} $w_i$ and $w_j$ have been assigned garbled values.
-	\State \textbf{Require} $w_k$ has not been assigned a garbled value.
-    	\For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
-        \al{use DKC}
-		\State $temp = \Dec_{w_j}(\Dec_{w_i}(tables[g][u,v]))$
-		\If{$temp$ decrypted correctly}
-			\State $w_k = temp$
-		\EndIf
-	\EndFor
-\EndFor
-\end{algorithmic}
-\end{algorithm}
+%\begin{algorithm}
+%\caption{Garble Circuit}
+%\label{alg:garble}
+%\begin{algorithmic}
+%    \Require Circuit $f(x,\cdot)$ 
+%    \Ensure Populate garbled tables $f(x,\cdot).tables$.
+%\For{wire $w_i$ in $f(x,\cdot).wires$} 
+%    \State Generate two encryption keys, called garbled values, $W_i^0$ and $W_i^1$.
+%    \State Assign $(W_i^0, W_i^1)$ to $w_i$.
+%\EndFor \\
+%
+%\For{gate $g$ in $f(x,\cdot).gates$}
+%    \State Let $w_i$ be $g$'s first input wire.
+%    \State Let $w_j$ be $g$'s second input wire.
+%    \State Let $w_k$ be $g$'s output wire.
+%    \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
+%    \State $T_g[u,v] = \Enc_{W_i^u}( \Enc_{W_j^v} ( W_k^{g(u,v)}))$
+%    \al{use DKC}
+%    \EndFor
+%    \State $f(x,\cdot).tables[g] = T_g$.
+%\EndFor
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}
+%\caption{Evaluate Circuit}
+%\label{alg:evaluate}
+%\begin{algorithmic}
+%
+%\Require $(input\_wires, tables, gates)$
+%\For{Input wire $w_i$ in $input\_wires$}
+%	\Comment retrieve garbled values of input wires
+%	\State Perform OT$(w_i, x_i)$ 
+%	\Comment retrieve $W^{x_i}_i$ from Alice
+%	\State Save the value to $w_i$.
+%\EndFor
+%
+%\For{Gate $g$ in $gates$}
+%	\Comment compute the output of each gate.
+%	\State Let $w_i$ be $g$'s first input wire.
+%	\State Let $w_j$ be $g$'s second input wire.
+%	\State Let $w_k$ be $g$'s output wire.
+%	\State \textbf{Require} $w_i$ and $w_j$ have been assigned garbled values.
+%	\State \textbf{Require} $w_k$ has not been assigned a garbled value.
+%    	\For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
+%        \al{use DKC}
+%		\State $temp = \Dec_{w_j}(\Dec_{w_i}(tables[g][u,v]))$
+%		\If{$temp$ decrypted correctly}
+%			\State $w_k = temp$
+%		\EndIf
+%	\EndFor
+%\EndFor
+%\end{algorithmic}
+%\end{algorithm}
 
 \subsection{Security of Garbled Circuits}
-We now discuss the security of garbled circuits without proof.
-
-The definition of security of a 2PC protocol $\Pi$ given early in Chapter 2 asked us to compare the execution of $\Pi$ in the real world to an ideal 2PC execution with a trusted third party Carlo.
-This definition is extremely useful; however, it is difficult to adapt it to intuiting the security of a given protocol.
-To think about the security of garbled circuits, we think about the information that Alice and Bob.
+The definition of security of a 2PC protocol $\Pi$ given early in Chapter 2 asked us to compare the execution of $\Pi$ in the real world to a protocol running in an ideal world with a trusted third party.
+To think about the security of garbled circuits, we think about the information that Alice and Bob acquire throughout the protocol.
 
 The only information that Alice receives from Bob during the execution of garbled circuits is in the OT stage.
-Thereby the security on Alice's side is dependent on the security of OT, whose security we describe in Chapter 1.
-Hence, we can confidently say that Alice does not learn anything during garbled circuits.
+Thereby the security on Alice's side is dependent on OT, which we assume to be secure.
+Hence, we can confidently say that Alice does not learn anything that undermines security during an execution of garbled circuits.
 
 The security of Bob is more complicated.
-Bob learns three sets of information: a single wire label for each wire (i.e. input labels)  and the fourth column of the garbled table for each gate.
+Bob learns two sets of information: input labels  and the fourth column of the garbled table for each gate.
 The input labels are acquired in two ways: some are sent naively by Alice and some are acquired via OT.
 We can be confident that Bob doesn't learn any extra information in the process of receiving the labels, since we are confident that OT does not reveal information, and other labels are coldly sent by Alice.
 Moreover, knowing input labels associated with Alice's input doesn't give Bob any information, since he cannot tell if the label is associated with 0 or 1.
@@ -320,10 +315,11 @@ For gates on that are connected to input wires, Bob only has a single label for 
 For subsequent gates, Bob will only ever have a single label for each wire, meaning he can only decrypt a single row.
 
 For Bob to learn extra information, he needs to acquire two wire labels for a single wire.
-If he can acquire two labels, then he can decrypt the circuit using that wire label, and with some thinking learn about Alice's input.
+If he can acquire two labels, then he can decrypt the circuit using that wire label, and make deductions about Alice's input. 
 Based on the information that Bob has, there is no way he can access two wire labels for a single wire.
-And that is the intuition behind the security of garbled circuits.
+This is the intuition behind the security of garbled circuits.
 Of course without a formal proof using computational indistinguishability, we cannot be confident that garbled circuits are secure, as there may be an attack that eludes us.
+A formal proof of garbled circuits is long and beyond the scope of this paper. 
 
 \subsection{Notes about complexity}
 There are three things to think about when considering the complexity of garbled circuits.
