@@ -330,25 +330,24 @@ OT, if used naively, is a significant contributor to overall bandwidth.
 
 The second thing to consider is the amount of computation that Alice performs.
 Alice performs 4 encryptions with a dual-key cipher for each gate.
-
 The third cost to consider is the amount of computation that Bob performs.
-Bob performs 4 decrypts with the dual-key cipher for each gate.
+Bob performs 4 decryptions with the dual-key cipher for each gate.
 
-These constraints are all important, but in practice the biggest bottlenecks are the communication per gate and Bob's computation, which are correlated as we see in Chapter 3.
+These constraints are all important, but in practice the biggest bottlenecks are the communication per gate and Bob's computation, which are correlated as we will see in Chapter 3.
 A circuit that computes AES requires approximately 35,000 gates.
 If 4 ciphertexts per gate need to communicated, and AES-128 is the encryption scheme, then $4 * 128 * 35,000$ bits = $2.24$ megabytes: a huge amount of communication for just encryption!
 
-\section{GMW}
-Where Yao's protocol is premised on encrypting gates individually, GMW's protocol for garbling circuits is premised on secret sharing and performing operations on the shared secrets. 
-In general, secret sharing is a class of methods for distributing a secret to a group of participants, where each participants is allocated a \textit{share} of the secret. 
-The secret can only be reconstructed when a sufficient number of the participants combine their shares, but any pool of insufficient shares yields no information about the secret.
-
-GMW begins by having Alice and Bob secret share their inputs, so each party now has a collection of \textit{shares}. 
-Algorithm \ref{alg:gmw_setup} describes this process in more detail.
-Then Alice and Bob perform a series of operations on their shares, which are dictated by the gates in the function they wish to compute.
-As with Yao's protocol, a gate may either compute XOR, AND or NOT.
-Each operation requires a different series of operations, which are described in Algorithm \ref{alg:gmw_gates}.
-Finally, Alice and Bob publicize their shares to each other, at which point each party will have sufficient shares to compute the output of the function.
+%\section{GMW}
+%Where Yao's protocol is premised on encrypting gates individually, GMW's protocol for garbling circuits is premised on secret sharing and performing operations on the shared secrets. 
+%In general, secret sharing is a class of methods for distributing a secret to a group of participants, where each participants is allocated a \textit{share} of the secret. 
+%The secret can only be reconstructed when a sufficient number of the participants combine their shares, but any pool of insufficient shares yields no information about the secret.
+%
+%GMW begins by having Alice and Bob secret share their inputs, so each party now has a collection of \textit{shares}. 
+%Algorithm \ref{alg:gmw_setup} describes this process in more detail.
+%Then Alice and Bob perform a series of operations on their shares, which are dictated by the gates in the function they wish to compute.
+%As with Yao's protocol, a gate may either compute XOR, AND or NOT.
+%Each operation requires a different series of operations, which are described in Algorithm \ref{alg:gmw_gates}.
+%Finally, Alice and Bob publicize their shares to each other, at which point each party will have sufficient shares to compute the output of the function.
 
 %\begin{algorithm}[h!]
 %\caption{GMW Setup}
