@@ -1,13 +1,11 @@
 %!TEX root = thesis.tex
 \chapter{Classic 2PC}
-\al{this paragraph is a little weak}
-Secure Computation was first proposed in an oral presentation by Andrew Yao \cite{yao86}.
-Since Yao's presentation, two main methods have emerged for secure computation.
-The first method is garbled circuits, and is the focus of this chapter.
-The second method is GMW, and is explained in brief at the end of the chapter.
 
-This chapter begins with motivating and describing desirable properties of a 2PC protocols, culminating in a definition of security. 
-Next, the chapter describes garbled circuits, a method popular method for performing 2PC.
+Using the tools of Chapter 1, this chapter presents a classic method of performing two-party computation: garbled circuits.
+Garbled circuits were first proposed at the first prevention of secure computation in an oral presentation by Andrew Yao \cite{yao86}.
+There are other methods of performing secure computation, but this thesis focuses on garbled circuits. 
+We begin this chapter by motivating and describing desirable properties of 2PC protocols, culminating in a definition of security. 
+We then describe garbled circuits and discuss their security.
 
 \section{2PC Security Motivation}
 Think back to Alice and Bob from the introduction. 
@@ -28,20 +26,19 @@ Based on the setup of the problem, we can list a few properties that Alice and B
     \item[Privacy] 
         Parties only learn their output. 
         Any information learned by a single party during the execution of $\Pi$ must be deduced from the output. 
-        For example, if Alice learns that she had more money after computing $f$, then she learns that $y < x$; however, this information about $y$ is deducible from the output therefore it is reasonable.
+        For example, if Alice learns that she had more money after computing $f$, then she learns that $y < x$; this information about $y$ is deducible from the output therefore it is reasonable.
         It would be unreasonable if Alice learns that $1,000,000 < y < 2,000,000$, as that information is not deducible from $f(x,y)$.
     \item[Correctness] 
         Each party receives the correct output.
         In the case of Alice and Bob, this simply means that they learn correctly who has more money.
-        In particular, correctness means that Alice and Bob \textit{both} learn the output.
 
 \end{description}
 
 One possible method for constructing a definition of security would be to list a number of properties a secure protocol must have.
 This approach is unsatisfactory for a number of reasons.
 
-One reason is that an import security property that is only relevant in certain cases may be missed.
-There are many applications of 2PC, and in some cases, there may be certain properties that critical to security.
+One reason is that is that if we use properties, we may miss certain security properties that are only relevant in certain cases. 
+There are many applications of 2PC, and in some cases, an important security property may be lurking in the shadows. 
 Ideally, a good definition of 2PC works for all applications, hence capturing all desirable properties.
 A second reason that the property based definition is unsatisfactory is that the definition should be simple.
 If the definition is simple, then it should be clear that \textit{all} possible attacks against the protocol are prevented by the definition.
