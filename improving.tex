@@ -238,25 +238,24 @@ Evaluator side computation increases slightly, as the evaluator constructs a pol
 
 
 \section{FleXOR}
-\al{passive tone}
 After the creation of GRR2, secure computation was at an awkward point.
 Circuits with many XOR gates were computed most quickly with Free XOR and GRR3, but circuits with many AND gates were computed most quickly with GRR2.
 FleXOR reconciles GRR2 with Free XOR, resulting in a scheme that is universally faster \cite{flexor}.
 
-Recall that GRR2 is incompatible with Free XOR because the wire labels are uncontrollably created by random polynomials, where Free XOR requires that $W_k^1 = W_k^0 \oplus \Delta$ for some global delta.
+Recall that GRR2 is incompatible with Free XOR because the wire labels are uncontrollably created by random polynomials, where Free XOR requires that $W_k^0 = W_k^1 \oplus \Delta$ for some global delta.
 FleXOR solves this problem in a straightforward fashion: correct the delta value of output wires of AND gates such that the output wires use the global delta.
 To correct the value, FleXOR adds a unary gate after each AND gate that corrects the wire label. \footnote{A unary gate is a gate that takes a single input wire and outputs a single wire. The unary gate does not change the semantic meaning of a wire label - that is, whether it represents 0 or 1. The unary gate merely alters the actual value of the wire label or ciphertext.}
 
 Suppose an XOR gate has input wires $W_i$ and $W_j$ and output wire $W_k$.
 Input wires $W_i$ and $W_j$ each come from an AND gate, so their labels are the result of the polynomial interpolation of GRR2.
-$W_i$ has labels $W_i$ and $W_i \oplus \Delta_i$ and $W_j$ has labels $W_j$ and $W_j \oplus \Delta_j$.
+$W_i$ has labels $W_i^0$ and $W_i^0 \oplus \Delta_i$ and $W_j$ has labels $W_j^0$ and $W_j \oplus \Delta_j^0$.
 To perform Free XOR, $W_i,W_j$ and $W_k$ need to be using the same delta value. 
 The garbler adds an extra gate between $W_i$ and $W_j$ and the $XOR$ gate that adjusts their XOR value to the correct value.
-$W_i$ and $W_i \oplus \Delta_i$ change to $W_i'$ and $W_i' \oplus \Delta$.
-$W_j$ and $W_j \oplus \Delta_j$ change to $W_j'$ and $W_j' \oplus \Delta$.
-Since $W_i, W_j$ and $W_k$ have the same delta value, FreeXOR is used.
+$W_i^0$ and $W_i^0 \oplus \Delta_i$ change to $W_i^{0'}$ and $W_i^{0'} \oplus \Delta$.
+$W_j^0$ and $W_j^0 \oplus \Delta_j$ change to $W_j^{0'}$ and $W_j^{0'} \oplus \Delta$.
+Since $W_i, W_j$ and $W_k$ have the same delta value, we can use Free XOR.
 
-The unary gate maps $W_i,W_i \oplus \Delta_1 \to W_i', W_i' \oplus \Delta$, where $\Delta$ is the correct delta value for the XOR gate.
+The unary gate maps $W_i^0,W_i^0 \oplus \Delta_1 \to W_i^{0'}, W_i^{0'} \oplus \Delta$, where $\Delta$ is the correct delta value for the XOR gate.
 
 FleXOR is made more efficient by not correcting the output wire of every AND gate.
 For example, if an output wire of an AND gate is immediately inputted into another AND gate, the wire label does not need to corrected.
@@ -266,30 +265,27 @@ For example, $W_i$ and $W_k$ may share a delta but $W_j$ may have a different de
 
 FleXOR is fastest when AND gates are grouped together and XOR gates are grouped together, since fewer unary gates will be required.
 Thereby, FleXOR creates an optimization problem: place XOR gates, AND gates and unary gates to minimize bandwidth requirements.
-However, FleXOR's optimization problem is too computationally expensive, but on the up side, analysis reveals that FleXOR requires on average an extra $0$ or $1$ ciphertext per gate, a relatively small amount.
+However, FleXOR's optimization problem is computationally expensive, but on the up side, analysis reveals that FleXOR requires on average an extra $0$ or $1$ ciphertext per gate, a relatively small amount.
 That cost comes at the benefit of a Free XOR circuit, and 1 fewer ciphertext for each AND gate.
 
 FleXOR requires slightly more garbler-side computation than FreeXOR and GRR2, since the garbler must create the unary gates.
 The evaluator-side computation is the same as FreeXOR and GRR2, with the additional computation of the unary gates, which is small.
-The size of the XOR garbled table is $0$, and the size of the AND garbled table is $2$.
+The size of the XOR garbled table is zero, and the size of the AND garbled table is two.
 But there is the additional communication of the unary gates' garbled tables.
 The garbled table of the unary gate has $2$ ciphertexts, and the number of unary gates depends on the circuit.
 
 FleXOR is intuitively secure, since the only additional information beyond GRR2 and FreeXOR is the unary gates.
-The unary gate is secure, since it functions the same as a normal garbled gate except that an input is missing.
-However, FreeXOR requires the circularity assumption, 
-The circularity assumption is discussed in the section on FreeXOR.
+The unary gate is secure, since it functions the same as a normal garbled gate except with a single input wire.
 
 \section{Half Gates}
 Half Gates is the most recent improvement to garbled circuits \cite{twohalves}.
 The goal of Half Gates is to make AND gates cost two ciphertexts, while preserving properties necessary for Free XOR without adding unary gates. 
 Half gates work by splitting an AND gate into two half gates.
 Each half gate is an AND gate, where one of the inputs is \textit{known} to a party.
-One half gate is the garbler-half-gate, where the garbler \textit{knows} the semantic value of one of the input wires.
-Similarly, the evaluat knows the semantic value of one of the input wires of the evaluator-half-gate.
+One half gate is the garbler-half-gate, where the garbler knows the semantic value of one of the input wires.
+Similarly, the evaluator knows the semantic value of one of the input wires of the evaluator-half-gate.
 We then combine the garbler-half-gate and the evaluator-half-gate to produce a generic AND gate.
 
-\al{where do the hashes come from?}
 We first examine the garbler-half-gate.
 Imagine an AND gate with input wires $W_i$ and $W_j$ and output wire $W_k$, where the garbler knows the semantic value of $W_i$.
 This means that the garbler knows whether $W_i^*$ is $W_i^0$ or $W_i^1$.
@@ -297,25 +293,24 @@ Let bits $\sigma_i, \sigma_j$ and $\sigma_k \in \{0,1\}$ represent the semantic 
 Since we working with an AND gate, if $\sigma_i = 0$, then $\sigma_k = \sigma_i \wedge \sigma_j = 0$, so the garbler creates a unary gate that always outputs $W_k$.
 If $\sigma_i = 1$, then $\sigma_k = \sigma_i \wedge \sigma_j = \sigma_j$, so the garbler creates a unary identity gate that outputs $W_k^{\sigma_j}$.
 We combine the unary gates into a single garbled table, shown in table \ref{tbl:halfgate-gg-garb}.
-Since the evaluator has $W_j^*$, the evaluator can compute the label of the output wire of the AND gate by xoring the rows in the garbled table by $\Enc_{W_j}$ or $\Enc_{W_j \oplus \Delta}$ to acquire $W_k$ or $W_k \oplus \Delta$ respectively. 
+Since the evaluator has $W_j^*$, the evaluator can compute the label of the output wire of the AND gate by decrypting the rows in the garbled table to acquire $W_k^0 \oplus \sigma_j \Delta$.
 
-Using point and permute and the GRR3 trick reduces the size of the garbler-half-gate garbled table to $1$ ciphertext.
+Using point and permute and the GRR3 trick, we reduce the size of the garbler-half-gate garbled table to one ciphertext.
 The garbler chooses $W_k^0$ such that the first of the top row of the garbled table is the all zeros ciphertext, and therefore is not sent to the evaluator.
 If the evaluator should decrypt the ciphertext on the top row (as directed by point and permute), then the evaluator assumes the ciphertext to be all 0s.
 
 \begin{table}[]
-    \label{tbl:halfgate-gg-garb}
     \centering
     \begin{tabular}{|c|}
         \hline
-        Garbled Table for $a = 0$ \\
+        Garbled Table for $\sigma_i = 0$ \\
         \hline
         $\Enc_{W_j^0}(W_k^0)$ \\
         \hline
     \end{tabular}
     \begin{tabular}{|c|}
         \hline
-        Garbled Table for $a = 1$ \\
+        Garbled Table for $\sigma_i = 1$ \\
         \hline
         $\Enc_{W_j^0}(W_k^0)$ \\
         $\Enc_{W_j^1}(W_k^1)$ \\
@@ -323,13 +318,14 @@ If the evaluator should decrypt the ciphertext on the top row (as directed by po
     \end{tabular} $\;\rightarrow$
     \begin{tabular}{|c|}
         \hline
-        Garbled Table for any $a$ \\
+        Garbled Table for any $\sigma_i$ \\
         \hline
         $\Enc_{W_j^0}(W_k^0)$ \\
         $\Enc_{W_j^1}(W_k^0 \oplus \sigma_k\Delta)$ \\
         \hline
     \end{tabular}
     \caption{Left: garbler-half-gate garbled table for $\sigma_i = 0$. Middle: garbler-half-gate garbled table for $\sigma_i = 1$. Right: garbler-half-gate garbled table for arbitrary $\sigma_i$.}
+        \label{tbl:halfgate-gg-garb}
 \end{table}
 
 The evaluator-half-gate is somewhat different from the garbler-half-gate.
@@ -370,11 +366,10 @@ It is secure for the garbler to give $r \oplus \sigma_j$ to the evaluator, since
 The value of $r \oplus \sigma_j$ can be communicated to the evaluator for free: use the select bit (from the point and permute technique) of the false wire label of wire $W_j$ (so $r$ is the select bit on the true wire label of wire $\sigma_j$).
 
 The overall cost of using Half Gates for AND gates is four encryptions for the garbler, two decryptions for the evaluator, and the communication of $2$ ciphertexts. 
-Half Gates guarantees only two ciphertexts are needed per AND gate, but the tradeoff is the additional computation for both parties.
+Half gates guarantees only two ciphertexts are needed per AND gate, but the tradeoff is the additional computation for both parties.
 With FleXOR, the number of ciphertexts that need to be communicated may vary, but there is less computation required.
 
 \section{Improving Oblivious Transfer}
-\al{Fix this up}
 \al{add citations}
 This section discusses improvements to oblivious transfer, the method by which the garbler communicates the wire labels corresponding to the evaluator's inputs to the evaluator.
 At its most basic, oblivious transfer enables Alice to potentially send one of two messages to Bob.
@@ -396,7 +391,6 @@ Alice and Bob only exchange a single message during the online phase, and there 
 
 In our work with secure computation, OT-preprocessing substantially improved the performance of garbled circuits, and OT-extension was less useful.
 If a garbled circuit scheme uses an offline phase and thereby uses OT-preprocessing, then OT-extension is largely unnecessary.
-The parties take the extra needed to send all of the wire labels in the offline phase, since the time does not matter.
-What we the parties are truly concerned about is online time.
-During online time, OT-preprocessing offers huge advantages.
+The parties take the extra time needed to send all of the wire labels in the offline phase, since the time does not matter; the parties are concerned with online time.
+OT-preprocessing offers huge improvements for online running time and online bandwidth.
 
