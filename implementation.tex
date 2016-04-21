@@ -2,7 +2,7 @@
 
 \chapter{Implementation}
 
-My largest contribution is the implementation of the theoretical ideas of component-based garbled circuits and SCMC in a program called \CompGC. 
+My largest contribution to the project of component-based garbled circuits is the implementation of the theoretical ideas in a program called \CompGC. 
 The aim of \CompGC is to run a two party garbled circuit protocol from start to finish. 
 The garbler and evaluator simply select a function to compute, plug their inputs into the system, and \CompGC securely computes the function.
 This chapter describes the creation of \CompGC and presents experimental results. 
@@ -20,7 +20,7 @@ I later replaced \JustGarble with \LibGarble, an improvement of \JustGarble, whi
 \LibGarble made a number of improvements to \JustGarble, including cleaning up the API and improving the memory layout of  data-structures.
 These improvements contributed to a substantial increase in performance: evaluating AES uses 17 cycles per gate in \LibGarble versus 22 cycles per gate in \JustGarble, a 22\% improvement. 
 \LibGarble also adds the newest cryptographic technique, half-gates; However, \CompGC does not use half-gates since half-gates reduces the size of the garbled table at the cost of a single call to the hash function during evaluation. 
-In the component-based garbled circuit setting, the garbled tables are communicated during offline time, and we are most concerned with online time when the hash function would be called; hence half-gates actually reduces performance.
+In the component-based garbled circuit setting, the garbled tables are communicated during offline time, and we are most concerned with online time when the hash function would be called; hence half-gates actually reduce performance.
 
 \CompGC has an offline and an online phase. 
 In the offline phase, \CompGC takes as input a list of circuits and creates a specified number of each circuit. 
@@ -34,13 +34,13 @@ Algorithms \ref{alg:garbler-offline} and \ref{alg:evaluator-offline} show the st
 
 In the online phase, the evaluator begins by loading the function to be computed from disk. 
 We specify the function in a JSON format, in which the following information is laid out: components needed in the function, how components input and output wires are linked, where inputs should go, and what wires are outputs. 
-We chose to use JSON because the file format is human readable, but a different format, such as binary format, would be faster. 
+We chose to use JSON because the file format is human readable, but a different format, such as a binary format, would be faster. 
 As the functions become more complex, it becomes harder to write the function specification files. 
 To overcome this, I wrote a python script that automatically generates the function specification file for various functions on arbitrary inputs. 
 
 After the garbler loads the function specification file from disk, it generates a set of instructions for the evaluator. 
 The instructions specify what components are used by naming them with the unique identification number assigned in the offline phase. 
-The instructions further specify in what order to evaluate components, and in what order and how to link components. 
+The instructions further specify in what order to evaluate components, and how to link components. 
 This step requires specifying the output wires of one garbled circuit, the input wires of another garbled circuit, and the linking value.
 Finally, the instructions specify how to map the final output wire labels to bits; this works by sending unary gates, with a two-row garbled table, for each output wire. 
 
@@ -105,8 +105,6 @@ Algorithms \ref{alg:garbler-online} and \ref{alg:evaluator-online} summarize the
 \end{algorithm}
 
 \section{Experiments}
-\al{talk about size and construction of circuit}
-
 \CompGC experiments were run on an Intel Core i5-4210H CPU. 
 They were conducted over two network settings. 
 The first network setting ran both parties on the default localhost configuration, which was measured to have a latency of 0.012 ms and bandwidth of 25.2 Gb per second. 
@@ -122,9 +120,10 @@ CBC mode is an algorithm for encrypting messages of arbitrary length using a blo
 We again used a single round of AES as a component, and we also used XOR component, which took 256 bits of input, and outputted their xor. 
 For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, thus requiring 110 components - 100 AES round components and 10 XOR components. 
 
-Levenshtein distance is a measure of the difference between two strings, but computing the minimum number of insertions, deletions or substitutions needed to transform one inputted string into the other inputted string. 
+Levenshtein distance is a measure of the difference between two strings which counts the minimum number of insertions, deletions or substitutions needed to transform one inputted string into the other inputted string. 
 The most popular algorithm for computing Levenshtein distance is a dynamic program that runs in $\Theta(n^2)$. 
-The algorithm is essentially a two for loops, one nested within the other, where on the inside of the for loops a procedure called \textit{Levenshtein-core} is run. 
+The algorithm is  two nested for loops where we run a procedure called \textit{Levenshtein-core} inside the inner for loop. 
+Levenshtein-core takes five inputs - three distance values and two symbols - and it computes a new distance based on those five values.
 For more information on the Levenshtein distance algorithm, we refer the reader to \cite{wiki-leven}. 
 
 For our Levenshtein experiment, we use the Levenshtein-core circuit as a our only component; see figure \ref{fig:leven-core} for a description of the component.
@@ -153,15 +152,14 @@ We see that larger circuits - Levenshtein 60 - offer more time savings than smal
 Table \ref{tbl:results-no-load} shows the same timing as table \ref{tbl:results} except we remove the time spent loading from disk.
 Since \CompGC employs an offline phase, data is loaded from disk in the online phase. 
 Table \ref{t/l:results-no-load} can be misleading - in what application do we assume that data is preloaded into RAM?
-This is not what happens in practice, so these numbers may be misleading.
 We include table \ref{tbl:results-no-load} because the literature often reports these times \cite{blazing-fast}. 
-The times do have merit, as they highlight how the CPU-bound nature of the computation, as opposed to measuring reading-from-disk speed, which can vary widely and is not something that algorithm creators or programmers have much control. 
+The times do have merit, as they highlight how CPU-bound the computation is, as opposed to measuring reading-from-disk speed, which can vary widely and is not something over which algorithm creators or programmers have much control. 
 
 Table \ref{tbl:results-scmc} compares the speed of standard component based garbled circuits to SCMC.
 We see approximately a 2x improvement for all of the experiments. 
 However, these experiments do not highlight the benefit of SCMC. 
 SCMC offers the greatest benefits in a large circuit where a large number of wires are used to represent a section of data.
-Levenshtein distance, while a large circuit, has a small data-size: the number of for 60 symbols is 6.
+Levenshtein distance, while a large circuit, has a small data-size: the data size of 60 symbol Levenshtein is only 6 bits. 
 Consider circuits where an entire matrix is moved around between circuits; for example, linking a 10 by 10 matrix uses $800$ link labels if entries in the matrix were between $0$ and $256$, but SCMC uses a single link label.
 
 \newpage
