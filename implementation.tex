@@ -151,7 +151,7 @@ We see that larger circuits - Levenshtein 60 - offer more time savings than smal
 
 Table \ref{tbl:results-no-load} shows the same timing as table \ref{tbl:results} except we remove the time spent loading from disk.
 Since \CompGC employs an offline phase, data is loaded from disk in the online phase. 
-Table \ref{t/l:results-no-load} can be misleading - in what application do we assume that data is preloaded into RAM?
+Table \ref{tbl:results-no-load} can be misleading - in what application do we assume that data is preloaded into RAM?
 We include table \ref{tbl:results-no-load} because the literature often reports these times \cite{blazing-fast}. 
 The times do have merit, as they highlight how CPU-bound the computation is, as opposed to measuring reading-from-disk speed, which can vary widely and is not something over which algorithm creators or programmers have much control. 
 
