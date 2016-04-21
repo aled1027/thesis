@@ -5,15 +5,13 @@
 In this chapter we introduce component-based garbled circuits, a method that allows for most of the work involved in building and communicating a garbled circuit to occur in an offline phase before the inputs or function to compute are known. 
 This offers significant improvements to the online performance of garbled circuits. 
 
-We begin with the observation that most functions are composed of many smaller components. 
-For example, many statistical operations are a composition of matrix operations; smith-waterman and Levenshtein distance, two algorithms important to analyzing genomes, are dynamic algorithm that run a single procedure inside a for loop; and encrypting arbitrary length messages via modes of operation repeats the encryption algorithm a number of times.
-The gist of component-based garbled circuits is then to build and communicate many small, garbled components in the offline stage.
-Later, in the online stage, the garbler and evaluator combine the pre-communicated components to form a larger function. 
-They compute each component individually, linking wire labels from one component to another as needed. 
-
-Imagine that two banks integrate secure computation into their daily transactions.
-At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
-The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
+Component-based garbled circuits are the research of a larger project to which this thesis contributes. 
+The first part of this chapter will describe naive component-based garbled circuits. 
+Naive component-based garbled circuits are presented in an unpublished paper, and I am a coauthor on the paper. 
+I contributed two items to the unpublished paper.
+The first is an improvement to component-based garbled circuits called single communication multiple connections (SCMC); we present SCMC at the end of this chapter. 
+The second is \CompGC, an implementation of component-based garbled circuits. 
+We discuss \CompGC in detail in Chapter 5. 
 
 \section{History}
 The goal to reduce online computation by using an offline phase is not a new goal.
@@ -23,17 +21,30 @@ Moreover, research in non-garbled circuit two party computation uses similar ide
 
 Most similar to component-based garbled circuits is a technique called \textit{partial garbled circuits} proposed by Mood et al. \cite{MGBF14}. 
 The goal of partial garbled circuits was to retain state after a garbled circuit computation. 
-To achieve this, they used two link labels per connection, whereas we, as you will see in the presentation of SCMC, use fewer than a single label per connection on average.   
+To achieve this, Mood et al. use two link labels per connection, whereas we use fewer than one label per connection on average.   
 
-\section{How to Chain}
-In this section we describe how to chain together garbled circuits.
-At a coarse level, chaining looks like figure \ref{fig:chaining-course} where the input to some some garbled components is the output of other garbler components. 
+\section{Naive Component-Based Garbled Circuits}
+Component-based garbled circuits begin with the observation that most functions are composed of many smaller components. 
+For example, many statistical operations are a composition of matrix operations; Smith-Waterman and Levenshtein distance, two algorithms important to analyzing genomes, are dynamic algorithm that run a single procedure inside a for loop; and encrypting arbitrary length messages via modes of operation repeats the encryption algorithm a number of times.
+The gist of component-based garbled circuits is then to build and communicate many small, garbled components in the offline stage.
+Later, in the online stage, the garbler and evaluator combine the pre-communicated components to form a larger function. 
+They compute each component individually, linking wire labels from one component to another as needed. 
+
+Imagine that two banks integrate secure computation into their daily transactions.
+At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
+The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
+
+\input{figure-chaining}
+
+At a coarse level, chaining looks like figure \ref{fig:chaining} where the input to some some garbled components is the output of other garbler components. 
 To chain, or stitch together, two garbled components, the evaluator needs to transform an output wire label of one component into a valid input wire label of another component, while preserving the semantic value of the wires. 
-In figure \ref{fig:chaining-coarse} the zeroth output wire of $c_0$, $U_0$, needs to transform into the zeroth input wire of $c_1$, $W_0$. 
+In figure \ref{fig:chaining} the zeroith output wire of $c_0$, $U_0$, needs to transform into the zeroth input wire of $c_1$, $W_0$. 
 
 Chaining, or stitching together two garbled circuits, essentially takes the output wires of one garbled circuits and converts them into valid input wires of another garbled circuit while retaining the semantic value of the input wires.
 Consider figure \ref{fig:chaining} where three output wires of component $c_0$ are chained to three input wires of component $c_1$. 
 We specifically desire that the evaluator transform $U_0^0$ into $W_0^0$ and $U_0^1$ into $W_0^1$. 
+
+\input{figure-chaining2}
 
 To achieve this transformation, the garbler sends the evaluator a link label.
 A link label is a ciphertext that allows the evaluator to transform the output wire label into the appropriate wire label. 
@@ -48,7 +59,6 @@ This notation is a useful way to reason with wire labels when the Free XOR condi
 \end{align}
 We see from this equation that the evaluator acquires a valid wire label for wire $W_0$ which has the same semantic value as wire label $U_0^*$.
 
-\input{figure-chaining}
 
 We formally describe component-based garbled circuits as a tuple of three algorithms $(\Garble, \Link, \Eval)$.
 The $\Garble$ algorithm is the same algorithm that we used before to garble circuits; it takes as inputs a circuit $\C$ and outputs three pieces of information: a garbled circuit $\GC$, a set of input wires $e_{\C}$, and a set of output wires $d_{\C}$.
