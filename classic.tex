@@ -124,7 +124,7 @@ Define $output^{\Pi}_i(n,x,y)$ as the output of the $i$th party on input $(x,y)$
 Also denote $ \outputrv^{\Pi}(n,x,y) = (\outputrv^{\Pi}_1(n,x,y), \outputrv^{\Pi}_2(n,x,y)).$
 Note that $\viewrv^{\Pi}_i$ and $\outputrv^{\Pi}_i$ are random variables whose probabilities are taken over the random tapes of the two parties. 
 
-We say that $\Pi$ securely computes $f$ in the presence of static\footnote{\al{TODO} Mention what static means} semi-honest adversaries if there exist probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following hold:
+We say that $\Pi$ securely computes $f$ in the presence of static semi-honest adversaries if there exist probabilistic polynomial time algorithms $S_1$ and $S_2$ such that for all $x,y \in \{0,1\}^*$, where $|x| = |y|$, the following hold:
 \begin{equation} 
     \label{eqn:secdef1}
     \{(S_1(x, f_1(x,y), f(x,y)))\}_{x,y} \compindist \{(\viewrv^{\Pi}_1(x,y), \outputrv^{\Pi}(x,y)) \}_{x,y} 
@@ -255,7 +255,6 @@ Alice and Bob have now securely computed the function.
 %    \State Let $w_k$ be $g$'s output wire.
 %    \For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
 %    \State $T_g[u,v] = \Enc_{W_i^u}( \Enc_{W_j^v} ( W_k^{g(u,v)}))$
-%    \al{use DKC}
 %    \EndFor
 %    \State $f(x,\cdot).tables[g] = T_g$.
 %\EndFor
@@ -283,7 +282,6 @@ Alice and Bob have now securely computed the function.
 %	\State \textbf{Require} $w_i$ and $w_j$ have been assigned garbled values.
 %	\State \textbf{Require} $w_k$ has not been assigned a garbled value.
 %    	\For{$(u,v) \in \{(0,0), (0,1), (1,0), (1,1)\}$}
-%        \al{use DKC}
 %		\State $temp = \Dec_{w_j}(\Dec_{w_i}(tables[g][u,v]))$
 %		\If{$temp$ decrypted correctly}
 %			\State $w_k = temp$
@@ -401,5 +399,3 @@ If 4 ciphertexts per gate need to communicated, and AES-128 is the encryption sc
 %\end{algorithmic}
 %\end{algorithm}
 %
-%\al{see mike rosulek first few slides for good images. }
-%\al{illustration about translating bits over to wire labels}

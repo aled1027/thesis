@@ -3,10 +3,9 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 
 
 ## TODO
-- add figures from talk
-- list of tables/figures is funky
-- spellcheck
-- go through \al notes
+- OT citations
+- table numbering
+- W_i^* in table of notation
 
 ## Not doing
 - expand OT improvements section
@@ -57,3 +56,4 @@ http://tex.stackexchange.com/questions/55213/how-to-draw-a-boolean-circuit-diagr
 - whatever I end up using for randomly samples
 
 - Inputs x and y and output z
+\al here

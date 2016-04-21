@@ -71,8 +71,6 @@ The garbler samples $4$ additional random bits, and the evaluator performs a sin
 Without point and permute, the evaluator needs to decrypt $2.5$ ciphertexts on average, hence the garbler performs roughly $1.5$ fewer decryptions per gate.
 The overall bandwidth is increased by $4$ bits per gate: a tiny constant increase. \footnote{The value is constant in the sense that it is independent of the security parameter.}
 
-\al{Is this not an XOR/And gate? Make it one of them}
-
 \begin{table}
     \label{tbl:point-and-permute}
     \centering
@@ -91,9 +89,9 @@ The overall bandwidth is increased by $4$ bits per gate: a tiny constant increas
         \hline
         Select Bits & Encryption \\
         \hline
-        (0,0) & $\Enc_{W_i^0, W_j^1}(W_k^1)$ \\
+        (0,0) & $\Enc_{W_i^0, W_j^1}(W_k^0)$ \\
         (0,1) & $\Enc_{W_i^0, W_j^0}(W_k^0)$ \\
-        (1,0) & $\Enc_{W_i^1, W_j^1}(W_k^0)$ \\
+        (1,0) & $\Enc_{W_i^1, W_j^1}(W_k^1)$ \\
         (1,1) & $\Enc_{W_i^1, W_j^0}(W_k^0)$ \\
         \hline
     \end{tabular}
@@ -104,8 +102,7 @@ The overall bandwidth is increased by $4$ bits per gate: a tiny constant increas
     %    $W_k^1 \gets \{0,1\}^n$ \\
     %    \hline
     %\end{tabular}
-    \caption{Garbled Gate for Point and Permute}
-    %\caption{Example garbled gate using point and permute. The gate being computed is given in figure \textbf{Make it 23:30 in mike's talk}}
+    \caption{Garbled AND gate for Point and Permute}
 \end{table}
 
 \section{Garbled Row Reduction 3}
