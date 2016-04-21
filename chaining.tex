@@ -51,14 +51,13 @@ A link label is a ciphertext that allows the evaluator to transform the output w
 Suppose that the garbling uses Free XOR where each component uses the same $\Delta$, that is, $U_0^0 \oplus U_0^1 = W_0^0 \oplus W_0^1 = \Delta$, then it is sufficient for the link label $L_{UW}$ to be $U_0^0 \oplus W_0^0$.
 The evaluator xors the output wire label $U_0^*$ with $L_{UW}$ to acquire $W_0^*$, a valid input label for wire $W_0$. 
 
-We show this computation below; the value $u_0 \in \{0,1\}$ is the semantic value of wire $U_0$, so that $u_0\Delta$ equals $0$ if $u_0$ is $0$ and $\Delta$ otherwise. 
-This notation is a useful way to reason with wire labels when the Free XOR condition is present. 
+We show this computation below; the value $u_0 \in \{0,1\}$ is the semantic value of wire $U_0$.
+For information on this notation, see section 3.5. 
 \begin{align}
 	U_0^0 \oplus u_0 \Delta \oplus L_{UW} & = U_0^0 \oplus u_0 \Delta \oplus U_0^0 \oplus W_0^0 \\
 	& = W_0^0 \oplus u_0 \Delta
 \end{align}
 We see from this equation that the evaluator acquires a valid wire label for wire $W_0$ which has the same semantic value as wire label $U_0^*$.
-
 
 We formally describe component-based garbled circuits as a tuple of three algorithms $(\Garble, \Link, \Eval)$.
 The $\Garble$ algorithm is the same algorithm that we used before to garble circuits; it takes as inputs a circuit $\C$ and outputs three pieces of information: a garbled circuit $\GC$, a set of input wires $e_{\C}$, and a set of output wires $d_{\C}$.
@@ -68,18 +67,18 @@ The $\Link$ algorithm is unique to component-based garbled circuits, and it prod
 $\Link$ takes as input two garbled components $c_0 = (\GC_0, e_0, d_0)$ and $c_1 = (\GC_1, e_1, d_1)$, and a mapping of output wires of $c_0$ to input wires of $c_1$. 
 $\Link$ outputs the \textit{link} labels needed to convert the output wires $d_0$ to input wires $e_1$. 
 Suppose that output wire $U_i \in d_0$ has labels $(U_i^0, U_i^1)$, and input wire $W_j \in e_1$ has wire labels $(W_j^0, W_j^1)$, then $\Link$ outputs $L_{u_i w_j} = U_i^0 \oplus W_j^0$. 
-This discussion above explains why link label $L_{u_i w_j}$ is sufficient for linking. 
+The discussion above explains why link label $L_{u_i w_j}$ is sufficient for linking. 
 
 The $\Eval$ algorithm evaluates the garbled components and links garbled circuits where necessary.
 It takes three inputs: a list of a garbled components $\{c_i\}$, linking labels $\{L_{ij}\}$ and input labels $\{W_i\}$, and it outputs output labels $\{Z_i\}$. 
-$\Eval$ starts with the inputs, and then proceeds component by component, evaluating each component in order to get the component output wire label.
+$\Eval$ starts with the inputs, and then proceeds component by component, evaluating each component in order to get the component output wire labels.
 Where necessary, $\Eval$ uses component output wire labels and link labels to compute the appropriate input label for later components. 
 Once all components are evaluated, $\Eval$ recovers the garbled outputs $\{Z_i\}$ from the output components, and uses $d$ for that component to recover the real output $y$. 
 
 Let us think about how the two banks who use secure computation in their daily operations employ the three algorithms.
 At night, during the offline stage, the garbler-bank generates many circuit components, garbles them with $\Garble$, and sends the garbled circuits to the other evaluator-bank. 
 The garbler-bank and evaluator-bank also perform the offline phase of OT-preprocessing.
-During the day, when the banks decide that they want to securely compute some function $f$, the garbler-bank runs $\Link$ on the components used in $f$ to generate the link labels, which are subsequently send to the evaluator-bank.
+During the day, when the banks decide that they want to securely compute some function $f$, the garbler-bank runs $\Link$ on the components used in $f$ to generate the link labels, which the garbler-bank subsequently sends to the evaluator-bank.
 The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
 Now that the evaluator-bank has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
 
@@ -102,27 +101,27 @@ Party 1, the garbler, only receives additional information from OT-preprocessing
 We think through the security of the evaluator, party 2, using \textit{hybrids}, a common cryptographic technique in proofs. 
 A hybrid argument begins by imagining the protocol in the real world. 
 The aim is to show that the real world protocol is computationally indistinguishable from the ideal world. 
-To achieve this, we rely on the fact that computational indistinguishability is transitive, that is if for world $X, Y$ and $Z$ such that $X \compindist Y \compindist Z$, we know that $X \compindist Z$. 
-So the hybrid argument starts with the real world, makes a small incremental change to the world to make it more similar to the ideal world.
+To achieve this, we rely on the fact that computational indistinguishability is transitive, that is if for worlds $X, Y$ and $Z$ such that $X \compindist Y \compindist Z$, we know that $X \compindist Z$. 
+The hybrid argument starts with the real world, makes a small incremental change to the world to make it more similar to the ideal world.
 Then we take the modified world, and make another small change to make the world more similar to the ideal world. 
 Eventually, the world that we are operating with is the ideal world. 
-If at every step, we prove that the first world is computationally indistinguishable from the next world, then by the transitivity of computationally indistinguishability, we have shown that the real world is computationally indistinguishable from the ideal world. 
+If at every step, we prove that the previous world is computationally indistinguishable from the next world, then by the transitivity of computationally indistinguishability, we have shown that the real world is computationally indistinguishable from the ideal world. 
 
 We start with the real world protocol, in which the evaluator has the following information: pre-garbled components $\{GC_i\}_{i = 0}^{|\Components|}$, input labels $\{W_j^{x_j}\}_{j \in \Inputs(C)}$, output map $d_{C_{out}}$ and link labels $\{L_{ij}\}_{i,j \in \Components}$.
-We first suppose that garbler instead of sending correct link labels sends garbage, random values for link labels. 
+We first suppose that garbler, instead of sending correct link labels, sends garbage, random values for link labels. 
 Yes, this will prevent Bob from recovering the correct output, but correctness is irrelevant when we are reasoning about security; we are only concerned with the information that Bob can access. 
-We now ask the question: is the real world computationally indistinguishable from the world where Bob receive incorrect link labels?
+We now ask the question: is the real world computationally indistinguishable from the world where Bob receives incorrect link labels?
 Or worded more accessibly: does Bob learn any more information from correct wire labels than he does from garbage wire labels?
-We argue, without too much proof, that Bob does not learn any more information because (1) the link labels are encrypted so they look like garbage to Bob anyways, and (2) Bob cannot use the link labels with other pieces of data, such as input wire labels of the garbled circuits, to gain information. 
+We argue, without proof, that Bob does not learn any more information because (1) the link labels are encrypted so they look like garbage to Bob anyways, and (2) Bob cannot use the link labels with other pieces of data, such as input wire labels of the garbled circuits, to gain information. 
 
-We now make hybrid from the world in which Bob receives garbage link labels to a world Bob receives both garbage link labels and garbage input wire labels. 
+We now hybrid from the world in which Bob receives garbage link labels to a world in which Bob receives both garbage link labels and garbage input wire labels. 
 Again, we note that Bob will not recover the correct answer, but correctness is irrelevant to our aim. 
 We know that input wire labels do not give Bob any information from our proof in Chapter 3 that garbled circuits are secure. 
 Therefore these two worlds are computationally indistinguishable. 
 
 By referencing the proof in Chapter 3 that garbled circuits are secure, we also know that turning the output map and garbled circuits into garbage values gives Bob no more information.
 This means a world in which all the information that Bob receives is garbage is computationally indistinguishable from the real world.
-This garbage infested world is identically the ideal world - the only non-random Bob has is his input, just like the ideal world - hence we successfully argue that the real world is computationally indistinguishable from the ideal world, satisfying equation \ref{eqn:party2}. 
+This garbage infested world is identically the ideal world - the only non-garbage value Bob has is his input, just like the ideal world - hence we successfully argue that the real world is computationally indistinguishable from the ideal world, satisfying equation \ref{eqn:party2}. 
 
 It should be noted that this not even close to a formal proof of security.
 A formal proof is long, many pages long, and beyond the scope of this project; rather, this section highlights the intuition behind why we believe a formal proof of security to be possible. 
@@ -164,13 +163,12 @@ For example, if AES is being computed where the components are single AES rounds
 
 The milage of SCMC varies based on the function being computed and components being used. 
 SCMC offers the most benefits to functions that are modular, and where large amounts of data are being passed around, like matrix-based functions and dynamic algorithms like Levenshtein distance. 
-SCMC is less effective when data moves in a more unpredictable manner, like in the computation of 
-Finally, SCMC does not scale with an increase in data size. 
+When using SCMC, online bandwidth does not scale with an increase in data size. 
 SCMC requires that a single link label being communicated for a 2 by 2 matrix and for a 1,000 by 1,000 matrix. 
 Thereby, SCMC greatly improves the speed of securely computing large statistical computations, such as those that might be performed by hospitals or on genomes. 
 
 The security of SCMC follows directly from the security of naive component-based garbled circuits. 
-The wire labels again do not offer any information, so a similar hybrid proof that is used to show that naive component-based garbled circuits is secure works in the SCMC setting as well. 
+The wire labels again do not offer any information, so a similar hybrid proof works in the SCMC setting as well. 
 There is a caveat: SCMC uses a new method of generating wire labels. 
 This is secure since $H$ is random function, hence $H(\cdot)$ blinds $A$ and $B$; in particular, the wire labels are only distinguishable if the evaluator can determine $T$, which is not possible since $H$ is a random oracle.
 Therefore, SCMC is secure. 
