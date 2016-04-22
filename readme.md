@@ -2,12 +2,13 @@
 My senior thesis on multiparty computation (a problem in cryptography). For more info, read the thesis or see my description of the project on my website: [aled1027.github.io](aled1027.github.io).
 
 ## TODO
-- W_i^* in table of notation
-
-## Not doing
-- expand OT improvements section
+- acknowledgements
+- footnote placement
+- citation formatting
 
 ## Done
+* abstract
+* W_i^* in table of notation
 * figure/table numbering
 * OT citations
 * \samples from notation
