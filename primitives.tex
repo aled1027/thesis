@@ -58,6 +58,7 @@ A function $\mu : \NN \to \RR$ is negligible if for all positive polynomial $p(\
 \end{equation}
 \cite{goldreich}
 \end{definition}
+
 Examples of negligible functions include $2^{-n}$, $2^{- \sqrt{2}}$ and $n^{- \log n}$. 
 
 To put a negligible function to use, say an adversary is attacking a cryptographic scheme that is equivalent to solving a problem $P$ with input size $\lambda$ and $2^{\lambda}$ possible answers. 
@@ -249,12 +250,11 @@ x & y & $x < y$ \\ \hline
     \caption{The high level idea of oblivious transfer. Image from \cite{alexirpan}}
     \label{fig:basic-ot}
 \end{figure}
-Oblivious Transfer (OT) is a simple, useful protocol that underlies many more complicated crypto-systems.
+Oblivious Transfer (OT) is a simple, useful protocol that underlies many more complicated crypto-systems \cite{EGL82, Rab05}.
 
 Figure \ref{fig:basic-ot} outlines the high level idea of oblivious transfer.
 The box in figure \ref{fig:basic-ot} may be thought of as a trusted post office.
-Alice potentially sends two messages $m_0$ and $m_1$ to Bob.
-Instead of sending the messages to Bob, she sends the messages to the post office.
+Alice potentially sends two messages $m_0$ and $m_1$ to Bob, but instead of sending the messages to Bob, she sends the messages to the post office.
 Bob, without seeing either $m_0$ or $m_1$, knows that he wants $m_b$ where $b \in \{0,1\}$, so he notifies the post office that he wants message $b$.
 With this information, the post office gives Bob $m_b$.
 We want two secure properties to hold: (1) Alice does not know whether Bob received $m_0$ or $m_1$ and (2) Bob does not learn any information about $m_{1-b}$, the message that he did not receive.

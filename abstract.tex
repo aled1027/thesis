@@ -1,2 +1,18 @@
+%!TEX root = thesis.tex
+
 \chapter*{Abstract}
-The preface pretty much says it all.
+
+Secure computation is a cryptographic method to securely compute a function between two parties while preserving the privacy of the parties' inputs.
+Modern secure computation techniques use an offline/online scheme, where parties pre-process and exchange information in an offline phase prior to computing the function in an online phase. 
+The offline/online setting has many advantages, namely that the online computation is very fast, but the setting is limiting, as the function that is being computed must be determined ahead of time.
+
+This thesis is part of a larger project studying component-based garbled circuit schemes which aim to improve the offline/online model.
+Component-based garbled circuits observe that many real-world functions are composed of many standard components such as arithmetic operations, matrix operations and other common operations.
+Component-based garbled circuits exchange many small, generic garbled components in an offline phase. 
+Later in the online phase, the parties choose a function they wish to compute, and stitch together the garbled components in order to create the function.
+
+As a part of this larger project, this this contributes two items.
+The first is an improvement of component-based garbled circuits called \textit{Single Communication Multiple Connections} (SCMC).
+SCMC dramatically reduces the online bandwidth of component-based garbled circuits by observing that there are common patterns when linking garbled components.
+This thesis also contributes an implementation, \CompGC, of component-based garbled circuits in the C-programming language. 
+We run performance measurements on \CompGC, and we find that component-based garbled circuits offer considerable savings in online time and online bandwidth over other implementations of garbled circuits. 

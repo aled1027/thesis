@@ -28,7 +28,7 @@ The list of circuits could be small and focused, designed for computing a single
 \CompGC garbles the list of circuits the specified number of times, and then sends the garbled circuits with an attached identification number from the garbler to the evaluator. 
 The garbler and evaluator each save the garbled circuits to disk. 
 Finally, the garbler and evaluator perform the offline phase of preprocessed oblivious transfer. 
-\CompGC uses the Naor-Pinkas semi-honest oblivious transfer protocol; the library for performing oblivious transfer was given to me by Alex Malozemoff. 
+\CompGC uses the Naor-Pinkas semi-honest oblivious transfer protocol; the library for performing oblivious transfer was given to me by Alex Malozemoff \cite{naor-pinkas-ot}. 
 The garbler finishes by saving the input labels and oblivious transfer data to disk, and similarly, the garbler saves the oblivious transfer data to disk. 
 Algorithms \ref{alg:garbler-offline} and \ref{alg:evaluator-offline} show the steps taken by each party in the offline phase. 
 

@@ -1,16 +1,15 @@
 # Thesis
 My senior thesis on multiparty computation (a problem in cryptography). For more info, read the thesis or see my description of the project on my website: [aled1027.github.io](aled1027.github.io).
 
-
 ## TODO
-- OT citations
-- table numbering
 - W_i^* in table of notation
 
 ## Not doing
 - expand OT improvements section
 
 ## Done
+* figure/table numbering
+* OT citations
 * \samples from notation
     * figure out fix
     * use macro

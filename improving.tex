@@ -331,12 +331,11 @@ If $a = 0$, then the evaluator should acquire $W_k^0$.
 Otherwise if $a = 1$, then the evaluator should acquire $W_k^0 \oplus \sigma_j\Delta$.
 In this case, it suffices for the evaluator to obtain $\Omega = W_k^0 \oplus W_j^0$, as the evaluator simply sets $W_k^*$ to $W_j^* \oplus \Omega$ which sets $W_k^*$ equal to $W_k^0 \oplus b\Delta$.
 
-Table \ref{tbl:halfgate-gg-eval} the garbled table for the evaluator-half-gate.
+Table \ref{tbl:halfgate-gg-eval} shows the garbled table for the evaluator-half-gate.
 This table does not need to be permuted, since the evaluator knows $a$.
 Again, we use the GRR3 trick, and set $W_k^0$ to $\EncInv_{W_i^0}(0^n)$, eliminating the need to send the top row of the garbled table.
 
 \begin{table}[h]
-    \label{tbl:halfgate-gg-eval}
     \centering
     \begin{tabular}{|c|}
         \hline
@@ -347,6 +346,7 @@ Again, we use the GRR3 trick, and set $W_k^0$ to $\EncInv_{W_i^0}(0^n)$, elimina
         \hline
     \end{tabular}
     \caption{Evaluator-half-gate garbled table.}
+    \label{tbl:halfgate-gg-eval}
 \end{table}
 
 We now put the two half gates together to form an AND gate. 
@@ -367,7 +367,6 @@ Half gates guarantees only two ciphertexts are needed per AND gate, but the trad
 With FleXOR, the number of ciphertexts that need to be communicated may vary, but there is less computation required.
 
 \section{Improving Oblivious Transfer}
-\al{add citations}
 This section discusses improvements to oblivious transfer, the method by which the garbler communicates the wire labels corresponding to the evaluator's inputs to the evaluator.
 At its most basic, oblivious transfer enables Alice to potentially send one of two messages to Bob.
 Bob selects which message he wants to receive.
