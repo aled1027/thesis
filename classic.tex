@@ -156,7 +156,7 @@ In the figure, the gates are ordered from $0$ to $2$, in order from nearest to t
 Alice begins by assigning two wire labels to each wire - a wire is a line connecting inputs and gates in the figure.
 Because Alice is working with a boolean circuit, each wire can semantically represent either a 0 or 1.
 For a given wire $W_i$, the zeroith wire label $W_i^0$ represents $0$, and the first wire label $W_i^1$ represents $1$.
-A wire labels is a ciphertext, the output of the encryption algorithm\footnote{A common encryption algorithm used now is AES-128, so the wire labels are 128 bit strings.}.
+A wire labels is a ciphertext, the output of the encryption algorithm.\footnote{A common encryption algorithm used now is AES-128, so the wire labels are 128 bit strings.}
 Alice assigns the wire labels by randomly sampling from $\{0,1\}^{\lambda}$, where $\lambda$ is the size of the output of the encryption algorithm.
 
 In general, we use $W_i$ to represent the $i$th wire, $W_i^j$ to represent the $i$th wire's $j$th label, and later we use $W_i^*$ to represent one of wire $i$'s wire labels without specifying whether it is wire label 0 or wire label 1.
