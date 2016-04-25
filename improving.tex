@@ -102,7 +102,7 @@ The overall bandwidth is increased by $4$ bits per gate: a tiny constant increas
     %    $W_k^1 \gets \{0,1\}^n$ \\
     %    \hline
     %\end{tabular}
-    \caption{Garbled AND gate for Point and Permute}
+    \caption[Garbled table with point and permute]{Garbled AND gate for Point and Permute}
 \end{table}
 
 \section{Garbled Row Reduction 3}
@@ -154,7 +154,7 @@ The value of $W_k^0$ is randomly sampled from $\{0,1\}^n$.
         $W_k^1 \gets \Enc_{W_i^0, W_j^1}^{-1}(0^n)$ \\
         \hline
     \end{tabular}
-    \caption{A garbled AND gate using point and permute and garbled row reduction 3}
+    \caption[Garbled table with GRR3]{A garbled AND gate using point and permute and garbled row reduction 3}
     \label{tbl:grr3}
 \end{table}
 
@@ -321,7 +321,7 @@ If the evaluator should decrypt the ciphertext on the top row (as directed by po
         $\Enc_{W_j^1}(W_k^0 \oplus \sigma_k\Delta)$ \\
         \hline
     \end{tabular}
-    \caption{Left: garbler-half-gate garbled table for $\sigma_i = 0$. Middle: garbler-half-gate garbled table for $\sigma_i = 1$. Right: garbler-half-gate garbled table for arbitrary $\sigma_i$.}
+    \caption[Garbler-half-gate garbled table]{Left: garbler-half-gate garbled table for $\sigma_i = 0$. Middle: garbler-half-gate garbled table for $\sigma_i = 1$. Right: garbler-half-gate garbled table for arbitrary $\sigma_i$.}
         \label{tbl:halfgate-gg-garb}
 \end{table}
 
@@ -345,7 +345,7 @@ Again, we use the GRR3 trick, and set $W_k^0$ to $\EncInv_{W_i^0}(0^n)$, elimina
         $\Enc_{W_i^1}(W_k \oplus W_j)$ \\
         \hline
     \end{tabular}
-    \caption{Evaluator-half-gate garbled table.}
+    \caption[Evaluator-half-gate garbled table]{Evaluator-half-gate garbled table.}
     \label{tbl:halfgate-gg-eval}
 \end{table}
 
