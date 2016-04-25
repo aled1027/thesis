@@ -6,11 +6,12 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 - citations before period
 
 ## TODO
-- footnote placement
-- citation formatting
 - acknowledgements
 
 ## Done
+* finish bib (finish TODO)
+* footnote placement
+* citation formatting
 * remoed color
 * fixed list of table and figures
 * abstract
