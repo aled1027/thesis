@@ -6,6 +6,7 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 - citations before period
 
 ## TODO
+- single \al in experiments section
 - acknowledgements
 
 ## Done
