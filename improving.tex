@@ -10,7 +10,8 @@ Communicating the input labels is an unavoidable cost; this information needs to
 In particular, many input labels are communicated via oblivious transfer which in its naive form is computational expensive. 
 We discuss improvements to oblivious transfer at the end of this chapter. 
 
-New techniques also reduce the size of the garbled table, the other information exchanged between the garbler and evaluator.\footnote{In Chapter 2, Alice was the garbler and Bob was the evaluator. For clarity in Chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}
+New techniques also reduce the size of the garbled table, the other information exchanged between the garbler and evaluator.\footnote{In Chapter 2, Alice was the garbler and Bob was the evaluator. 
+For clarity in Chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}
 In the classical garbled circuit scheme, the evaluator sends all four rows of the garble table to the evaluator.
 New techniques, wherein the garbler cleverly chooses wire labels, reduce the number of rows of the garbled table that are communicated.
 Reducing the size of the garbled table is important, because it is a measure of the bandwidth requirement of the scheme.
@@ -37,13 +38,13 @@ Because many of the techniques have different effects on XOR gates and AND gates
 
 The goal of this chapter is primarily to explain each row in this table.
 We will understand the new techniques, and their associated computational and bandwidth cost.
-We start with the earliest technique and move forward chronologically\footnote{For further information and exposition, we encourage the reader to investigate \cite{mikes-video}.}.
+We start with the earliest technique and move forward chronologically.\footnote{For further information and exposition, we encourage the reader to investigate \cite{mikes-video}.}
 
 \section{Point and Permute}
 The \textit{point and permute} technique speeds up the evaluator's computation of the garbled table by removing the need to trial decrypt the ciphertexts; instead, the garbler subtly communicates which row of the garbled table to decrypt, and the evaluator only decrypts that ciphertext \cite{fairplay}.
 
-In the classic garbled circuit scheme, the garbled table is randomly permuted - that is, the garbler randomly reorders the rows of the garbled table before sending the garbled table to the evaluator.\footnote{This is required for security. See Chapter 2 for more information}
-Upon receiving the garbled table, the evaluator trial decrypts each row of the garbled table until a decryption succeeds.\footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. For more information, see Chapter 1.}
+In the classic garbled circuit scheme, the garbled table is randomly permuted - that is, the garbler randomly reorders the rows of the garbled table before sending the garbled table to the evaluator.\footnote{This is required for security. See Chapter 2 for more information.}
+Upon receiving the garbled table, the evaluator trial decrypts each row of the garbled table until a decryption succeeds.\footnote{Recall that the decryption algorithm outputs a single bit indicating whether or not the decryption was successful. See Chapter 1 for more information.}
 
 Point and permute enables the evaluator to bypass the trial decryption step, so that they decrypt the correct wire label the first time.
 In point and permute, the garbler randomly assigns a select bit $0$ or $1$ to each wire label of the gate's input wires, where wire labels of the same wire have opposite bits.
@@ -69,7 +70,7 @@ Thus it is secure for the garbler to permute the table based on the select bits,
 Point and permute slightly increases garbler-side computation to substantially decrease evaluator-side computation.
 The garbler samples $4$ additional random bits, and the evaluator performs a single decryption.
 Without point and permute, the evaluator needs to decrypt $2.5$ ciphertexts on average, hence the garbler performs roughly $1.5$ fewer decryptions per gate.
-The overall bandwidth is increased by $4$ bits per gate: a tiny constant increase. \footnote{The value is constant in the sense that it is independent of the security parameter.}
+The overall bandwidth is increased by $4$ bits per gate: a tiny constant increase.\footnote{The value is constant in the sense that it is independent of the security parameter.}
 
 \begin{table}
     \label{tbl:point-and-permute}
@@ -241,7 +242,8 @@ FleXOR reconciles GRR2 with Free XOR, resulting in a scheme that is universally 
 
 Recall that GRR2 is incompatible with Free XOR because the wire labels are uncontrollably created by random polynomials, where Free XOR requires that $W_k^0 = W_k^1 \oplus \Delta$ for some global delta.
 FleXOR solves this problem in a straightforward fashion: correct the delta value of output wires of AND gates such that the output wires use the global delta.
-To correct the value, FleXOR adds a unary gate after each AND gate that corrects the wire label. \footnote{A unary gate is a gate that takes a single input wire and outputs a single wire. The unary gate does not change the semantic meaning of a wire label - that is, whether it represents 0 or 1. The unary gate merely alters the actual value of the wire label or ciphertext.}
+To correct the value, FleXOR adds a unary gate after each AND gate that corrects the wire label.\footnote{A unary gate is a gate that takes a single input wire and outputs a single wire. 
+The unary gate does not change the semantic meaning of a wire label - that is, whether it represents 0 or 1. The unary gate merely alters the actual value of the wire label or ciphertext.}
 
 Suppose an XOR gate has input wires $W_i$ and $W_j$ and output wire $W_k$.
 Input wires $W_i$ and $W_j$ each come from an AND gate, so their labels are the result of the polynomial interpolation of GRR2.

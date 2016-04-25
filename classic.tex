@@ -161,7 +161,7 @@ Alice assigns the wire labels by randomly sampling from $\{0,1\}^{\lambda}$, whe
 
 In general, we use $W_i$ to represent the $i$th wire, $W_i^j$ to represent the $i$th wire's $j$th label, and later we use $W_i^*$ to represent one of wire $i$'s wire labels without specifying whether it is wire label 0 or wire label 1.
 
-After assigning wire labels, Alice garbles gate $G_0$, the gate nearest to the inputs\footnote{Multiple gates at some point could equidistant from the input. In these cases, the ordering of gates does not matter.}.
+After assigning wire labels, Alice garbles gate $G_0$, the gate nearest to the inputs.\footnote{Multiple gates at some point could equidistant from the input. In these cases, the ordering of gates does not matter.}
 Alice garbles gate $G_0$ by creating a garbled table $T_{G_0}$.
 Gate $G_0$ is an AND gate, so the structure of the table resembles the logical table for an AND gate.
 The table has four columns. 

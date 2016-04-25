@@ -81,7 +81,7 @@ Encryption is the process of obfuscating a message, and then later un-obfuscatin
 Say Alice has a message that she wants to send to Bob, but somewhere between Alice and Bob sits Eve, who wants to learn about the message.
 An encryption scheme enables Alice to send her message to Bob with confidence that Eve cannot learn any information about the message. 
 
-An encryption scheme is composed of three algorithms: $\Enc$, $\EncInv$ and $\Gen$; formally, we say an encryption scheme is a tuple $\Pi = (\Gen, \Enc, \EncInv)$\footnote{We use $\Pi$ here to denote the encryption scheme, because it is a protocol. Protocol starts with a p.}.
+An encryption scheme is composed of three algorithms: $\Enc$, $\EncInv$ and $\Gen$; formally, we say an encryption scheme is a tuple $\Pi = (\Gen, \Enc, \EncInv)$.\footnote{We use $\Pi$ here to denote the encryption scheme, because it is a protocol. Protocol starts with a p.}
 $\Enc$ the obfuscating algorithm, $\EncInv$ is the un-obfuscating algorithm and $\Gen$ generates a key. 
 The key is extra information that $\Enc$ and $\EncInv$ use to obfuscate and un-obfuscate the message respectively. 
 The key, denoted $k$, is a random\footnote{The notion of randomness in cryptography is precisely defined, and in cases where $\lambda$ is large, it is sufficient for $k$ to be pseudorandom. Pseudorandomness is also precisely defined.} string of $\lambda$ bits, that is $k$ is randomly sampled from the set $\{0,1\}^{\lambda}$  where $\lambda$ is the security parameter of the encryption scheme. 
@@ -124,7 +124,7 @@ where $E$ is the following experiment:
 \begin{enumerate}
 \item Generate key $k$ by running $\Gen(1^n)$. 
 \item The adversary $\A$ is given $1^n$ and oracle access to $\Enc_k$, and outputs a pair of messages $m_0$ and $m_1$ of the same length.
-\item A uniform bit $b \samples \{0,1\}$ is sampled uniformly at random\footnote{Throughout this thesis, we use the notation $x \samples X$ to mean that x is sampled uniformly at random from set $X$.}, and then ciphertext $c \gets \Enc_k(m_b)$ is computed and given to $\A$\footnote{We use the arrow $\gets$ to indicate that a value to being assigned to variable. Other common notation would write $c := \Enc_k(m_b)$}.
+\item A uniform bit $b \samples \{0,1\}$ is sampled uniformly at random, and then ciphertext $c \gets \Enc_k(m_b)$ is computed and given to $\A$.\footnote{Throughout this thesis, we use the notation $x \samples X$ to mean that x is sampled uniformly at random from the set $X$. We use the arrow $\gets$ to indicate that a value to being assigned to variable. For example, $x \gets 3$, means that $x$ is being assigned the value $3$.}
 \item $\A$ continues to have oracle access to $\Enc_k$, and outputs a bit $b'$. 
 \item The output of the experiment is defined to be $1$ if $b' = b$ and $0$ otherwise. If at any point $\A$ encrypts $m_0$ or $m_1$ with their encryption oracle, the output is $0$. $1$ indicates that the adversary wins, and $0$ indicates that the adversary loses.
 \end{enumerate}
