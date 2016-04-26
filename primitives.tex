@@ -1,7 +1,7 @@
 %!TEX root = thesis.tex
 
 \chapter{Cryptographic Primitives}
-Secure Compuation is the study of computing functions in a secure fashion. 
+Secure computation is a cryptographic technique for securely a function between two parties.
 We split secure computation into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
 This thesis focuses on 2PC protocols, but many of the methods are applicable to MPC as well.
 
@@ -36,9 +36,9 @@ The average computer today can solve the problem for a larger $N$ than the avera
 
 The changing computational power highlights the importance of being able to scale how hard a cryptographic scheme is to break.
 To this end, we introduce a \textit{security parameter}, denoted as $\lambda$.
-A security parameter is a positive integer that represents how hard a scheme is to break; A larger security parameter should mean that the scheme is more difficult to break. 
+A security parameter is a positive integer that represents how hard a scheme is to break; a larger security parameter should mean that the scheme is more difficult to break. 
 More specifically, the security parameter is correlated to the input size of the problem underlying the cryptographic scheme. 
-For example, if the underlying problem is factoring large number $N$, then $N = \lambda$. 
+For example, if the underlying problem is factoring large number $N$, then $\lambda$ is the number of bits needed to express $N$ in binary, that is, $\lambda = |N|$.
 As $N$ and $\lambda$ scale up, the factoring problem becomes more difficult and the scheme becomes hard to break. 
 
 Finally, we acknowledge that adversaries have access to some random values, hence we strengthen adversaries to be probabilistic algorithms. 
@@ -63,7 +63,7 @@ Examples of negligible functions include $2^{-n}$, $2^{- \sqrt{2}}$ and $n^{- \l
 
 To put a negligible function to use, say an adversary is attacking a cryptographic scheme that is equivalent to solving a problem $P$ with input size $\lambda$ and $2^{\lambda}$ possible answers. 
 Moreover, say that $P$ is known to be NP-hard such that there is no polynomial time algorithm to solve $P$. 
-Then, the best that the adversary can do is to guess the answer to $P$.
+Then, the best that the adversary can do might be to guess the answer to $P$.
 Hence the probability that the adversary successfully answers $P$, or breaks the scheme, is 
 \begin{align*}
 Pr[\text{A correctly answers $P$}] & = {2^{- \lambda}}
@@ -106,11 +106,10 @@ We define security using a thought experiment.
 In the thought experiment, the adversary has access to the encryption algorithm with the key hardcoded in. 
 This means that the adversary can encrypt any message they want, and see how the message would encrypt. 
 The goal of the adversary at this point in the thought experiment is to find a pattern or weakness in the encryption algorithm that they can exploit.
-The adversary eventually picks any two messages $m_0$ and $m_1$ which they did not give to their encryption algorithm to see how they encrypt.
-The adversary shows us $m_0$ and $m_1$.
+The adversary eventually picks any two messages $m_0$ and $m_1$; the adversary shows us $m_0$ and $m_1$.
 We choose one of the messages\footnote{We select the message uniformly at random.}, encrypt the message, and send the resulting ciphertext to the adversary.
 The adversary's goal now is to determine which message we encrypted.
-They still may use their encryption algorithm with the key hardcoded in, but they cannot encrypt $m_0$ or $m_1$.
+They still may use their encryption algorithm with the key hardcoded.
 Eventually the adversary must output either $0$ or $1$ indicating that they think we selected $m_0$ or $m_1$ to encrypt, respectively.
 If the adversary picks correctly, then we say that the adversary wins; otherwise, we say that the adversary loses.
 We consider the encryption scheme to be secure if the probability that the adversary wins is $\frac{1}{2} + \mu(\lambda)$ where $\mu$ is a negligible function, i.e. the best the adversary can do is guess.
@@ -140,13 +139,20 @@ It is easy to instantiate a DKC if one has a secure single-key encryption scheme
     \end{split}
 \end{equation}
 
-If the encryption scheme used to create the DKC is secure, then it is easy to see to that the DKC is also secure.
-We are formally considering the statement: $\Enc$ secure $\implies$ DKC secure. 
-Consider the contrapositive: DKC insecure $\implies$ $\Enc$ insecure. 
-If the DKC is insecure, then an adversary can find two messages, $m_0$ and $m_1$ such that their ciphertexts are distinguishable. 
-For example, in the $\Enc$ experiment, the adversary could set $m_0 \gets \Enc_k(0)$ and $m_1 \gets \Enc_k(1)$ using their oracle. 
-The ciphertext that the adversary receives back will be $\Enc_k(\Enc_k(b))$, for which the adversary can determine if $b$ is $0$ or $1$ since they can break the DKC experiment. 
-Therefore the adversary can break the $\Enc$ experiment if they can break the DKC experiment.
+If the encryption scheme used to create the DKC is secure, then it is easy to see that the DKC is also secure.
+We are formally considering the statement: if $\Enc$ is secure then the constructed DKC is secure. 
+
+Consider the contrapositive: if the constructed DKC is insecure then $\Enc$ is insecure. 
+We sketch a proof of this claim.
+Suppose that we have an adversary $\A$ competing in the $\Enc$ security experiment, and $\A$ can break the DKC security experiment - this assumption is made since we assume that the DKC is insecure.
+Since $\A$ can beat the DKC experiment, $\A$ finds two messages, $m_0$ and $m_1$, such that they can determine $b$ given $\Enc_k(\Enc_k(m_b))$.
+
+In the $\Enc$ experiment, $\A$ sets $m'_0 \gets \Enc_k(m_0)$ and $m_1' \gets \Enc_k(m_1)$ using their encryption oracle.
+The adversary submits $m_0'$ and $m_1'$ as their messages, and they recieve back $\Enc_k(m_b')$.
+Since $\Enc_k(m_b')$ is actually $\Enc_k(\Enc_k(m_b))$, the $\A$ can determine $b$.
+The adversary can do this because they chose $m_0$ and $m_1$ such that they could beat the DKC security experiment.
+Finally, $\A$ outputs $b$, which will be correct with probabilty greater than $\frac{1}{2} + \mu(\lambda)$ where $\mu$ is a negligible function.
+Therefore the adversary can break the $\Enc$ experiment if they can break the DKC experiment, and the contrapositive of this statement tells us that if the $\Enc$ scheme is secure, then the DKC scheme is also secure.
 
 \section{Computational Indistinguishability}
 This section introduces the idea of computational indistinguishability. 
@@ -154,7 +160,7 @@ We do not use computational indistinguishability immediately, but it will import
 
 Informally, two probability distribution are indistinguishable if no probabilistic polynomial-time algorithm can tell them apart.
 The thought experiment is like this: an algorithm knows that there are two distributions.
-It is given one of the distributions.
+It samples from one of the distributions.
 If the algorithm correctly determines which distribution it was given, then it wins, otherwise the algorithm loses.
 The algorithm, since it must run in polynomial time, can only sample a polynomial number of values from the distributions.
 

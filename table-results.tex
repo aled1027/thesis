@@ -1,9 +1,10 @@
 %!TEX root = thesis.tex
 \begin{table}[h]
 
+    %\tiny
     \scriptsize
-    %\footnotesize
     %\small
+    %\footnotesize
 
     \centering
     \begin{tabular}{ r c c c c c c }
@@ -18,19 +19,19 @@
         & 542.6 $\pm$ 0.7 ms
         & 68.5 $\pm$ 0.2 ms
         & 24 Mb & 254 Kb \\
-        CBC mode, 10 blocks 
+        CBC, 10 blocks 
         & 45.8 $\pm$ 4.0 ms
         & 22.7 $\pm$ 1.4 ms
         & 4.8 $\pm$ 0.0 s
         & 216.7 $\pm$ 0.2 ms
         & 235 Mb & 2.6 Mb \\
-        Levenshtein, 30 symbols
+        Leven, 30 symbols
         & 28.9 $\pm$ 6.6 ms
         & 24.3 $\pm$ 1.2 ms
         & 2.2 $\pm$ 0.0 s
         & 315.9 $\pm$ 0.5 ms
         & 108 Mb & 6.3 Mb \\
-        Levenshtein, 60 symbols
+        Leven, 60 symbols
         & 109.8 $\pm$ 7.0 ms
         & 62.2 $\pm$ 0.7 ms
         & 10.6 $\pm$ 0.0 s
@@ -40,6 +41,7 @@
     \caption[Experimental results]{Experimental results.
         \Naive denotes standard semi-honest 2PC using garbled circuits and preprocessed OTs using \LibGarble,
         whereas \CompGC denotes our component-based implementation using SCMC. 
+        Leven is Levenshtein distance.
         Time is online computation time, not including the time to preprocess OTs, but including the time to load data from disk.
         All timings are of the evaluator's running time, and are the average of 100 runs, with the value after the $\pm$ denoting the 95\% confidence interval.
         The communication reported is the number of bits received by the evaluator.

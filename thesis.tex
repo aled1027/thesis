@@ -43,6 +43,7 @@
 \setlength{\parskip}{0pt}
 
 \begin{document}
+\sloppy
 
 \maketitle
 \frontmatter % this stuff will be roman-numbered
@@ -54,8 +55,8 @@
 
 % The preface is optional
 % To remove it, comment it out or delete it.
-\chapter*{Preface}
-This is an example of a thesis setup to use the reed thesis document class.
+%\chapter*{Preface}
+%This is an example of a thesis setup to use the reed thesis document class.
 
 \chapter*{List of Notation}
 
@@ -95,7 +96,9 @@ This is an example of a thesis setup to use the reed thesis document class.
 %\input{dedication}
 	
 \mainmatter % here the regular arabic numbering starts
+
 \doublespacing
+
 \pagestyle{fancyplain} % turns page numbering back on
 
 \input{intro}
