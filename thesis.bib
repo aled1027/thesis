@@ -1,13 +1,32 @@
-% Hoang's Dissertation
-% http://www.cs.ucsb.edu/~tvhoang/hviettung_research.pdf
 
-% that nice, intuitive write up
-% https://www.math.ucla.edu/~tdokos/notes_files/garbledCircuits.pdf
 
-% Lindell proof of Yao security
-% https://users-cs.au.dk/~stm/local-cache/yao.pdf
 
-% http://www.alexirpan.com/2016/02/11/secure-computation.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Eprint
+
+                                                            
+
+@inproceedings{justgarble,
+    title={Efficient garbling from a fixed-key blockcipher},
+    author={Bellare, Mihir and Hoang, Viet Tung and Keelveedhi, Sriram and Rogaway, Phillip},
+    booktitle={IEEE Symposium on Security and Privacy (SP)},
+    pages={478--492},
+    year={2013},
+    organization={IEEE}
+}
 
 @inproceedings{naor-pinkas-ot,
   title={Privacy preserving auctions and mechanism design},
@@ -22,7 +41,6 @@
   title={How To Exchange Secrets with Oblivious Transfer.},
   author={Rabin, Michael O},
   journal={IACR Cryptology ePrint Archive},
-  volume={2005},
   pages={187},
   year={2005}
 }
@@ -40,22 +58,18 @@
 
 @misc{wiki-leven,
   year = 2016,
-  author = {Wikipedia Levenshtein Distance}
-  title = {Levenshtein Distance}
-  url = {@misc{alexirpan,
-  author = {Alexir Pan},
-  year = 2016,
-  url = {http://www.alexirpan.com/2016/02/11/secure-computation.html},
+  author = {Wikipedia},
+  title = {Wikiepdia Levenshtein Distance}
 }
-
+      
 @misc{alexirpan,
   author = {Alexir Pan},
   year = 2016,
-  url = {http://www.alexirpan.com/2016/02/11/secure-computation.html},
+  url = {http://www.alexirpan.com/2016/02/11/secure-computation.html}
 }
 
 @incollection{SZ13,
-  title={GMW vs. Yao? Efficient secure two-party computation with low depth circuits},
+  title={GMW vs. {Y}ao? Efficient secure two-party computation with low depth circuits},
   author={Schneider, Thomas and Zohner, Michael},
   booktitle={Financial Cryptography and Data Security},
   pages={275--292},
@@ -71,7 +85,7 @@
 }
 
 @article{SV11,
-  title={Fully homomorphic SIMD operations},
+  title={Fully homomorphic {SIMD} operations},
   author={Smart, Nigel P and Vercauteren, Frederik},
   journal={Designs, codes and cryptography},
   volume={71},
@@ -84,7 +98,7 @@
 @inproceedings{MGBF14,
   title={Reuse it or lose it: More efficient secure computation through reuse of encrypted values},
   author={Mood, Benjamin and Gupta, Debayan and Butler, Kevin and Feigenbaum, Joan},
-  booktitle={Proceedings of the 2014 ACM SIGSAC Conference on Computer and Communications Security},
+  booktitle={Conference on Computer and Communications Security (SIGSAC)},
   pages={582--596},
   year={2014},
   organization={ACM}
@@ -93,7 +107,7 @@
 @incollection{NNOB12,
   title={A new approach to practical active-secure two-party computation},
   author={Nielsen, Jesper Buus and Nordholt, Peter Sebastian and Orlandi, Claudio and Burra, Sai Sheshank},
-  booktitle={Advances in Cryptology--CRYPTO 2012},
+  booktitle={Advances in Cryptology (CRYPTO)},
   pages={681--700},
   year={2012},
   publisher={Springer}
@@ -102,25 +116,16 @@
 @incollection{DPSZ12,
   title={Multiparty computation from somewhat homomorphic encryption},
   author={Damg{\aa}rd, Ivan and Pastro, Valerio and Smart, Nigel and Zakarias, Sarah},
-  booktitle={Advances in Cryptology--CRYPTO 2012},
+  booktitle={Advances in Cryptology (CRYPTO)},
   pages={643--662},
   year={2012},
   publisher={Springer}
 }
 
-@inproceedings{LR15,
-  title={Blazing fast 2pc in the offline/online setting with security for malicious adversaries},
-  author={Lindell, Yehuda and Riva, Ben},
-  booktitle={Proceedings of the 22nd ACM SIGSAC Conference on Computer and Communications Security},
-  pages={579--590},
-  year={2015},
-  organization={ACM}
-}
-
 @incollection{LR14,
   title={Cut-and-choose Yao-based secure computation in the online/offline and batch settings},
   author={Lindell, Yehuda and Riva, Ben},
-  booktitle={Advances in Cryptology--CRYPTO 2014},
+  booktitle={Advances in Cryptology (CRYPTO)},
   pages={476--494},
   year={2014},
   publisher={Springer}
@@ -129,7 +134,7 @@
 @incollection{HKK14,
   title={Amortizing garbled circuits},
   author={Huang, Yan and Katz, Jonathan and Kolesnikov, Vladimir and Kumaresan, Ranjit and Malozemoff, Alex J},
-  booktitle={Advances in Cryptology--CRYPTO 2014},
+  booktitle={Advances in Cryptology (CRYPTO)},
   pages={458--475},
   year={2014},
   publisher={Springer}
@@ -138,7 +143,7 @@
 @incollection{Bea95,
   title={Precomputing oblivious transfer},
   author={Beaver, Donald},
-  booktitle={Advances in Cryptology—CRYPT0’95},
+  booktitle={Advances in Cryptology (CRYPT0)},
   pages={97--109},
   year={1995},
   publisher={Springer}
@@ -147,7 +152,7 @@
 @incollection{otextension,
   title={Extending oblivious transfers efficiently},
   author={Ishai, Yuval and Kilian, Joe and Nissim, Kobbi and Petrank, Erez},
-  booktitle={Advances in Cryptology-CRYPTO 2003},
+  booktitle={Advances in Cryptology (CRYPTO)},
   pages={145--161},
   year={2003},
   publisher={Springer}
@@ -163,16 +168,16 @@
 }
 
 @incollection{flexor,
-  title={FleXOR: Flexible garbling for XOR gates that beats free-XOR},
+  title={FleXOR: Flexible garbling for {XOR} gates that beats free-{XOR}},
   author={Kolesnikov, Vladimir and Mohassel, Payman and Rosulek, Mike},
-  booktitle={Advances in Cryptology--CRYPTO 2014},
+  booktitle={Advances in Cryptology (CRYPTO)},
   pages={440--457},
   year={2014},
   publisher={Springer}
 }
 
 @incollection{freexor,
-  title={Improved garbled circuit: Free XOR gates and applications},
+  title={Improved garbled circuit: Free {XOR} gates and applications},
   author={Kolesnikov, Vladimir and Schneider, Thomas},
   booktitle={Automata, Languages and Programming},
   pages={486--498},
@@ -183,7 +188,7 @@
 @incollection{grr,
   title={Secure two-party computation is practical},
   author={Pinkas, Benny and Schneider, Thomas and Smart, Nigel P and Williams, Stephen C},
-  booktitle={Advances in Cryptology--ASIACRYPT 2009},
+  booktitle={Advances in Cryptology (ASIACRYPT)},
   pages={250--267},
   year={2009},
   publisher={Springer}
@@ -201,15 +206,16 @@
 @inproceedings{bellare2013efficient,
     title={Efficient garbling from a fixed-key blockcipher},
     author={Bellare, Mihir and Hoang, Viet Tung and Keelveedhi, Sriram and Rogaway, Phillip},
-    booktitle={IEEE Symposium of Security and Privacy},
+    booktitle={IEEE Symposium on Security and Privacy (SP)},
     pages={478--492},
     year={2013}
+    organization={IEEE}
 }
 
 @inproceedings{bellare2012foundations,
     title={Foundations of garbled circuits},
     author={Bellare, Mihir and Hoang, Viet Tung and Rogaway, Phillip},
-    booktitle={Proceedings of the 2012 ACM Conference on Computer and Communications Security},
+    booktitle={ACM Conference on Computer and Communications Security (CCS)},
     pages={784--796},
     year={2012},
     organization={ACM}
@@ -218,7 +224,7 @@
 @article{lindell2009,
     title={Secure multiparty computation for privacy-preserving data mining},
     author={Lindell, Yehuda and Pinkas, Benny},
-    journal={Journal of Privacy and Confidentiality},
+    journal={Journal of Privacy and Confidentiality (JPC)},
     volume={1},
     number={1},
     pages={5},
@@ -245,22 +251,14 @@
     publisher = {Chapman and Hall/CRC},
     year = {2007},
     ISBN = {1584885513},
-    URL = {http://www.amazon.com/Introduction-Modern-Cryptography-Principles-Protocols/dp/1584885513%3FSubscriptionId%3D0JYN1NVW651KCA56C102%26tag%3Dtechkie-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3D1584885513}
 }
 
 @inproceedings{GMW87,
     author = {Goldreich, O. and Micali, S. and Wigderson, A.},
     title = {How to Play ANY Mental Game},
-    booktitle = {Proceedings of the Nineteenth Annual ACM Symposium on Theory of Computing},
-    series = {STOC '87},
+    booktitle = {ACM Symposium on Theory of Computing (STOC) 1987},
     year = {1987},
-    isbn = {0-89791-221-7},
-    location = {New York, New York, USA},
     pages = {218--229},
-    numpages = {12},
-    url = {http://doi.acm.org/10.1145/28395.28420},
-    doi = {10.1145/28395.28420},
-    acmid = {28420},
     publisher = {ACM},
     address = {New York, NY, USA},
 } 
@@ -268,20 +266,13 @@
 @incollection{twohalves,
     title={Two halves make a whole},
     author={Zahur, Samee and Rosulek, Mike and Evans, David},
-    booktitle={Advances in Cryptology-EUROCRYPT 2015},
+    booktitle={Advances in Cryptology (EUROCRYPT)},
     pages={220--250},
     year={2015},
     publisher={Springer}
 }
 
-@inproceedings{justgarble,
-    title={Efficient garbling from a fixed-key blockcipher},
-    author={Bellare, Mihir and Hoang, Viet Tung and Keelveedhi, Sriram and Rogaway, Phillip},
-    booktitle={Security and Privacy (SP), 2013 IEEE Symposium on},
-    pages={478--492},
-    year={2013},
-    organization={IEEE}
-}
+
 
 @inproceedings{faster2pc,
     title={Faster Secure Two-Party Computation Using Garbled Circuits.},
@@ -295,16 +286,16 @@
 @inproceedings{yao86,
   title={How to generate and exchange secrets},
   author={Yao, Andrew},
-  booktitle={Foundations of Computer Science, 1986., 27th Annual Symposium on},
+  booktitle={Foundations of Computer Science 1986},
   pages={162--167},
   year={1986},
   organization={IEEE}
 }
 
 @inproceedings{blazing-fast,
-    title={Blazing fast 2pc in the offline/online setting with security for malicious adversaries},
+    title={Blazing fast 2{PC} in the offline/online setting with security for malicious adversaries},
     author={Lindell, Yehuda and Riva, Ben},
-    booktitle={Proceedings of the 22nd ACM SIGSAC Conference on Computer and Communications Security},
+    booktitle={Conference on Computer and Communications Security (SIGSAC)},
     pages={579--590},
     year={2015},
     organization={ACM}

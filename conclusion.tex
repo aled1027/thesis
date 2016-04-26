@@ -24,7 +24,7 @@ SCMC offers the best improvements when large pieces of data are being chained be
 Since SCMC uses a single link label per piece of data, a 10 by 10 matrix requires the same bandwidth as a 100 by 100 matrix.
 In other words, SCMC makes the online bandwidth of component-based garbled invariant to size of a piece of data but scale linearly with the number of pieces of data (linearly with a small constant).
 
-The second contribution of this thesis is \CompGC, an implementation of component-based garbled circuits in full cryptographically secure system.
+The second contribution of this thesis is \CompGC, an implementation of component-based garbled circuits in a full cryptographically secure system.
 \CompGC performs the entire secure computation protocol from start to finish: the parties perform an offline phase, later select and function in their inputs, and \CompGC returns the output to their function. 
 We timed \CompGC and found that it is the fastest implementation of garbled circuits in the literature.
 
@@ -33,7 +33,7 @@ In the malicious setting, we assume that the parties may lie, in which case the 
 Another area is to expand component-based methods to work with more than two parties.
 The two party setting is a special case, so some theoretical work needs to be done to make component-based methods work with three or more parties.
 
-The goal of secure computation research is make methods that are sufficiently fast, flexible and secure.
+The goal of secure computation research is to make methods that are sufficiently fast, flexible and secure.
 Component-based garbled circuits are a step in this direction: They are faster and generate more flexibility than past garbled circuit protocols.
 By continuing research in this direction, and extending component-based methods to work in stronger security settings, secure computation may soon be a standard part of the internet operations in the real world.
 As data becomes more prevalent and security becomes more important, the demand for secure computation will increase; fortunately, flexible, fast and secure protocols are near.
