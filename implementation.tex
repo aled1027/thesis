@@ -117,7 +117,7 @@ We ran four experiments: AES, CBC mode, and Levenshtein distance with 30 symbols
 In the AES experiment, we treated each round of AES as a separate component. AES has 10 rounds, and hence required linking 10 components. Moreover, we used 128-bit AES, meaning that each component link required linking 128 wires. 
 
 CBC mode is an algorithm for encrypting messages of arbitrary length using a blockcipher, for which we used AES-128. 
-In CBC mode we used two components; we again used a single round of AES as a component, and we also used an XOR component, which took two 128 bit string as input, and outputted the bitwise XOR of those strings.
+In CBC mode we used two components: we again used a single round of AES as a component, and we also used an XOR component, which took two 128 bit string as input, and outputted the bitwise XOR of those strings.
 For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, thus requiring 110 components - 100 AES round components and 10 XOR components. 
 
 Levenshtein distance is a measure of the difference between two strings which counts the minimum number of insertions, deletions or substitutions needed to transform one inputted string into the other inputted string. 

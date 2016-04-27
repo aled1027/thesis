@@ -38,7 +38,7 @@ The computational requirements for the banks, when they compute the function, is
 
 At a coarse level, chaining looks like figure \ref{fig:chaining} where the input to some some garbled components is the output of other garbler components. 
 To chain, or stitch together, two garbled components, the evaluator needs to transform an output wire label of one component into a valid input wire label of another component, while preserving the semantic value of the wires. 
-In figure \ref{fig:chaining} the zeroith output wire of $c_0$, $U_0$, needs to transform into the zeroth input wire of $c_1$, $W_0$. 
+In figure \ref{fig:chaining} the zeroth output wire of $c_0$, $U_0$, needs to transform into the zeroth input wire of $c_1$, $W_0$. 
 
 Chaining, or stitching together two garbled circuits, essentially takes the output wires of one garbled circuits and converts them into valid input wires of another garbled circuit while retaining the semantic value of the input wires.
 Consider figure \ref{fig:chaining} where three output wires of component $c_0$ are chained to three input wires of component $c_1$. 

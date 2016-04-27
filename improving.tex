@@ -54,7 +54,7 @@ When the evaluator evaluates the gate, they use the select bits appended to each
 For example, if the select bits on the end of the input wire labels are 1 and 0, then the evaluator decrypts the third row.
 
 Tables \ref{tbl:point-and-permute} show an example of point and permute.
-$W_i, W_j$ and $W_k$ are wires, where $W_i^0$ and $W_i^1$ are the zeroith and first wire label of wire $W_i$ respectively.
+$W_i, W_j$ and $W_k$ are wires, where $W_i^0$ and $W_i^1$ are the zeroth and first wire label of wire $W_i$ respectively.
 The left table shows the select bits of the input wires $W_i$ and $W_j$.
 The garbler gives $W_i^0$ select bit 0, determining that $W_i^1$ has select bit 1.
 Likewise, the garbler gives $W_j^0$ select bit 1, determining that $W_j^1$ has select bit 0.
@@ -155,7 +155,7 @@ The value of $W_k^0$ is randomly sampled from $\{0,1\}^n$.
         $W_k^1 \gets \Enc_{W_i^0, W_j^1}^{-1}(0^n)$ \\
         \hline
     \end{tabular}
-    \caption[Garbled table with GRR3]{A garbled AND gate using point and permute and garbled row reduction 3}
+    \caption[Garbled table with GRR3]{A garbled AND gate using point and permute and garbled row reduction 3 (GRR3)}
     \label{tbl:grr3}
 \end{table}
 
@@ -300,6 +300,7 @@ If the evaluator should decrypt the ciphertext on the top row (as directed by po
 
 \begin{table}[]
     \centering
+    \footnotesize
     \begin{tabular}{|c|}
         \hline
         Garbled Table for $\sigma_i = 0$ \\
