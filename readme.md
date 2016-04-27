@@ -3,6 +3,8 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 
 ## TODO
 - acknowledgements
+- lowercase single communication multiple connections
+- Free XOR
 
 ## Done
 - single \al in experiments section
