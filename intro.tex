@@ -52,7 +52,7 @@ They are no longer stuck using their original function - they can securely compu
 This thesis is part of a larger project which created component-based garbled circuits; specifically, it contributes two items to the project.
 The first is a new method that improves the efficiency of component-based garbled circuits. 
 The original component-based garbled circuits scheme requires that a ciphertext be communicated per wire chained - in other words, the communication scales linearly with the size of data.
-Our new method, called \textit{Single Communication Multiple Connections} (SCMC), requires a single ciphertext be communicated per block of data instead of per wire. 
+Our new method, called \textit{single communication multiple connections} (SCMC), requires a single ciphertext be communicated per block of data instead of per wire. 
 The communication requirement for chaining is now linear in the number of data objects but is constant in the size of the data object: chaining a $10$ by $10$ matrix has the same bandwidth requirement as chaining a $1,000$ by $1,000$ matrix. 
 This allows for extremely fast computation of large statistical operations. 
 

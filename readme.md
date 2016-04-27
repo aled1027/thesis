@@ -2,11 +2,11 @@
 My senior thesis on multiparty computation (a problem in cryptography). For more info, read the thesis or see my description of the project on my website: [aled1027.github.io](aled1027.github.io).
 
 ## TODO
+
+## Done
 - acknowledgements
 - lowercase single communication multiple connections
 - Free XOR
-
-## Done
 - single \al in experiments section
 - figure captions, check for periods
 - change zeroith to zeroth

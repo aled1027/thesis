@@ -231,7 +231,7 @@ GRR2 is incompatible with Free XOR since it sets $W_k^0$ and $W_k^1$ implicitly 
 Free XOR requires that $W_k^0$ = $W_k^1 \oplus \Delta$ for some global delta, which is not achievable with the randomly constructed polynomials.
 
 GRR2 alters garbler-side computation by having the garbler construct two polynomials instead of encrypting ciphertexts.
-This is slightly more computation than required by FreeXOR and GRR3, but not an undermining amount.
+This is slightly more computation than required by Free XOR and GRR3, but not an undermining amount.
 Evaluator side computation increases slightly, as the evaluator constructs a polynomial instead of decrypting two ciphertexts.
 
 
@@ -267,13 +267,13 @@ Thereby, FleXOR creates an optimization problem: place XOR gates, AND gates and 
 However, FleXOR's optimization problem is computationally expensive, but on the up side, analysis reveals that FleXOR requires on average an extra $0$ or $1$ ciphertext per gate, a relatively small amount.
 That cost comes at the benefit of a Free XOR circuit, and 1 fewer ciphertext for each AND gate.
 
-FleXOR requires slightly more garbler-side computation than FreeXOR and GRR2, since the garbler must create the unary gates.
-The evaluator-side computation is the same as FreeXOR and GRR2, with the additional computation of the unary gates, which is small.
+FleXOR requires slightly more garbler-side computation than Free XOR and GRR2, since the garbler must create the unary gates.
+The evaluator-side computation is the same as Free XOR and GRR2, with the additional computation of the unary gates, which is small.
 The size of the XOR garbled table is zero, and the size of the AND garbled table is two.
 But there is the additional communication of the unary gates' garbled tables.
 The garbled table of the unary gate has $2$ ciphertexts, and the number of unary gates depends on the circuit.
 
-FleXOR is intuitively secure, since the only additional information beyond GRR2 and FreeXOR is the unary gates.
+FleXOR is intuitively secure, since the only additional information beyond GRR2 and Free XOR is the unary gates.
 The unary gate is secure, since it functions the same as a normal garbled gate except with a single input wire.
 
 \section{Half Gates}
