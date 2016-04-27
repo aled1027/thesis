@@ -11,13 +11,13 @@ In particular, many input labels are communicated via oblivious transfer which i
 We discuss improvements to oblivious transfer at the end of this chapter. 
 
 New techniques also reduce the size of the garbled table, the other information exchanged between the garbler and evaluator.\footnote{In Chapter 2, Alice was the garbler and Bob was the evaluator. 
-For clarity in Chapter 3 and beyond, the term \textit{garbler} to allude to the person who garbles the circuit, and the term \textit{evaluator} to describe the person who evaluates, or decrypts, the garbled circuit.}
+For clarity in Chapter 3 and beyond, the term \textit{garbler} is used to allude to the person who garbles the circuit, and the term \textit{evaluator} is used to describe the person who evaluates, or decrypts, the garbled circuit.}
 In the classical garbled circuit scheme, the evaluator sends all four rows of the garble table to the evaluator.
 New techniques, wherein the garbler cleverly chooses wire labels, reduce the number of rows of the garbled table that are communicated.
 Reducing the size of the garbled table is important, because it is a measure of the bandwidth requirement of the scheme.
-The garbled table amount to most of the communication, and the number of garbled tables scales with the size of the circuit - that is, a larger circuit means more gates means more garbled tables.
-Moreover, bandwidth is the most important factor in assessing the performance of a garbled circuit scheme.
-This is because communication over the internet is slower than local computation.
+Most communication is spent exchanging the garbled tables, and the number of garbled tables scales with the size of the circuit - that is, a larger circuit means more gates means more garbled tables.
+Hence, any reduction is the size of the garbled circuit translates into a notable reduction in bandwidth.
+It turns out that bandwidth is the most important factor in assessing the performance of a garbled circuit scheme because communication over the internet is slower than local computation.
 
 We also consider garbler-side computation, which is the number of encryptions that the garbler performs in preparing a garbled table.
 In the classical garbled circuit scheme, the garbler performs four encryptions; however, new techniques do not substantially reduce this number.
@@ -62,7 +62,7 @@ Likewise, the garbler gives $W_j^0$ select bit 1, determining that $W_j^1$ has s
 The garbler then permutes the garbled table based on the select bits. 
 The permuted table is shown on the left in table \ref{tbl:point-and-permute}.
 When evaluating this gate, the evaluator has $W_i^*$ and $W_j^*$ with select bits $b_i$ and $b_j$.
-The evaluator decrypts the ciphertext in the row corresponding $b_i$ and $b_j$.
+The evaluator decrypts the ciphertext in the row corresponding to $b_i$ and $b_j$.
 
 Intuitively, point and permute is secure because the select bits are independent of the truth value (also known as semantic value) of the wires.
 Thus it is secure for the garbler to permute the table based on the select bits, and it secure for the garbler to send the select bits to the evaluator.
@@ -168,9 +168,9 @@ Evaluator-side computation is the same as point and permute: the evaluator perfo
 Finally, GRR3 reduces the size of the garbled table from $4$ ciphertexts to $3$ ciphertexts, a $25\%$ reduction in bandwidth.
 
 \section{Free XOR}
-The Free XOR technique makes the computation of XOR gates free, in the sense that no garbled table need to be communicated \cite{freexor}.
+The Free XOR technique makes the computation of XOR gates free, in the sense that no garbled table needs to be communicated \cite{freexor}.
 The evaluator can compute $W_k^*$ from only $W_i^*$ and $W_j^*$.
-Like GRR3, the Free XOR techniques takes advantage of carefully crafted wire labels, even input wires.
+Like GRR3, the Free XOR technique takes advantage of carefully crafted wire labels, even input wires.
 
 To start, the garbler randomly samples a ciphertext $\Delta$ from $\{0,1\}^n$.
 For each input wire $W_i$, let $W_i^0$ be randomly sampled from $\{0,1\}^n$ as before, and set $W_i^1 = W_i^0 \oplus \Delta$.
@@ -199,13 +199,13 @@ With this notation, we can rewrite the above equations succinctly as
 
 Free XOR is compatible with point and permute and GRR3; however, since XOR does not require a garbled table, GRR3 is only used on AND gates.
 
-One interesting implication of using the Free XOR technique is that an added assumption must be made to our encryption algorithm.
-Since $\Delta$ is part of the key and part of the the payload\footnote{The payload is the value that is being encrypted} of the encryption algorithm, the encryption algorithm must be secure under the circularity assumption.
+One interesting implication of using the Free XOR technique is that an added assumption must be made in our encryption algorithm.
+Since $\Delta$ is part of the key and part of the the payload\footnote{The payload is the value that is being encrypted.} of the encryption algorithm, the encryption algorithm must be secure under the circularity assumption.
 Fortunately, the popular encryption scheme AES-128 is presumed to be secure under the circularity assumption.
 
 Free XOR dramatically reduces bandwidth, and because XOR gates are relatively cheaper than AND gates, circuits with more XOR gates perform faster.
 Many programs have been made to optimize the number of XOR gates and minimize the number of AND gates in a circuit (while minimizing the size of the entire circuit of course).
-The Free XOR technique reduces garbler-side computation: constructing the xor garbled table does not require three encryptions and one decryption.
+The Free XOR technique reduces garbler-side computation: constructing the XOR garbled table does not require three encryptions and one decryption.
 It likewise reduces evaluator-side computation  since XOR gates do not require any decryption. 
 The biggest benefit is undoubtedly that XOR gates do not require a garbled table.
 
@@ -232,7 +232,7 @@ Free XOR requires that $W_k^0$ = $W_k^1 \oplus \Delta$ for some global delta, wh
 
 GRR2 alters garbler-side computation by having the garbler construct two polynomials instead of encrypting ciphertexts.
 This is slightly more computation than required by FreeXOR and GRR3, but not an undermining amount.
-Evaluator side computation increases slightly, as the evaluator constructs a polynomial instead of of decrypting two ciphertexts.
+Evaluator side computation increases slightly, as the evaluator constructs a polynomial instead of decrypting two ciphertexts.
 
 
 \section{FleXOR}
