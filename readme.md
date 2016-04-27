@@ -7,6 +7,7 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 - acknowledgements
 - check section titles - some not capitalized
 - figure captions, check for periods
+- change zeroith to zeroth
 
 ## Done
 * finish bib (finish TODO)
