@@ -1,7 +1,7 @@
 %!TEX root = thesis.tex
 
 \chapter{Cryptographic Primitives}
-Secure computation is a cryptographic technique for securely a function between two parties.
+Secure computation is a cryptographic technique for securely computing a function between two parties.
 We split secure computation into two cases: cases where there are two parties involved, referred to as two-party computation (2PC), and cases where there are three or more parties, referred to as multiparty computation (MPC).
 This thesis focuses on 2PC protocols, but many of the methods are applicable to MPC as well.
 
@@ -10,7 +10,7 @@ In order to understand 2PC, it is not crucial to understand how the cryptographi
 This first chapter will give an overview of the cryptographic primitives used in 2PC protocols.
 
 \section{Introducing Cryptographic Security} 
-The goal of this section is to explain cryptographic security, starting at an intuitive level and moving outward. 
+The goal of this section is to explain cryptographic security, starting at an intuitive level and moving into more complex ideas. 
 We do not present cryptographic security in a comprehensive fashion; rather, we explain cryptographic security with the goal of explaining 2PC protocols and their security.
 For more information on cryptographic security, we encourage the reader to peruse \cite{katzlindelltextbook}. 
 
@@ -19,27 +19,26 @@ A \textit{cryptographic scheme} is a series of instructions designed to perform 
 An \textit{adversary} is an algorithm that tries to \textit{break} the scheme. 
 If an adversary \textit{breaks} a scheme, then the adversary has learned information about inputs to the scheme that they shouldn't. 
 
-The goal of defining security in cryptography is to build a formal definition that matches real world needs and intuitions. 
+One aim of defining security in cryptography is to build a formal definition that matches real world needs and intuitions. 
 A good starting place is to consider perfect security. 
 A scheme is perfectly secure if no matter what the adversary does, they cannot break the scheme.
 Even if the adversary has unlimited computational power, in terms of time and space, an adversary cannot break a perfectly secure scheme. 
 
-However, perfect security is not the most useful way to think of security, because it forces schemes to be slow and communication intensive.
+However, perfect security is not the most useful way to think of security, because it forces schemes to be slow and communication-intensive.
 We relax the definition of security by requiring that the adversary run in polynomial time. 
-This substantially reduces the power of the adversary, and it matches our intuition. 
-We are really only concerned with what adversaries can reasonably achieve, as opposed to what is theoretically possible. 
+This substantially reduces the power of the adversary, and it matches our intuition: we are really only concerned with what adversaries can reasonably achieve, as opposed to what is theoretically possible. 
 
 Because computers have improved drastically over the years, what was previously considered a reasonable adversary is not what is considered a reasonable adversary today. 
 Modern computing advances have created easy access to faster computation, meaning that modern adversaries can solve harder problems than they could in previous years. 
 As a concrete example, consider giving an adversary the following problem: find the factors of $N$. 
 The average computer today can solve the problem for a larger $N$ than the average computer could a decade ago.
 
-The changing computational power highlights the importance of being able to scale how hard a cryptographic scheme is to break.
+The changing computational power highlights the importance of being able to scale how hard it is to break a cryptographic scheme.
 To this end, we introduce a \textit{security parameter}, denoted as $\lambda$.
 A security parameter is a positive integer that represents how hard a scheme is to break; a larger security parameter should mean that the scheme is more difficult to break. 
 More specifically, the security parameter is correlated to the input size of the problem underlying the cryptographic scheme. 
-For example, if the underlying problem is factoring large number $N$, then $\lambda$ is the number of bits needed to express $N$ in binary, that is, $\lambda = |N|$.
-As $N$ and $\lambda$ scale up, the factoring problem becomes more difficult and the scheme becomes hard to break. 
+For example, if the underlying problem is factoring a large number $N$, then $\lambda$ is the number of bits needed to express $N$ in binary, that is, $\lambda = |N|$.
+As $N$ and $\lambda$ scale up, the factoring problem becomes more difficult and the scheme becomes harder to break. 
 
 Finally, we acknowledge that adversaries have access to some random values, hence we strengthen adversaries to be probabilistic algorithms. 
 Probabilistic means that the algorithms have access to a string of uniform random bits, with the implication being that the algorithm is capable of guessing. 
@@ -72,8 +71,7 @@ Since $2^{- \lambda}$ is a negligible function, we say that the adversary has a 
 
 In summary, we model an adversary as a probabilistic polynomial-time algorithm. 
 This limits the computational power of the adversary to what is reasonably computable in reality. 
-Moreover, we can scale the security of a scheme or problem by changing $\lambda$, the security parameter. 
-A higher security parameter makes the scheme more difficult to break. 
+Moreover, we can scale the security of a scheme or problem by changing $\lambda$, the security parameter, where a higher security parameter makes the scheme more difficult to break. 
 
 \section{Encryption}
 
@@ -158,10 +156,10 @@ Therefore the adversary can break the $\Enc$ experiment if they can break the DK
 This section introduces the idea of computational indistinguishability. 
 We do not use computational indistinguishability immediately, but it will important later for defining security of a 2PC protocol.
 
-Informally, two probability distribution are indistinguishable if no probabilistic polynomial-time algorithm can tell them apart.
+Informally, two probability distributions are indistinguishable if no probabilistic polynomial-time algorithm can tell them apart.
 The thought experiment is like this: an algorithm knows that there are two distributions.
 It samples from one of the distributions.
-If the algorithm correctly determines which distribution it was given, then it wins, otherwise the algorithm loses.
+If the algorithm correctly determines which distribution it was given, then it wins, and otherwise the algorithm loses.
 The algorithm, since it must run in polynomial time, can only sample a polynomial number of values from the distributions.
 
 Formally, computational indistinguishability is:
@@ -176,7 +174,7 @@ $\mathcal{X}$ and $\mathcal{Y}$ are computationally indistinguishable, denoted $
 \cite{katzlindelltextbook}.
 \end{definition}
 
-We quickly break down the definition.
+We break down the definition.
 The unary input $1^n$ tells the algorithm $D$ to run in polynomial time in $n$.
 The probability distributions $X_n$ and $Y_n$ are restricted by $n$, which in this context is the security parameter.
 The phrases $x \gets X_n$ and $y \gets Y_n$ mean that the probability is taken over samples from the distributions.
@@ -259,7 +257,7 @@ x & y & $x < y$ \\ \hline
 Oblivious Transfer (OT) is a simple, useful protocol that underlies many more complicated crypto-systems \cite{EGL82, Rab05}.
 
 Figure \ref{fig:basic-ot} outlines the high level idea of oblivious transfer.
-The box in figure \ref{fig:basic-ot} may be thought of as a trusted post office.
+The box labeled OT in figure \ref{fig:basic-ot} may be thought of as a trusted post office.
 Alice potentially sends two messages $m_0$ and $m_1$ to Bob, but instead of sending the messages to Bob, she sends the messages to the post office.
 Bob, without seeing either $m_0$ or $m_1$, knows that he wants $m_b$ where $b \in \{0,1\}$, so he notifies the post office that he wants message $b$.
 With this information, the post office gives Bob $m_b$.
@@ -267,4 +265,4 @@ We want two secure properties to hold: (1) Alice does not know whether Bob recei
 
 We will not focus on the internal operations of oblivious transfer; for our purposes, it is a secure black box.
 When we use oblivious transfer in the next chapter, the two messages that Alice potentially sends will be encryption keys, and Bob will select a key that corresponds to his input - a value that he doesn't want Alice to know.
-In Chapter 3 we discuss improvements to oblivious transfer, since oblivious transfer, despite its simple appearance, is computationally expensive.
+In Chapter 3 we will discuss improvements to oblivious transfer, since oblivious transfer, despite its simple appearance, is computationally expensive.

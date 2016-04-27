@@ -5,6 +5,8 @@ My senior thesis on multiparty computation (a problem in cryptography). For more
 - dedication
 - single \al in experiments section
 - acknowledgements
+- check section titles - some not capitalized
+- figure captions, check for periods
 
 ## Done
 * finish bib (finish TODO)
