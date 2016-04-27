@@ -9,7 +9,7 @@ This chapter describes the creation of \CompGC and presents experimental results
 
 \section{\CompGC}
 
-\CompGC was constructed over the period of 5 months in the programming language C. 
+\CompGC was constructed over the period of five months in the programming language C. 
 It consists of approximately $5,000$ lines of code, includes a submodule, \LibGarble, and includes python scripts to generate auxiliary files. 
 
 \CompGC started with \JustGarble as its basic building block.
@@ -36,7 +36,7 @@ In the online phase, the evaluator begins by loading the function to be computed
 We specify the function in a JSON format, in which the following information is laid out: components needed in the function, how components input and output wires are linked, where inputs should go, and what wires are outputs. 
 We chose to use JSON because the file format is human readable, but a different format, such as a binary format, would be faster. 
 As the functions become more complex, it becomes harder to write the function specification files. 
-To overcome this, I wrote a python script that automatically generates the function specification file for various functions on arbitrary inputs. 
+To overcome this, I wrote a python script that automatically generates the function specification file for various functions with arbitrary size input. 
 
 After the garbler loads the function specification file from disk, it generates a set of instructions for the evaluator. 
 The instructions specify what components are used by naming them with the unique identification number assigned in the offline phase. 
@@ -105,29 +105,22 @@ Algorithms \ref{alg:garbler-online} and \ref{alg:evaluator-online} summarize the
 \end{algorithm}
 
 \section{Experiments}
-\CompGC experiments were run on an Intel Core i5-4210H CPU. 
-They were conducted over two network settings. 
-The first network setting ran both parties on the default localhost configuration, which was measured to have a latency of 0.012 ms and bandwidth of 25.2 Gb per second. 
-The second network setting used the built in Linux network emulator {\sf netem} to configure localhost to mimic the latency and bandwidth of the internet. 
-This included setting latency to 33 ms and bandwidth to 50 Mbits per second. 
-Finally, \CompGC requires reading from disk; our experimental machine was measured to have cache reads speed of 6.7 GB per second and buffered disk reads speed of 96 MB per second.
-
 We ran four experiments: AES, CBC mode, and Levenshtein distance with 30 symbols and with 60 symbols. 
 
 In the AES experiment, we treated each round of AES as a separate component. AES has 10 rounds, and hence required linking 10 components. Moreover, we used 128-bit AES, meaning that each component link required linking 128 wires. 
 
 CBC mode is an algorithm for encrypting messages of arbitrary length using a blockcipher, for which we used AES-128. 
-In CBC mode we used two components: we again used a single round of AES as a component, and we also used an XOR component, which took two 128 bit string as input, and outputted the bitwise XOR of those strings.
+In CBC mode we used two components: we again used a single round of AES as a component, and we also used an XOR component, which took two 128 bit strings as input, and outputted the bitwise XOR of those strings.
 For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, thus requiring 110 components - 100 AES round components and 10 XOR components. 
 
-Levenshtein distance is a measure of the difference between two strings which counts the minimum number of insertions, deletions or substitutions needed to transform one inputted string into the other inputted string. 
+Levenshtein distance is a measure of the difference between two strings which counts the minimum number of insertions, deletions and substitutions needed to transform one inputted string into the other inputted string. 
 The most popular algorithm for computing Levenshtein distance is a dynamic program that runs in $\Theta(n^2)$. 
 The algorithm is  two nested for loops where we run a procedure called \textit{Levenshtein-core} inside the inner for loop. 
 Levenshtein-core takes five inputs - three distance values and two symbols - and it computes a new distance based on those five values.
 For more information on the Levenshtein distance algorithm, we refer the reader to \cite{wiki-leven}. 
 
 For our Levenshtein experiment, we use the Levenshtein-core circuit as our only component; see figure \ref{fig:leven-core} for a description of the component.
-If Levenshtein is being run on $n$-bit inputs, then we use $n^2$ Levenshtein-core components. 
+If Levenshtein is being run on $n$-symbol inputs, then we use $n^2$ Levenshtein-core components. 
 Our experiment used an 8-bit alphabet and ran Levenshtein distance on strings of length 30 symbols and on strings of length 60 symbols, corresponding to 900 and 3600 components respectively. 
 
 \begin{figure}
@@ -141,25 +134,33 @@ Our experiment used an 8-bit alphabet and ran Levenshtein distance on strings of
 
 \section{Results}
 
-We ran experiments on the \CompGC system to compare component-based garbled circuits to standard 2PC garbled circuits, and to compare standard component-based garbled circuits to SCMC.
+In this section we present the results of the experiments.
 After I wrote \CompGC and setup the code for experiments, I sent the code to Alex Malozemoff who ran the experiments.
+
+The experiments were run on an Intel Core i5-4210H CPU. 
+They were conducted over two network settings. 
+The first network setting ran both parties on the default localhost configuration, which was measured to have a latency of 0.012 ms and bandwidth of 25.2 Gb per second. 
+The second network setting used the built in Linux network emulator {\sf netem} to configure localhost to mimic the latency and bandwidth of the internet. 
+This included setting latency to 33 ms and bandwidth to 50 Mbits per second. 
+Finally, \CompGC requires reading from disk; our experimental machine was measured to have cache reads speed of 6.7 GB per second and buffered disk reads speed of 96 MB per second.
+
 
 Table \ref{tbl:results} shows the online evaluator computation time, including time to load data from disk, of standard 2PC garbled circuits (implemented inside of the \CompGC system) and component-based garbled circuits with SCMC.
 We give the average time of 100 trials and the 95\% confidence interval.
-We see that larger circuits - Levenshtein 60 - offer more time savings than smaller circuits - AES; this is expected, since standard garbled circuits require that the entire circuit is communicated during online time, whereas the component-based garbled circuits sends the circuit during the offline phase. 
+We see that larger circuits - Levenshtein 60 - offer more time savings than smaller circuits - AES; this is expected, since standard garbled circuits require that the entire circuit is communicated during online time, whereas component-based garbled circuits send the circuit during the offline phase. 
 
-Table \ref{tbl:results-no-load} shows the same timing as table \ref{tbl:results} except we remove the time spent loading from disk.
+Table \ref{tbl:results-no-load} shows the same timings as table \ref{tbl:results} except we remove the time spent loading from disk.
 Since \CompGC employs an offline phase, data is loaded from disk in the online phase. 
 Table \ref{tbl:results-no-load} can be misleading - in what application do we assume that data is preloaded into RAM?
 We include table \ref{tbl:results-no-load} because the literature often reports these times \cite{blazing-fast}. 
 The times do have merit, as they highlight how CPU-bound the computation is, as opposed to measuring reading-from-disk speed, which can vary widely and is not something over which algorithm creators or programmers have much control. 
 
-Table \ref{tbl:results-scmc} compares the speed of standard component based garbled circuits to SCMC.
+Table \ref{tbl:results-scmc} compares the speed of standard component-based garbled circuits to SCMC.
 We see approximately a 2x improvement for all of the experiments. 
 However, these experiments do not highlight the benefit of SCMC. 
 SCMC offers the greatest benefits in a large circuit where a large number of wires are used to represent a section of data.
 Levenshtein distance, while a large circuit, has a small data-size: the data size of 60 symbol Levenshtein is only 6 bits. 
-Consider circuits where an entire matrix is moved around between circuits; for example, linking a 10 by 10 matrix uses $800$ link labels if entries in the matrix were between $0$ and $256$, but SCMC uses a single link label.
+Consider circuits where an entire matrix is moved around between circuits; for example, linking a 10 by 10 matrix uses $800$ link labels if entries in the matrix are between $0$ and $256$, but SCMC uses a single link label.
 
 \newpage
 \input{table-results}

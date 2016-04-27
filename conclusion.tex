@@ -15,17 +15,17 @@ In the latter case, communicating a garbled circuit during the online phase is s
 To solve this problem we propose component-based garbled circuits.
 Component-based garbled circuits break a large function up into its smaller components.
 In the offline phase, the parties exchange the smaller components, and then in the online phase, the parties stitch, or chain, together the pre-exchanged components into a function of their choosing.
-With component-based garbled circuits, the function to be computed may be selected in the online phase without the cost of cost of sending a garbled circuit.
+With component-based garbled circuits, the function to be computed may be selected in the online phase without the cost of sending a garbled circuit.
 
-Component-based garbled circuits is the the work of a larger project, in which this thesis contributes two specific items. 
-The first contribution is Single Communication Multiple Connections (SCMC), a method for improving component-based garbled circuits.
-SCMC cleverly chooses input wire labels and output wire labels to have a predictable pattern, such that fewer link labels are exchanged during the online phase to stitch together the garbled components.
+Component-based garbled circuits are the the work of a larger project, to which this thesis contributes two specific items. 
+The first contribution is single communication multiple connections (SCMC), a method for improving component-based garbled circuits.
+SCMC cleverly chooses input wire labels and output wire labels to have a predictable pattern, such that fewer link labels are exchanged during the online phase.
 SCMC offers the best improvements when large pieces of data are being chained between garbled components.
 Since SCMC uses a single link label per piece of data, a 10 by 10 matrix requires the same bandwidth as a 100 by 100 matrix.
 In other words, SCMC makes the online bandwidth of component-based garbled invariant to size of a piece of data but scale linearly with the number of pieces of data (linearly with a small constant).
 
 The second contribution of this thesis is \CompGC, an implementation of component-based garbled circuits in a full cryptographically secure system.
-\CompGC performs the entire secure computation protocol from start to finish: the parties perform an offline phase, later select and function in their inputs, and \CompGC returns the output to their function. 
+\CompGC performs the entire secure computation protocol from start to finish: the parties perform an offline phase, later select a function and their inputs, and \CompGC returns the output to their function. 
 We timed \CompGC and found that it is the fastest implementation of garbled circuits in the literature.
 
 Future work in the area of component-based garbled circuits should focus on adapting component-based methods to the malicious setting.
@@ -34,6 +34,6 @@ Another area is to expand component-based methods to work with more than two par
 The two party setting is a special case, so some theoretical work needs to be done to make component-based methods work with three or more parties.
 
 The goal of secure computation research is to make methods that are sufficiently fast, flexible and secure.
-Component-based garbled circuits are a step in this direction: They are faster and generate more flexibility than past garbled circuit protocols.
-By continuing research in this direction, and extending component-based methods to work in stronger security settings, secure computation may soon be a standard part of the internet operations in the real world.
+Component-based garbled circuits are a step in this direction: they are faster and offer more flexibility than past garbled circuit protocols.
+By continuing research in this direction, and extending component-based methods to work in stronger security settings, secure computation may soon be a standard part of internet operations.
 As data becomes more prevalent and security becomes more important, the demand for secure computation will increase; fortunately, flexible, fast and secure protocols are near.
