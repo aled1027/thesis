@@ -16,7 +16,7 @@ We discuss \CompGC in detail in Chapter 5.
 \section{History}
 The goal to reduce online computation by using an offline phase is not a new goal.
 In Chapter 3, we discuss oblivious transfer preprocessing, a method that moves most of the work involved in oblivious transfer to an offline stage \cite{Bea95}. 
-In the research of Malicious garbled circuits, researchers improve the online efficiency of cut-and-choose by using an offline phase \cite{HKK14, LR14, blazing-fast}.
+In the research of malicious garbled circuits, researchers improve the online efficiency of cut-and-choose by using an offline phase \cite{HKK14, LR14, blazing-fast}.
 Moreover, research in non-garbled circuit two party computation uses similar ideas in \cite{DPSZ12, NNOB12}. 
 
 Most similar to component-based garbled circuits is a technique called \textit{partial garbled circuits} proposed by Mood et al. \cite{MGBF14}. 
@@ -32,24 +32,21 @@ They compute each component individually, linking wire labels from one component
 
 Imagine that two banks integrate secure computation into their daily transactions.
 At night when activity is low, the banks' servers exchange many garbled circuits, and then during the day, they use the pre-exchanged garbled circuits to quickly perform secure computation.
-The computational requirements for the banks, when they compute the function, is only to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
+The computational requirements for the banks, when they compute the function, is to exchange input labels and for the evaluator-bank to evaluate the garbled circuit, while, importantly, the banks preserve the ability to choose their inputs and the function to be computed at the time of the computation. 
 
 \input{figure-chaining}
 
 At a coarse level, chaining looks like figure \ref{fig:chaining} where the input to some some garbled components is the output of other garbler components. 
 To chain, or stitch together, two garbled components, the evaluator needs to transform an output wire label of one component into a valid input wire label of another component, while preserving the semantic value of the wires. 
 In figure \ref{fig:chaining} the zeroth output wire of $c_0$, $U_0$, needs to transform into the zeroth input wire of $c_1$, $W_0$. 
-
-Chaining, or stitching together two garbled circuits, essentially takes the output wires of one garbled circuits and converts them into valid input wires of another garbled circuit while retaining the semantic value of the input wires.
-Consider figure \ref{fig:chaining} where three output wires of component $c_0$ are chained to three input wires of component $c_1$. 
-We specifically desire that the evaluator transform $U_0^0$ into $W_0^0$ and $U_0^1$ into $W_0^1$. 
+We specifically desire that the evaluator transforms $U_0^0$ into $W_0^0$ and $U_0^1$ into $W_0^1$. 
 
 \input{figure-chaining2}
 
 To achieve this transformation, the garbler sends the evaluator a link label.
-A link label is a ciphertext that allows the evaluator to transform the output wire label into the appropriate wire label. 
-Suppose that the garbling uses Free XOR where each component uses the same $\Delta$, that is, $U_0^0 \oplus U_0^1 = W_0^0 \oplus W_0^1 = \Delta$, then it is sufficient for the link label $L_{UW}$ to be $U_0^0 \oplus W_0^0$.
-The evaluator xors the output wire label $U_0^*$ with $L_{UW}$ to acquire $W_0^*$, a valid input label for wire $W_0$. 
+A link label is a ciphertext that allows the evaluator to transform the output wire label into the appropriate input wire label. 
+Suppose that the garbling scheme uses Free XOR where each component uses the same $\Delta$, that is, $U_0^0 \oplus U_0^1 = W_0^0 \oplus W_0^1 = \Delta$, then it is sufficient for the link label $L_{UW}$ to be $U_0^0 \oplus W_0^0$.
+The evaluator xors the output wire label $U_0^*$ with $L_{UW}$ to acquire $W_0^*$, a valid wire label for wire $W_0$. 
 
 We show this computation below; the value $u_0 \in \{0,1\}$ is the semantic value of wire $U_0$.
 For information on this notation, see section 3.5. 
@@ -72,14 +69,14 @@ The discussion above explains why link label $L_{u_i w_j}$ is sufficient for lin
 The $\Eval$ algorithm evaluates the garbled components and links garbled circuits where necessary.
 It takes three inputs: a list of a garbled components $\{c_i\}$, linking labels $\{L_{ij}\}$ and input labels $\{W_i\}$, and it outputs output labels $\{Z_i\}$. 
 $\Eval$ starts with the inputs, and then proceeds component by component, evaluating each component in order to get the component output wire labels.
-Where necessary, $\Eval$ uses component output wire labels and link labels to compute the appropriate input label for later components. 
+Where necessary, $\Eval$ uses component output wire labels and link labels to compute the appropriate input wire label for later components. 
 Once all components are evaluated, $\Eval$ recovers the garbled outputs $\{Z_i\}$ from the output components, and uses $d$ for that component to recover the real output $y$. 
 
 Let us think about how the two banks who use secure computation in their daily operations employ the three algorithms.
 At night, during the offline stage, the garbler-bank generates many circuit components, garbles them with $\Garble$, and sends the garbled circuits to the other evaluator-bank. 
 The garbler-bank and evaluator-bank also perform the offline phase of OT-preprocessing.
 During the day, when the banks decide that they want to securely compute some function $f$, the garbler-bank runs $\Link$ on the components used in $f$ to generate the link labels, which the garbler-bank subsequently sends to the evaluator-bank.
-The garbler and evaluator also exchange wire labels, some via online OT-preprocessing. 
+The garbler-bank and evaluator-bank also exchange wire labels, some via online OT-preprocessing. 
 Now that the evaluator-bank has the garbled components, link labels and input labels, they run $\Eval$, recovering the output of the function.
 
 \section{Security of Component-Based Garbled Circuits}
@@ -102,14 +99,14 @@ We think through the security of the evaluator, party 2, using \textit{hybrids},
 A hybrid argument begins by imagining the protocol in the real world. 
 The aim is to show that the real world protocol is computationally indistinguishable from the ideal world. 
 To achieve this, we rely on the fact that computational indistinguishability is transitive, that is if for worlds $X, Y$ and $Z$ such that $X \compindist Y \compindist Z$, we know that $X \compindist Z$. 
-The hybrid argument starts with the real world, makes a small incremental change to the world to make it more similar to the ideal world.
-Then we take the modified world, and make another small change to make the world more similar to the ideal world. 
+The hybrid argument starts with the real world and makes a small incremental change to make it more similar to the ideal world.
+Then we take the modified world and make another small change such that it is more similar to the ideal world. 
 Eventually, the world that we are operating with is the ideal world. 
 If at every step, we prove that the previous world is computationally indistinguishable from the next world, then by the transitivity of computationally indistinguishability, we have shown that the real world is computationally indistinguishable from the ideal world. 
 
 We start with the real world protocol, in which the evaluator has the following information: pre-garbled components $\{GC_i\}_{i = 0}^{|\Components|}$, input labels $\{W_j^{x_j}\}_{j \in \Inputs(C)}$, output map $d_{C_{out}}$ and link labels $\{L_{ij}\}_{i,j \in \Components}$.
 We first suppose that garbler, instead of sending correct link labels, sends garbage, random values for link labels. 
-Yes, this will prevent Bob from recovering the correct output, but correctness is irrelevant when we are reasoning about security; we are only concerned with the information that Bob can access. 
+Yes, this will prevent Bob from recovering the correct output, but correctness is irrelevant when we are reasoning about security; we are only concerned with the information that Bob can infer. 
 We now ask the question: is the real world computationally indistinguishable from the world where Bob receives incorrect link labels?
 Or worded more accessibly: does Bob learn any more information from correct wire labels than he does from garbage wire labels?
 We argue, without proof, that Bob does not learn any more information because (1) the link labels are encrypted so they look like garbage to Bob anyways, and (2) Bob cannot use the link labels with other pieces of data, such as input wire labels of the garbled circuits, to gain information. 
@@ -128,20 +125,20 @@ A formal proof is long, many pages long, and beyond the scope of this project; r
 
 \section{Single Communication Multiple Connections}
 
-The previous method of chaining garbled circuits was presented to me, and I was asked to implement the ideas in a program (see Chapter 5) as part of a larger research project. 
+At the begining of my thesis project, I was presented naive component-based garbled circuits, and I was asked to implement the ideas in a program (see Chapter 5) as part of a larger research project. 
 In this midst of writing the program, I discovered a method to improve the efficiency of chaining. 
-In this section I discuss my theoretical contribution to component-based garbled circuits:  \textit{Single Communication Multiple Connections}.
+In this section I discuss my theoretical contribution to component-based garbled circuits:  \textit{single communication multiple connections}.
 
-Single Communication Multiple Connections (SCMC) is a technique that improves upon naive component-based garbled circuits for some functions by observing that large sequences of consecutive wires often represent a single element of data, like a string, number or matrix. 
+Single communication multiple connections (SCMC) is a technique that improves upon naive component-based garbled circuits for some functions by observing that large sequences of consecutive wires often represent a single element of data, like a string, number or matrix. 
 When large sequences of consecutive wires are mapped between garbled components, the sequence of consecutive wires is mapped together - the order of the wires is preserved. 
 SCMC takes advantage of this fact by requiring that only a single link label is communicated for each sequence of consecutive wires, as opposed to one link label per wire. 
-This technique is analogous to SIMD-style (single instruction multiple data) computation that is used in homomorphic encryption \cite{SV11} and GMW-based two party computation \cite{DSZ15, SZ13} in that a single piece of communication, or instruction, is used for multiple links, or data. 
+This technique is analogous to SIMD-style (single instruction multiple data) computation that is used in homomorphic encryption \cite{SV11} and GMW-based two party computation \cite{DSZ15, SZ13} in that a single piece of communication, or a single instruction, is used for multiple links, or data. 
 
 As with most improvements to garbled circuits, SCMC operates by modifying the generation of wire labels. 
 Wire labels that are part of a block representing a single piece of data are generated in a fixed, patterned way such that the differences between linked labels will be the same for all wires in a block. 
 
 SCMC modifies the $\Garble$ algorithm by choosing input wires and output wires in a particular way. 
-For every component, we first choose three random labels $A,B$ and $T$: $A$ and $B$ are the base values for input wires and output wires respectively, and $T$ is a tweak value, ensuring security for the hash function.
+For every component, we first choose three random labels $A,B$ and $T$: $A$ and $B$ are the base values for input wires and output wires respectively, and $T$ is a tweak value, ensuring security for the random oracle.
 We next assume that all parties have access to a random oracle $H$. 
 A random oracle is a theoretically perfect random function, which on input of any value $x \in \{0,1\}^*$, returns a value from $\{0,1\}^{\lambda}$ selected uniformly at random.
 In practice, we use a hash function for $H$. 
@@ -159,7 +156,7 @@ Evaluation is the same as naive component-based garbled circuits, wherein the ev
 
 \subsection{Analysis}
 SCMC substantially reduces the amount of communication required for chaining. 
-For example, if AES is being computed where the components are single AES rounds, then SCMC requires only $9$ link labels to be communicated between the garbler and evaluator; naive component-based garbled circuits requires $1152$ labels. 
+For example, if AES is being computed where the components are single AES rounds, then SCMC requires only $9$ link labels to be communicated between the garbler and evaluator; in contrast, naive component-based garbled circuits requires $1152$ labels. 
 
 The milage of SCMC varies based on the function being computed and components being used. 
 SCMC offers the most benefits to functions that are modular, and where large amounts of data are being passed around, like matrix-based functions and dynamic algorithms like Levenshtein distance. 
