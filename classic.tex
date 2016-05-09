@@ -9,7 +9,7 @@ We then describe garbled circuits and discuss their security.
 \section{2PC Security Motivation}
 Think back to Alice and Bob from the introduction. 
 Alice and Bob are millionaires who wish to determine who is wealthier without disclosing how much wealth they have.
-More formally, Alice has input $x$ and Bob has input $y$ ($x$ and $y$ are integers corresponding to the wealth of each party), and they wish to compute the less than function $f$, such that 
+More formally, Alice has input $x$ and Bob has input $y$ ($x$ and $y$ are integers corresponding to the wealth of each party), and they wish to compute the \textit{less than} function $f$, such that 
 \begin{equation}
     \label{less-than}
 f(x,y) = \left\{
@@ -51,7 +51,7 @@ There are two primary security settings: the semi-honest setting and the malicio
 
 The work presented in this thesis uses the semi-honest setting. 
 In the semi-honest setting, we assume that each party obeys the protocol but tries to learn as much as possible from the information they are given.
-This means that parties do not lie about their information, they do not abort, do not send out of order, do not withhold messages or deviate in any way from what is specified in the protocol. 
+This means that parties do not lie about their information, they do not abort, do not send messages out of order, do not withhold messages or deviate in any way from what is specified in the protocol. 
 In contrast, the malicious setting considers that each party is liable to lie and cheat; parties can take any action to learn more information.
 
 The malicious setting is often more realistic. 
@@ -209,7 +209,7 @@ Alice now wants to send Bob $W_2^{y_0}$ and $W_3^{y_1}$, but she does not know a
 Alice and Bob can achieve this by using Oblivious Transfer, as described in Chapter 1.
 As an example, we look at wire $W_2$.
 Alice potentially sends $W_2^0$ and $W_2^1$ to Bob.
-Alice only wants Bob to acquire one of the values, because otherwise he can decrypt multiple rows garbled table.
+Alice only wants Bob to acquire one of the values, because otherwise he can decrypt multiple rows of the garbled table.
 Bob wants to receive $W_2^{y_0}$, as that wire label corresponds to his input.
 In terms of the post office metaphor from Chapter 1, Alice gives $W_2^0$ and $W_2^1$ to the post office, and Bob notifies the post office that he wants message $y_0$.
 The post office gives $W_2^{y_0}$ to Bob, but does not tell Bob anything about $W_2^{1 - y_0}$ and does not tell Alice which message Bob requested. 
@@ -220,7 +220,7 @@ Bob has everything he needs to evaluate, or decrypt, the circuit.
 Bob starts with gate $G_0$, for which he has the fourth column of $T_{G_0}$, a wire label for wire $W_0$, which I denote $W_0^*$ since Bob does not know which wire label it is, and $W_1^*$ accordingly.
 Bob starts with the first row of $T_{G_0}$ and tries decrypting the value using $W_0^*$ and $W_1^*$.
 Formally, Bob tries $\EncInv_{W_0^*, W_1^*}(T_{G_0}\big[0\big])$ where $T_{G_0}\big[0\big]$ represents the value in the zeroth row of $T_{G_0}$.
-Bob tries decrypting the values in all four rows of the garbled table $T_{G_0}$, but only one should work, since the other decryptions using the incorrect keys.
+Bob tries decrypting the values in all four rows of the garbled table $T_{G_0}$, but only one should work, since the other decryptions use incorrect keys.
 
 For Bob to recognize that encryption is failing, we add an additional property to the encryption scheme: the output of the decryption algorithm should indicate whether the decryption was valid.
 The decryption algorithm outputs a single additional bit, where 1 indicates that decryption was successful and 0 indicates that decryption failed, i.e., that keys or ciphertext were invalid.
@@ -322,8 +322,9 @@ However, a formal proof of garbled circuits is long and beyond the scope of this
 There are three things to think about when considering the complexity of garbled circuits.
 The first is the amount of information that needs to be communicated per gate.
 Garbled circuits require 4 ciphertexts, that is $4\lambda$ bits.
-On top of this communication is Alice sending her input labels, and the communication required to complete OT for Bob's input labels.
-OT, if used naively, is a significant contributor to overall bandwidth.
+
+Alice and Bob also exchange wire labels of input wires, but this communication is not per gate; rather, it scales with the number of inputs to the function.
+Regardless, it is important to consider that Alice and Bob use OT to communicate Bob's input labels, and OT, if used naively, is a significant contributor to overall bandwidth.
 
 The second thing to consider is the amount of computation that Alice performs.
 Alice performs 4 encryptions with a dual-key cipher for each gate.

@@ -10,7 +10,7 @@ This chapter describes the creation of \CompGC and presents experimental results
 \section{\CompGC}
 
 \CompGC was constructed over the period of five months in the programming language C. 
-It consists of approximately $5,000$ lines of code, includes a submodule, \LibGarble, and includes python scripts to generate auxiliary files. 
+It consists of approximately $5,000$ lines of code, includes a submodule, \LibGarble, and includes Python scripts to generate auxiliary files. 
 
 \CompGC started with \JustGarble as its basic building block.
 \JustGarble is a C-library written by Bellare et al. \cite{justgarble} that creates a garbled circuit given an inputted circuit, and evaluates the garbled circuit given input labels. 
@@ -19,7 +19,7 @@ It is a tool, supporting only garbling and evaluating operations, but does not p
 I later replaced \JustGarble with \LibGarble, an improvement of \JustGarble, which was implemented by my colleague Alex Malozemoff.
 \LibGarble made a number of improvements to \JustGarble, including cleaning up the API and improving the memory layout of  data-structures.
 These improvements contributed to a substantial increase in performance: evaluating AES uses 17 cycles per gate in \LibGarble versus 22 cycles per gate in \JustGarble, a 22\% improvement. 
-\LibGarble also adds the newest cryptographic technique, half-gates; however, \CompGC does not use half-gates since half-gates reduces the size of the garbled table at the cost of a single call to the hash function during evaluation. 
+\LibGarble also adds the newest cryptographic technique, half-gates; however, \CompGC does not use half-gates since half-gates reduce the size of the garbled table at the cost of a single call to the hash function during evaluation. 
 In the component-based garbled circuit setting, the garbled tables are communicated during offline time, and we are most concerned with online time when the hash function would be called; hence half-gates actually reduce performance.
 
 \CompGC has an offline and an online phase. 
@@ -33,10 +33,10 @@ The garbler finishes by saving the input labels and oblivious transfer data to d
 Algorithms \ref{alg:garbler-offline} and \ref{alg:evaluator-offline} show the steps taken by each party in the offline phase. 
 
 In the online phase, the evaluator begins by loading the function to be computed from disk. 
-We specify the function in a JSON format, in which the following information is laid out: components needed in the function, how components input and output wires are linked, where inputs should go, and what wires are outputs. 
+We specify the function in a JSON format, in which the following information is laid out: which components are used in the function, how components input and output wires are linked, where inputs should go, and what wires are outputs. 
 We chose to use JSON because the file format is human readable, but a different format, such as a binary format, would be faster. 
 As the functions become more complex, it becomes harder to write the function specification files. 
-To overcome this, I wrote a python script that automatically generates the function specification file for various functions with arbitrary size input. 
+To overcome this, I wrote a Python script that automatically generates the function specification file for various functions with arbitrary size input. 
 
 After the garbler loads the function specification file from disk, it generates a set of instructions for the evaluator. 
 The instructions specify what components are used by naming them with the unique identification number assigned in the offline phase. 
@@ -115,7 +115,7 @@ For our experiment, we ran CBC mode on a 10 block message, a 1,280 bit string, t
 
 Levenshtein distance is a measure of the difference between two strings which counts the minimum number of insertions, deletions and substitutions needed to transform one inputted string into the other inputted string. 
 The most popular algorithm for computing Levenshtein distance is a dynamic program that runs in $\Theta(n^2)$. 
-The algorithm is  two nested for loops where we run a procedure called \textit{Levenshtein-core} inside the inner for loop. 
+The algorithm is  two nested \textit{for} loops where we run a procedure called \textit{Levenshtein-core} inside the inner \textit{for} loop. 
 Levenshtein-core takes five inputs - three distance values and two symbols - and it computes a new distance based on those five values.
 For more information on the Levenshtein distance algorithm, we refer the reader to \cite{wiki-leven}. 
 
@@ -127,7 +127,7 @@ Our experiment used an 8-bit alphabet and ran Levenshtein distance on strings of
     \center
     \includegraphics[scale=0.3]{images/leven_core}
     \caption[Levenshtein-core component]{The Levenshtein-core component used in the Levenshtein distance algorithm. 
-    Levenshtein distance is a dynamic algorithm, and this is the only component used. 
+    Levenshtein distance is a dynamic program, and this is the only component used. 
     This particular version of Levenshtein-core was designed by \cite{faster2pc}.}
     \label{fig:leven-core}
 \end{figure}

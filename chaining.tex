@@ -25,7 +25,7 @@ To achieve this, Mood et al. use two link labels per connection, whereas we use 
 
 \section{Naive Component-Based Garbled Circuits}
 Component-based garbled circuits begin with the observation that most functions are composed of many smaller components. 
-For example, many statistical operations are a composition of matrix operations; Smith-Waterman and Levenshtein distance, two algorithms important to analyzing genomes, are dynamic algorithm that run a single procedure inside a for loop; and encrypting arbitrary length messages via modes of operation repeats the encryption algorithm a number of times.
+For example, many statistical operations are a composition of matrix operations; Smith-Waterman and Levenshtein distance, two algorithms important to analyzing genomes, are dynamic programs that run a single procedure inside a \textit{for} loop; and encrypting arbitrary length messages via modes of operation repeats the encryption algorithm a number of times.
 The gist of component-based garbled circuits is then to build and communicate many small, garbled components in the offline stage.
 Later, in the online stage, the garbler and evaluator combine the pre-communicated components to form a larger function. 
 They compute each component individually, linking wire labels from one component to another as needed. 
@@ -105,7 +105,7 @@ Eventually, the world that we are operating with is the ideal world.
 If at every step, we prove that the previous world is computationally indistinguishable from the next world, then by the transitivity of computationally indistinguishability, we have shown that the real world is computationally indistinguishable from the ideal world. 
 
 We start with the real world protocol, in which the evaluator has the following information: pre-garbled components $\{GC_i\}_{i = 0}^{|\Components|}$, input labels $\{W_j^{x_j}\}_{j \in \Inputs(C)}$, output map $d_{C_{out}}$ and link labels $\{L_{ij}\}_{i,j \in \Components}$.
-We first suppose that garbler, instead of sending correct link labels, sends garbage, random values for link labels. 
+We first suppose that the garbler, instead of sending correct link labels, sends garbage, random values for link labels. 
 Yes, this will prevent Bob from recovering the correct output, but correctness is irrelevant when we are reasoning about security; we are only concerned with the information that Bob can infer. 
 We now ask the question: is the real world computationally indistinguishable from the world where Bob receives incorrect link labels?
 Or worded more accessibly: does Bob learn any more information from correct wire labels than he does from garbage wire labels?
@@ -158,16 +158,16 @@ Evaluation is the same as naive component-based garbled circuits, wherein the ev
 SCMC substantially reduces the amount of communication required for chaining. 
 For example, if AES is being computed where the components are single AES rounds, then SCMC requires only $9$ link labels to be communicated between the garbler and evaluator; in contrast, naive component-based garbled circuits requires $1152$ labels. 
 
-The milage of SCMC varies based on the function being computed and components being used. 
-SCMC offers the most benefits to functions that are modular, and where large amounts of data are being passed around, like matrix-based functions and dynamic algorithms like Levenshtein distance. 
+The advantage gained from SCMC varies based on the function being computed and components being used. 
+SCMC offers the most benefits to functions that are modular, and where large amounts of data are being passed around, like matrix-based functions and dynamic programs like Levenshtein distance. 
 When using SCMC, online bandwidth does not scale with an increase in data size. 
-SCMC requires that a single link label being communicated for a 2 by 2 matrix and for a 1,000 by 1,000 matrix. 
+SCMC requires that a single link label be communicated for a 2 by 2 matrix and for a 1,000 by 1,000 matrix. 
 Thereby, SCMC greatly improves the speed of securely computing large statistical computations, such as those that might be performed by hospitals or on genomes. 
 
 The security of SCMC follows directly from the security of naive component-based garbled circuits. 
 The wire labels again do not offer any information, so a similar hybrid proof works in the SCMC setting as well. 
 There is a caveat: SCMC uses a new method of generating wire labels. 
-This is secure since $H$ is random function, hence $H(\cdot)$ blinds $A$ and $B$; in particular, the wire labels are only distinguishable if the evaluator can determine $T$, which is not possible since $H$ is a random oracle.
+This is secure since $H$ is a random function, hence $H(\cdot)$ blinds $A$ and $B$; in particular, the wire labels are only distinguishable if the evaluator can determine $T$, which is not possible since $H$ is a random oracle.
 Therefore, SCMC is secure. 
 
 

@@ -44,7 +44,7 @@ Finally, we acknowledge that adversaries have access to some random values, henc
 Probabilistic means that the algorithms have access to a string of uniform random bits, with the implication being that the algorithm is capable of guessing. 
 
 In order to reason about the security of cryptographic schemes, it is useful to think about breaking a scheme in terms of a probability. 
-For example, we want to be able to say that the best adversary, that is best probabilistic polynomial-time algorithm, has some probability $p$ of breaking the scheme. 
+For example, we want to be able to say that the best adversary, that is the best probabilistic polynomial-time algorithm, has some probability $p$ of breaking the scheme. 
 We note that $p$ is nonzero, since the adversary can always guess and be right with some nonzero probability. 
 To achieve a probability based formalism, we introduce a negligible function.
 Informally, a negligible function is smaller than the reciprocal of all polynomial functions.
@@ -243,7 +243,7 @@ x & y & $x < y$ \\ \hline
 1 & 0 & 0 \\ \hline
 1 & 1 & 0 \\ \hline
 \end{tabular}
-    \caption{Logical table of the less than function. See equation \ref{less-than}.}
+    \caption{Logical table of the \textit{less than} function. See equation \ref{less-than}.}
 \end{table}
 
 \section{Oblivious Transfer}

@@ -14,8 +14,8 @@ However, that method has many disadvantages, one being that they need to trust a
 What if there were a method that allows Alice and Bob to determine who is wealthier by only sending messages between themselves?
 
 This classic problem is known as the \textit{millionaire problem}, and it is a special case of \textit{secure computation}.
-Secure computation gives multiple parties the ability to jointly to compute an arbitrary function, while keeping each party's input private from all other parties.
-In the millionaire problem, there are two parties, Alice and Bob, and they wish to compute the less than function.
+Secure computation gives multiple parties the ability to jointly compute an arbitrary function, while keeping each party's input private from all other parties.
+In the millionaire problem, there are two parties, Alice and Bob, and they wish to compute the \textit{less than} function.
 
 We generalize secure computation to allow for an arbitrary number of parties to compute an arbitrary function amongst themselves. 
 By generalizing secure computation, we open up many possible uses where secure computation can improve an existing process or allow for computations that are otherwise impossible or illegal. 
@@ -33,7 +33,7 @@ For most of that period, garbled circuit protocols were too slow and cumbersome 
 
 In order to further increase the speed of garbled circuits, researchers split the garbled circuit protocol into two phases, an offline phase and an online phase.
 In the offline phase, before the two parties determine their inputs to the function, the parties exchange as much information as feasible. 
-later, when the parties decide to compute the function, and they determine determine their inputs to the function, the parties engage in an online phase, where they exchange more information and finish the garbled circuit protocol, whereby they recover the output to their function.
+Later, when the parties decide to compute the function, and they determine determine their inputs to the function, the parties engage in an online phase, where they exchange more information and finish the garbled circuit protocol, whereby they recover the output to their function.
 Using an offline/online protocol greatly reduces the latency of the computation - the time that it takes to go from determining inputs to acquiring an answer.
 
 The offline/online system, while offering a number of benefits, is also limiting in that the function is determined ahead of time in the offline phase.
@@ -44,7 +44,7 @@ They cannot pivot and compute the new function without large computational sacri
 
 This thesis presents a new method called \textit{component-based} garbled circuits to solve this problem.
 In the offline phase, instead of exchanging information corresponding to a single function, Alice and Bob exchange smaller pieces of information that can be stitched together to compute a class of functions.
-For example, instead of exchanging a garbled circuit that computes the ``who is wealthier'' function, Alice and Bob exchange many garbled circuits which are \textit{components} or subparts of the less than function and other similar functions.
+For example, instead of exchanging a garbled circuit that computes the ``who is wealthier'' function, Alice and Bob exchange many garbled circuits which are \textit{components} or subparts of the \textit{less than} function and other similar functions.
 Then, during the online phase, Alice and Bob select the function that they wish to compute from the class of available functions, and build their function by \textit{chaining} pre-exchanged components.
 With component-based garbled circuits, Alice and Bob have more flexibility. 
 They are no longer stuck using their original function - they can securely compute a host of functions at their whim. 
